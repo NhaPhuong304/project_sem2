@@ -1,0 +1,148 @@
+/* Task row colors */
+.row-green {
+  -fx-background-color: #e8f5e9;
+}
+.row-red {
+  -fx-background-color: #ffebee;
+}
+.row-yellow {
+  -fx-background-color: #fffde7;
+}
+
+/* Message badge */
+.badge {
+  -fx-background-color: #e53935;
+  -fx-text-fill: white;
+  -fx-background-radius: 10;
+  -fx-padding: 2 6 2 6;
+  -fx-font-size: 11px;
+}
+
+/* Task status badges */
+.status-pending {
+  -fx-background-color: #e0e0e0;
+  -fx-text-fill: #424242;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+.status-inprogress {
+  -fx-background-color: #e3f2fd;
+  -fx-text-fill: #1565c0;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+.status-reviewing {
+  -fx-background-color: #fff3e0;
+  -fx-text-fill: #e65100;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+.status-revising {
+  -fx-background-color: #fce4ec;
+  -fx-text-fill: #880e4f;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+.status-completed {
+  -fx-background-color: #e8f5e9;
+  -fx-text-fill: #1b5e20;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+
+/* Sidebar buttons */
+.sidebar-btn {
+  -fx-background-color: transparent;
+  -fx-alignment: CENTER_LEFT;
+  -fx-padding: 8 16 8 16;
+  -fx-font-size: 13px;
+  -fx-cursor: hand;
+}
+.sidebar-btn:hover {
+  -fx-background-color: rgba(0, 0, 0, 0.08);
+}
+.sidebar-btn-active {
+  -fx-background-color: #bbdefb;
+  -fx-font-weight: bold;
+  -fx-border-color: transparent transparent transparent #1565c0;
+  -fx-border-width: 0 0 0 4;
+}
+
+.clickable-avatar {
+  -fx-cursor: hand;
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 8, 0.2, 0, 1);
+}
+
+.splash-progress {
+  -fx-accent: #1565c0;
+}
+
+.splash-progress > .track {
+  -fx-background-color: #dbe8f6;
+  -fx-background-radius: 999;
+}
+
+.splash-progress > .bar {
+  -fx-background-color: linear-gradient(to right, #29b6f6, #1565c0);
+  -fx-background-radius: 999;
+  -fx-padding: 0.2em;
+}
+
+/* Primary action button */
+.btn-primary {
+  -fx-background-color: #1565c0;
+  -fx-text-fill: white;
+  -fx-background-radius: 4;
+  -fx-cursor: hand;
+}
+.btn-primary:hover {
+  -fx-background-color: #0d47a1;
+}
+
+/* Table action buttons */
+.table-action-button {
+  -fx-font-size: 11px;
+  -fx-padding: 4 8 4 8;
+  -fx-cursor: hand;
+}
+
+.project-status-green {
+  -fx-background-color: #e8f5e9;
+  -fx-text-fill: #1b5e20;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+
+.project-status-yellow {
+  -fx-background-color: #fff8e1;
+  -fx-text-fill: #f57f17;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+
+.project-status-red {
+  -fx-background-color: #ffebee;
+  -fx-text-fill: #b71c1c;
+  -fx-background-radius: 4;
+  -fx-padding: 2 8 2 8;
+}
+
+.task-table .table-row-cell:selected {
+  -fx-background-color: rgb(29, 234, 234);
+}
+
+.task-table .table-row-cell.row-green:selected {
+  -fx-background-color: rgb(29, 234, 234);
+}
+
+.task-table .table-row-cell.row-red:selected {
+  -fx-background-color: rgb(29, 234, 234);
+}
+
+.task-table .table-row-cell.row-yellow:selected {
+  -fx-background-color: rgb(29, 234, 234);
+}
+
+.task-table .table-row-cell:selected .table-cell {
+  -fx-background-color: transparent;
+}

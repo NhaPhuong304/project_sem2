@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="620" prefWidth="880" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.student.MyTaskListController">
+
+    <Label fx:id="projectNameLabel" layoutX="20" layoutY="20" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Cong viec cua toi" />
+
+    <Button fx:id="addTaskBtn" layoutX="20" layoutY="55" text="+ Them cong viec" visible="false" />
+
+    <TableView fx:id="taskTable" layoutX="20" layoutY="95" prefHeight="500" prefWidth="840" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="95.0">
+        <columns>
+            <TableColumn fx:id="titleColumn" prefWidth="180.0" text="Tieu de" />
+            <TableColumn fx:id="estimatedTimeColumn" prefWidth="230.0" text="Thoi gian DK" />
+            <TableColumn fx:id="statusColumn" prefWidth="110.0" text="Trang thai" />
+            <TableColumn fx:id="assignedToColumn" prefWidth="130.0" text="Nguoi thuc hien" />
+            <TableColumn fx:id="reviewedByColumn" prefWidth="189.7142333984375" text="Nguoi kiem tra" />
+            <TableColumn fx:id="revisionNoteColumn" prefWidth="160.5714111328125" text="Noi dung chinh sua" />
+            <TableColumn fx:id="actionColumn" prefWidth="200.0" text="Hanh dong" />
+        </columns>
+    </TableView>
+</AnchorPane>

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/mail.properties:*)",
+      "Bash(mvn compile:*)",
+      "Bash(sed -i '' 's/case GREEN -> getStyleClass\\(\\).add\\(\"\"row-green\"\"\\);/case GREEN: getStyleClass\\(\\).add\\(\"\"row-green\"\"\\); break;/g' /Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/controller/staff/TaskListController.java)",
+      "Bash(sed -i '' 's/case RED -> getStyleClass\\(\\).add\\(\"\"row-red\"\"\\);/case RED: getStyleClass\\(\\).add\\(\"\"row-red\"\"\\); break;/g' /Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/controller/staff/TaskListController.java)",
+      "Bash(sed -i '' 's/case YELLOW -> getStyleClass\\(\\).add\\(\"\"row-yellow\"\"\\);/case YELLOW: getStyleClass\\(\\).add\\(\"\"row-yellow\"\"\\); break;/g' /Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/controller/staff/TaskListController.java)",
+      "Bash(sed -i '' 's/default -> {}/default: break;/g' /Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/controller/staff/TaskListController.java)",
+      "Bash(__NEW_LINE_5dfce5dbe0ef13d3__ sed:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}

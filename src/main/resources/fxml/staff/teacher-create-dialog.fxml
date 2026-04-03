@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.staff.TeacherCreateDialogController"
+            prefWidth="430" prefHeight="210">
+
+    <Label text="Username:" layoutX="20" layoutY="28" />
+    <TextField fx:id="usernameField" layoutX="130" layoutY="24" prefWidth="260" />
+
+    <Label text="Ho ten:" layoutX="20" layoutY="74" />
+    <TextField fx:id="fullNameField" layoutX="130" layoutY="70" prefWidth="260" />
+
+    <Label text="Email:" layoutX="20" layoutY="120" />
+    <TextField fx:id="emailField" layoutX="130" layoutY="116" prefWidth="260" />
+
+    <Label text="Mat khau mac dinh: 123" layoutX="130" layoutY="162"
+           style="-fx-text-fill: #616161; -fx-font-size: 11px;" />
+</AnchorPane>
