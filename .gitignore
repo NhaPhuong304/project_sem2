@@ -1,1 +1,7 @@
-/target/
+# Eclipse project files
+.classpath
+.project
+.settings/
+
+# Claude AI config
+.claude/

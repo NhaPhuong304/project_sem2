@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.student.TaskCreateDialogController"
+            prefWidth="520" prefHeight="360">
+
+    <Label text="Tieu de:" layoutX="20" layoutY="20" />
+    <TextField fx:id="titleField" layoutX="140" layoutY="16" prefWidth="340" />
+
+    <Label text="Mo ta:" layoutX="20" layoutY="60" />
+    <TextArea fx:id="descriptionArea" layoutX="140" layoutY="56" prefWidth="340" prefHeight="70" />
+
+    <Label text="Ngay bat dau:" layoutX="20" layoutY="145" />
+    <DatePicker fx:id="startDatePicker" layoutX="140" layoutY="141" prefWidth="160" />
+
+    <Label text="Gio bat dau:" layoutX="315" layoutY="145" />
+    <TextField fx:id="startTimeField" layoutX="390" layoutY="141" prefWidth="90" text="00:00" />
+
+    <Label text="Ngay ket thuc:" layoutX="20" layoutY="190" />
+    <DatePicker fx:id="endDatePicker" layoutX="140" layoutY="186" prefWidth="160" />
+
+    <Label text="Gio ket thuc:" layoutX="315" layoutY="190" />
+    <TextField fx:id="endTimeField" layoutX="390" layoutY="186" prefWidth="90" text="23:59" />
+
+    <Label text="Nguoi thuc hien:" layoutX="20" layoutY="235" />
+    <ComboBox fx:id="assignedCombo" layoutX="140" layoutY="231" prefWidth="340" />
+
+    <Label text="Nguoi kiem tra:" layoutX="20" layoutY="280" />
+    <ComboBox fx:id="reviewerCombo" layoutX="140" layoutY="276" prefWidth="340" />
+</AnchorPane>
