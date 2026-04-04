@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.staff.TaskListController"
+            prefWidth="880" prefHeight="600">
+
+    <TableView fx:id="taskTable"
+               layoutX="10" layoutY="10"
+               prefWidth="860" prefHeight="580"
+               AnchorPane.topAnchor="10.0"
+               AnchorPane.rightAnchor="10.0"
+               AnchorPane.bottomAnchor="10.0"
+               AnchorPane.leftAnchor="10.0">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Tieu de" prefWidth="180.0" />
+            <TableColumn fx:id="estimatedTimeColumn" text="Du kien" prefWidth="250.0" />
+            <TableColumn fx:id="actualTimeColumn" text="Thuc te" prefWidth="250.0" />
+            <TableColumn fx:id="statusColumn" text="Trang thai" prefWidth="110.0" />
+            <TableColumn fx:id="assignedToColumn" text="Nguoi thuc hien" prefWidth="170.0" />
+            <TableColumn fx:id="reviewedByColumn" text="Nguoi kiem tra" prefWidth="130.0" />
+            <TableColumn fx:id="createdByColumn" text="Nguoi giao viec" prefWidth="130.0" />
+            <TableColumn fx:id="latestRevisionColumn" text="Noi dung chinh sua" prefWidth="180.0" />
+            <TableColumn fx:id="actionColumn" text="Hanh dong" prefWidth="160.0" />
+        </columns>
+    </TableView>
+</AnchorPane>
