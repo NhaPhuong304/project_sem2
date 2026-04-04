@@ -1,1 +1,13 @@
-/target/
+# Eclipse project files
+.classpath
+.project
+.settings/
+
+# Maven
+target/
+
+# uploads (optional)
+uploads/avatars/
+
+# Claude AI config
+.claude/
