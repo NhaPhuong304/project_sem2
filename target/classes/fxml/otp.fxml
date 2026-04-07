@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.OtpController"
+            prefWidth="500" prefHeight="450">
+
+    <Label text="Xac thuc OTP"
+           layoutX="170" layoutY="30"
+           style="-fx-font-size: 20; -fx-font-weight: bold;" />
+
+    <Label text="Ma OTP da duoc gui den:" layoutX="80" layoutY="90" />
+    <Label fx:id="emailLabel" text="a***@gmail.com" layoutX="80" layoutY="110"
+           style="-fx-font-weight: bold;" />
+
+    <Label text="Nhap ma OTP (6 chu so):" layoutX="80" layoutY="150" />
+    <TextField fx:id="otpField" layoutX="80" layoutY="170" prefWidth="340" />
+
+    <Button fx:id="resendBtn" text="Gui lai"
+            layoutX="80" layoutY="215" prefWidth="120" />
+    <Label fx:id="countdownLabel" text="" layoutX="220" layoutY="220" />
+    <Label fx:id="expiryLabel" text="" layoutX="80" layoutY="242"
+           style="-fx-text-fill: #666666;" />
+
+    <Label text="Mat khau moi:" layoutX="80" layoutY="282" />
+    <PasswordField fx:id="newPasswordField" layoutX="80" layoutY="302" prefWidth="340" />
+
+    <Label text="Xac nhan mat khau moi:" layoutX="80" layoutY="342" />
+    <PasswordField fx:id="confirmPasswordField" layoutX="80" layoutY="362" prefWidth="340" />
+
+    <Button fx:id="confirmBtn" text="Xac nhan"
+            layoutX="180" layoutY="405" prefWidth="140" prefHeight="36" />
+</AnchorPane>

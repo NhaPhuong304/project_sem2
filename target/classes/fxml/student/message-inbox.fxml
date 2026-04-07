@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.student.MessageInboxController"
+            prefWidth="880" prefHeight="620">
+
+    <Label text="Hop thu den"
+           layoutX="20" layoutY="20"
+           style="-fx-font-size: 16; -fx-font-weight: bold;" />
+
+    <ListView fx:id="messageList"
+              layoutX="20" layoutY="55"
+              prefWidth="400" prefHeight="540" />
+
+    <TextArea fx:id="messageDetailArea" text="Chon tin nhan de xem noi dung..."
+              layoutX="440" layoutY="55"
+              prefWidth="420" prefHeight="540"
+              editable="false" wrapText="true"
+              style="-fx-text-fill: #757575; -fx-background-color: transparent; -fx-control-inner-background: white; -fx-border-color: transparent; -fx-focus-color: transparent; -fx-faint-focus-color: transparent;" />
+</AnchorPane>

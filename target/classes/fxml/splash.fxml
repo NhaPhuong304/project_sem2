@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="500.0" style="-fx-background-color: linear-gradient(to bottom, #f8fbff, #e3f2fd);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.SplashController">
+
+    <ImageView fx:id="logoImageView" fitHeight="240.0" fitWidth="300.0" layoutX="100.0" layoutY="70.0" preserveRatio="true" smooth="true">
+        <image>
+            <Image url="@/images/aptech.png" />
+        </image>
+    </ImageView>
+
+    <Label layoutX="66.0" layoutY="175.0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0d47a1;" text="Project Management System - Aptech" />
+
+    <Label layoutX="187.0" layoutY="220.0" style="-fx-font-size: 13px; -fx-text-fill: #546e7a;" text="Khoi dong he thong..." />
+
+    <ProgressBar fx:id="loadingProgressBar" layoutX="60.0" layoutY="272.0" prefHeight="16.0" prefWidth="380.0" progress="0.0" styleClass="splash-progress" />
+
+    <Label fx:id="progressLabel" layoutX="232.0" layoutY="300.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1565c0;" text="0%" />
+</AnchorPane>
