@@ -88,7 +88,6 @@ public class AccountService {
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException ignored) {
-            // Khong fail toan bo flow neu xoa file cu khong thanh cong.
         }
     }
 

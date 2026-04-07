@@ -43,6 +43,7 @@ public class SceneManager {
     public static final String MY_TASK_ACTION_CELL = "/fxml/student/my-task-action-cell.fxml";
     public static final String TASK_CREATE_DIALOG = "/fxml/student/task-create-dialog.fxml";
     public static final String MESSAGE_INBOX     = "/fxml/student/message-inbox.fxml";
+    public static final String STUDENT_TRANSFER_DIALOG = "/fxml/staff/student-transfer-dialog.fxml";
 
     public static void switchScene(Stage stage, String fxmlPath) throws IOException {
         FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
