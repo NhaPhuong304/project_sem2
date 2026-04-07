@@ -7,19 +7,30 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400" prefWidth="500" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.LoginController">
+<AnchorPane prefHeight="400" prefWidth="500"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.LoginController">
 
-    <Label layoutX="150" layoutY="40" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Dang nhap He thong" />
+    <Label layoutX="150" layoutY="40"
+           style="-fx-font-size: 20; -fx-font-weight: bold;"
+           text="Dang nhap He thong" />
 
     <Label layoutX="80" layoutY="120" text="Ten dang nhap:" />
     <TextField fx:id="usernameField" layoutX="80" layoutY="140" prefWidth="340" />
 
     <Label layoutX="80" layoutY="180" text="Mat khau:" />
-    <PasswordField fx:id="passwordField" layoutX="80" layoutY="200" prefWidth="340" />
 
-    <Label fx:id="errorLabel" layoutX="80" layoutY="240" prefWidth="340" style="-fx-text-fill: red;" visible="false" />
+    <PasswordField fx:id="passwordField" layoutX="80" layoutY="200" prefWidth="300" />
+    <TextField fx:id="visiblePasswordField" layoutX="80" layoutY="200" prefWidth="300" visible="false" managed="false" />
+    <Button fx:id="togglePasswordBtn" layoutX="390" layoutY="200" prefHeight="26" prefWidth="30" text="👁" />
 
-    <Button fx:id="loginBtn" layoutX="180" layoutY="270" prefHeight="36" prefWidth="140" text="Dang nhap" />
+    <Label fx:id="errorLabel" layoutX="80" layoutY="240" prefWidth="340"
+           style="-fx-text-fill: red;" visible="false" />
 
-    <Hyperlink fx:id="forgotPasswordLink" layoutX="200.0" layoutY="313.0" text="Quen mat khau?" />
+    <Button fx:id="loginBtn" layoutX="180" layoutY="270"
+            prefHeight="36" prefWidth="140" text="Dang nhap" />
+
+    <Hyperlink fx:id="forgotPasswordLink" layoutX="200" layoutY="313"
+               text="Quen mat khau?" />
 </AnchorPane>

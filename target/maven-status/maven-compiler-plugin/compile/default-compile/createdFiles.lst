@@ -1,6 +1,7 @@
 com\aptech\projectmgmt\controller\staff\ClassCreateDialogController.class
 com\aptech\projectmgmt\service\StaffService.class
 com\aptech\projectmgmt\controller\staff\StudentListController$5.class
+com\aptech\projectmgmt\controller\staff\StudentManagementController$9.class
 com\aptech\projectmgmt\controller\student\MyTaskListController$11.class
 com\aptech\projectmgmt\util\NotificationUtil.class
 com\aptech\projectmgmt\controller\student\MessageInboxController$1.class
@@ -101,6 +102,7 @@ com\aptech\projectmgmt\model\Student.class
 com\aptech\projectmgmt\controller\staff\ProjectDetailController$6.class
 com\aptech\projectmgmt\controller\student\MyTaskActionCellController.class
 com\aptech\projectmgmt\controller\staff\TaskListController$TaskDetailData.class
+com\aptech\projectmgmt\controller\staff\StudentTransferDialogController$1.class
 com\aptech\projectmgmt\controller\student\MyTaskListController$9.class
 com\aptech\projectmgmt\controller\staff\TaskListController$5.class
 com\aptech\projectmgmt\controller\student\MyProjectListController$1.class
@@ -109,6 +111,7 @@ com\aptech\projectmgmt\model\TaskAbandonLog.class
 com\aptech\projectmgmt\controller\staff\GroupDetailController$5.class
 com\aptech\projectmgmt\controller\staff\StudentListController$2.class
 com\aptech\projectmgmt\controller\OtpController$1.class
+com\aptech\projectmgmt\controller\staff\StudentTransferDialogController.class
 com\aptech\projectmgmt\util\AlertUtil.class
 com\aptech\projectmgmt\controller\staff\StudentManagementController$1.class
 com\aptech\projectmgmt\controller\staff\ProjectListController$6.class
@@ -140,12 +143,15 @@ com\aptech\projectmgmt\controller\staff\TaskListController$9.class
 com\aptech\projectmgmt\model\Message.class
 com\aptech\projectmgmt\repository\OtpRepository.class
 com\aptech\projectmgmt\service\MailService.class
+com\aptech\projectmgmt\controller\staff\StudentManagementController$5.class
 com\aptech\projectmgmt\service\StudentService.class
 com\aptech\projectmgmt\controller\staff\ProjectCreateDialogController$1.class
 com\aptech\projectmgmt\model\Project.class
 com\aptech\projectmgmt\controller\staff\ProjectDetailController$5.class
+com\aptech\projectmgmt\controller\staff\StudentManagementController$8.class
 com\aptech\projectmgmt\repository\BaseRepository.class
 com\aptech\projectmgmt\model\SchoolClass.class
+com\aptech\projectmgmt\controller\staff\StudentTransferDialogController$2.class
 com\aptech\projectmgmt\controller\staff\TeacherListController.class
 com\aptech\projectmgmt\controller\staff\TeacherListController$3.class
 com\aptech\projectmgmt\controller\staff\ClassListController$2.class
@@ -162,6 +168,7 @@ com\aptech\projectmgmt\controller\staff\TeacherListController$2.class
 com\aptech\projectmgmt\service\OtpService.class
 com\aptech\projectmgmt\controller\staff\StaffDashboardController.class
 com\aptech\projectmgmt\service\MessageService.class
+com\aptech\projectmgmt\controller\staff\StudentManagementController$7.class
 com\aptech\projectmgmt\AppLauncher.class
 com\aptech\projectmgmt\controller\SplashController.class
 com\aptech\projectmgmt\controller\staff\StudentAssignDialogController$2.class
@@ -169,6 +176,7 @@ com\aptech\projectmgmt\repository\GroupRepository.class
 com\aptech\projectmgmt\service\ClassService.class
 com\aptech\projectmgmt\service\MailService$1.class
 com\aptech\projectmgmt\controller\staff\ProjectDetailController$7.class
+com\aptech\projectmgmt\controller\staff\StudentManagementController$6.class
 com\aptech\projectmgmt\controller\staff\TeacherListController$1.class
 com\aptech\projectmgmt\model\OtpVerification.class
 com\aptech\projectmgmt\service\AuthException.class
