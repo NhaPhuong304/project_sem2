@@ -10,45 +10,51 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
 
-    private final AccountRepository accountRepository = new AccountRepository();
-    private final StudentRepository studentRepository = new StudentRepository();
-    private final StaffRepository staffRepository = new StaffRepository();
+	private final AccountRepository accountRepository = new AccountRepository();
+	private final StudentRepository studentRepository = new StudentRepository();
+	private final StaffRepository staffRepository = new StaffRepository();
 
-    public Account login(String username, String password) {
-        Account account = accountRepository.findByUsername(username);
-        if (account == null || !account.isActive()) {
-            throw new AuthException("Tai khoan khong ton tai");
-        }
-        if (!BCrypt.checkpw(password, account.getPasswordHash())) {
-            throw new AuthException("Sai mat khau");
-        }
+	public Account login(String username, String password) {
+		Account account = accountRepository.findByUsername(username);
 
-        SessionManager sessionManager = SessionManager.getInstance();
-        sessionManager.clearSession();
-        sessionManager.setCurrentAccount(account);
+		if (account == null) {
+			throw new AuthException("Tai khoan khong ton tai");
+		}
 
-        if (account.getRole().isStaffRole()) {
-            var staff = staffRepository.findByAccountId(account.getAccountId());
-            if (staff == null) {
-                throw new AuthException("Khong tim thay thong tin nhan su");
-            }
-            sessionManager.setCurrentStaff(staff);
-        } else {
-            var student = studentRepository.findByAccountId(account.getAccountId());
-            if (student == null) {
-                throw new AuthException("Khong tim thay thong tin sinh vien");
-            }
-            sessionManager.setCurrentStudent(student);
-        }
+		if (!account.isActive()) {
+			throw new AuthException("Tai khoan da bi khoa");
+		}
 
-        return account;
-    }
+		if (!BCrypt.checkpw(password, account.getPasswordHash())) {
+			throw new AuthException("Sai mat khau");
+		}
 
-    public Account findAccountForPasswordReset(String username) {
-        Account account = accountRepository.findByUsername(username);
-        if (account == null || !account.isActive()) {
-            throw new AuthException("Khong tim thay tai khoan voi ten dang nhap nay");
-        }
-        return account;
-    }
+		SessionManager sessionManager = SessionManager.getInstance();
+		sessionManager.clearSession();
+		sessionManager.setCurrentAccount(account);
+
+		if (account.getRole().isStaffRole()) {
+			var staff = staffRepository.findByAccountId(account.getAccountId());
+			if (staff == null) {
+				throw new AuthException("Khong tim thay thong tin nhan su");
+			}
+			sessionManager.setCurrentStaff(staff);
+		} else {
+			var student = studentRepository.findByAccountId(account.getAccountId());
+			if (student == null) {
+				throw new AuthException("Khong tim thay thong tin sinh vien");
+			}
+			sessionManager.setCurrentStudent(student);
+		}
+
+		return account;
+	}
+
+	public Account findAccountForPasswordReset(String username) {
+		Account account = accountRepository.findByUsername(username);
+		if (account == null || !account.isActive()) {
+			throw new AuthException("Khong tim thay tai khoan voi ten dang nhap nay");
+		}
+		return account;
+	}
 }

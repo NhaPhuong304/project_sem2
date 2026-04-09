@@ -3,6 +3,12 @@
 .project
 .settings/
 
+# Maven
+target/
+
+# uploads (optional)
+uploads/avatars/
+
 # Claude AI config
 .claude/
 /target/
