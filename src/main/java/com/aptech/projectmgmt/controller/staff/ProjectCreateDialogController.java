@@ -37,6 +37,16 @@ public class ProjectCreateDialogController {
                 return null;
             }
         });
+
+        // Auto-fill end date = start date + 1 month, lock end date picker
+        endDatePicker.setDisable(true);
+        startDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                endDatePicker.setValue(newVal.plusMonths(1));
+            } else {
+                endDatePicker.setValue(null);
+            }
+        });
     }
 
     public void setSupervisors(List<Staff> staffList) {

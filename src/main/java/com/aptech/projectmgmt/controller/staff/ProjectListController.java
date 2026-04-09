@@ -345,6 +345,19 @@ public class ProjectListController {
             }
 
             Project project = controller.buildProject(classId);
+
+            // Validate: end date must be exactly 1 month after start date
+            java.time.LocalDate startDate = project.getStartDate();
+            java.time.LocalDate endDate = project.getEndDate();
+            if (startDate == null || endDate == null) {
+                AlertUtil.showError("Vui long chon ngay bat dau va ngay ket thuc cho project.");
+                return;
+            }
+            if (!endDate.equals(startDate.plusMonths(1))) {
+                AlertUtil.showError("Thoi gian du an phai dung 1 thang (ngay ket thuc = ngay bat dau + 1 thang).");
+                return;
+            }
+
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
