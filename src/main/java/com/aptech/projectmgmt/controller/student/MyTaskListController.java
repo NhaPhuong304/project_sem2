@@ -51,7 +51,6 @@ public class MyTaskListController {
     private final GroupService groupService = new GroupService();
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private int groupId;
-    private int projectId;
     private MemberRole myRole;
     private boolean currentMemberActive;
     private boolean canCreateTask;
@@ -83,7 +82,6 @@ public class MyTaskListController {
 
     public void initData(int groupId, int projectId, MemberRole myRole) {
         this.groupId = groupId;
-        this.projectId = projectId;
         this.myRole = myRole;
         var student = SessionManager.getInstance().getCurrentStudent();
         if (student != null) currentStudentId = student.getStudentId();

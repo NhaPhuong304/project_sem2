@@ -1,7 +1,6 @@
 package com.aptech.projectmgmt.service;
 
 import com.aptech.projectmgmt.model.Account;
-import com.aptech.projectmgmt.model.UserRole;
 import com.aptech.projectmgmt.repository.AccountRepository;
 import com.aptech.projectmgmt.repository.StaffRepository;
 import com.aptech.projectmgmt.repository.StudentRepository;

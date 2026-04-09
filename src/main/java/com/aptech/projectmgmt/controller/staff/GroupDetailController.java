@@ -50,7 +50,6 @@ public class GroupDetailController {
 
 	private final GroupService groupService = new GroupService();
 	private int groupId;
-	private int projectId;
 	private int classId;
 	private String groupName;
 	private final ObservableList<GroupMember> memberList = FXCollections.observableArrayList();
@@ -75,7 +74,6 @@ public class GroupDetailController {
 
 	public void initData(int groupId, int projectId, int classId, String groupName) {
 		this.groupId = groupId;
-		this.projectId = projectId;
 		this.classId = classId;
 		this.groupName = groupName;
 		loadMembers();
