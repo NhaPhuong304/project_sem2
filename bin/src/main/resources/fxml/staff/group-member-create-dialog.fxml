@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="150" prefWidth="327.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.staff.GroupMemberCreateDialogController">
+
+    <Label layoutX="20" layoutY="28" text="Sinh vien:" />
+    <ComboBox fx:id="studentCombo" layoutX="110" layoutY="24" prefHeight="25.0" prefWidth="200.0" />
+
+    <Label layoutX="20" layoutY="78" text="Vai tro:" />
+    <ComboBox fx:id="roleCombo" layoutX="110" layoutY="74" prefWidth="200" />
+</AnchorPane>

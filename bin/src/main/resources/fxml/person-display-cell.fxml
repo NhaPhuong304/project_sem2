@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Circle?>
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.PersonDisplayCellController"
+            prefWidth="180.0" prefHeight="28.0">
+
+    <HBox spacing="6.0"
+          alignment="CENTER_LEFT"
+          AnchorPane.topAnchor="0.0"
+          AnchorPane.rightAnchor="0.0"
+          AnchorPane.bottomAnchor="0.0"
+          AnchorPane.leftAnchor="0.0">
+        <ImageView fx:id="avatarImageView"
+                   fitWidth="22.0"
+                   fitHeight="22.0"
+                   preserveRatio="false"
+                   managed="false"
+                   smooth="true"
+                   visible="false">
+            <clip>
+                <Circle centerX="11.0" centerY="11.0" radius="11.0" />
+            </clip>
+        </ImageView>
+        <Label fx:id="nameLabel" text="" />
+    </HBox>
+</AnchorPane>
