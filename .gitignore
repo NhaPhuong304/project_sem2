@@ -5,3 +5,4 @@
 
 # Claude AI config
 .claude/
+/target/
