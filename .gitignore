@@ -12,3 +12,4 @@ uploads/avatars/
 # Claude AI config
 .claude/
 /target/
+/bin/

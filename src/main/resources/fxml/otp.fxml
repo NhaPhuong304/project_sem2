@@ -1,37 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.OtpController"
-            prefWidth="500" prefHeight="450">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-    <Label text="Xac thuc OTP"
-           layoutX="170" layoutY="30"
-           style="-fx-font-size: 20; -fx-font-weight: bold;" />
+<HBox prefHeight="560.0" prefWidth="1000.0" stylesheets="@/css/otp.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.OtpController">
 
-    <Label text="Ma OTP da duoc gui den:" layoutX="80" layoutY="90" />
-    <Label fx:id="emailLabel" text="a***@gmail.com" layoutX="80" layoutY="110"
-           style="-fx-font-weight: bold;" />
+    <!-- LEFT SIDE -->
+    <StackPane styleClass="left-panel" HBox.hgrow="ALWAYS">
+        <VBox alignment="CENTER" spacing="8" stylesheets="@../css/otp.css">
+            <HBox alignment="CENTER" spacing="0">
+                <Text styleClass="title-dark" text="Student " />
+                <Text styleClass="title-accent" text="Project" />
+            </HBox>
 
-    <Label text="Nhap ma OTP (6 chu so):" layoutX="80" layoutY="150" />
-    <TextField fx:id="otpField" layoutX="80" layoutY="170" prefWidth="340" />
+            <Text styleClass="title-dark" text="Management" />
+            <Text styleClass="title-light" text="System" />
+        </VBox>
+    </StackPane>
 
-    <Button fx:id="resendBtn" text="Gui lai"
-            layoutX="80" layoutY="215" prefWidth="120" />
-    <Label fx:id="countdownLabel" text="" layoutX="220" layoutY="220" />
-    <Label fx:id="expiryLabel" text="" layoutX="80" layoutY="242"
-           style="-fx-text-fill: #666666;" />
+    <!-- RIGHT SIDE -->
+    <VBox alignment="CENTER" prefWidth="460.0" spacing="14" styleClass="right-panel" stylesheets="@../css/otp.css">
 
-    <Label text="Mat khau moi:" layoutX="80" layoutY="282" />
-    <PasswordField fx:id="newPasswordField" layoutX="80" layoutY="302" prefWidth="340" />
+        <Label styleClass="welcome-text" text="OTP Verification" />
 
-    <Label text="Xac nhan mat khau moi:" layoutX="80" layoutY="342" />
-    <PasswordField fx:id="confirmPasswordField" layoutX="80" layoutY="362" prefWidth="340" />
+        <VBox maxWidth="320" spacing="4">
+            <Label styleClass="form-label" text="OTP sent to:" />
+            <Label fx:id="emailLabel" styleClass="email-label" text="a***@gmail.com" />
+        </VBox>
 
-    <Button fx:id="confirmBtn" text="Xac nhan"
-            layoutX="180" layoutY="405" prefWidth="140" prefHeight="36" />
-</AnchorPane>
+        <VBox maxWidth="320" spacing="6">
+            <Label styleClass="form-label" text="Enter OTP (6 digits)" />
+            <TextField fx:id="otpField" maxWidth="320.0" minWidth="320.0" prefHeight="44.0" prefWidth="320.0" promptText="Enter OTP" />
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" maxWidth="320" spacing="12">
+            <Button fx:id="resendBtn" prefHeight="38.0" prefWidth="110.0" styleClass="secondary-btn" text="Resend" />
+
+            <Label fx:id="countdownLabel" styleClass="countdown-label" text="" />
+        </HBox>
+
+        <Label fx:id="expiryLabel" maxWidth="320" styleClass="expiry-label" text="" wrapText="true" />
+
+        <VBox maxWidth="320" spacing="6">
+            <Label styleClass="form-label" text="New Password" />
+            <PasswordField fx:id="newPasswordField" maxWidth="320.0" minWidth="320.0" prefHeight="44.0" prefWidth="320.0" promptText="Enter new password" />
+        </VBox>
+
+        <VBox maxWidth="320" spacing="6">
+            <Label styleClass="form-label" text="Confirm Password" />
+            <PasswordField fx:id="confirmPasswordField" maxWidth="320.0" minWidth="320.0" prefHeight="44.0" prefWidth="320.0" promptText="Confirm new password" />
+        </VBox>
+
+        <Button fx:id="confirmBtn" prefHeight="42.0" prefWidth="180.0" styleClass="login-btn" text="Confirm" />
+    </VBox>
+
+</HBox>

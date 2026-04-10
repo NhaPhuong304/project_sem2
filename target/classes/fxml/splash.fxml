@@ -16,7 +16,7 @@
 
     <Label layoutX="66.0" layoutY="175.0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0d47a1;" text="Project Management System - Aptech" />
 
-    <Label layoutX="187.0" layoutY="220.0" style="-fx-font-size: 13px; -fx-text-fill: #546e7a;" text="Khoi dong he thong..." />
+    <Label layoutX="187.0" layoutY="220.0" style="-fx-font-size: 13px; -fx-text-fill: #546e7a;" text="System loading..." />
 
     <ProgressBar fx:id="loadingProgressBar" layoutX="60.0" layoutY="272.0" prefHeight="16.0" prefWidth="380.0" progress="0.0" styleClass="splash-progress" />
 

@@ -1,0 +1,108 @@
+.root {
+    -fx-font-family: "Segoe UI";
+}
+
+/* ===== LEFT PANEL ===== */
+.left-panel {
+-fx-background-image: url("../images/nen1.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+    -fx-padding: 40;
+}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel {
+    -fx-background-color: #0D4B3E;
+    -fx-background-radius: 40 0 0 40;
+    -fx-border-radius: 40 0 0 40;
+    -fx-padding: 60 40;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 25, 0, -5, 0);
+}
+
+/* ===== TITLES ===== */
+.title-dark {
+    -fx-font-family: "Impact";
+    -fx-font-size: 48px;
+    -fx-fill: black;
+}
+
+.title-accent {
+    -fx-font-family: "Impact";
+    -fx-font-size: 48px;
+    -fx-fill: #E6A5A5;
+}
+
+.title-light {
+    -fx-font-family: "Impact";
+    -fx-font-size: 48px;
+    -fx-fill: #E6A5A5;
+}
+
+.welcome-text {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F3A6A6;
+}
+
+/* ===== INPUT ===== */
+.text-field,
+.password-field {
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-padding: 12 45 12 15;
+    -fx-font-size: 14px;
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-prompt-text-fill: #9ca3af;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #ED6637;
+    -fx-border-width: 2;
+}
+
+/* ===== EYE BUTTON ===== */
+.eye-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+    -fx-padding: 0 12 0 12;
+}
+
+.eye-btn:hover {
+    -fx-opacity: 0.8;
+}
+
+/* ===== BUTTON ===== */
+.login-btn {
+    -fx-background-color: #ED6637;
+    -fx-text-fill: white;
+    -fx-background-radius: 25;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-padding: 10 25;
+}
+
+.login-btn:hover {
+    -fx-background-color: #ff7b4f;
+}
+
+.error-label {
+    -fx-text-fill: #ffd6d6;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.register-link {
+    -fx-text-fill: #ff7a4d;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+
+.register-link:hover {
+    -fx-underline: true;
+    -fx-text-fill: #ff9c7a;
+}

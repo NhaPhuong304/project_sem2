@@ -1,0 +1,116 @@
+.root {
+    -fx-font-family: "Segoe UI";
+}
+
+/* ===== LEFT PANEL ===== */
+.left-panel {
+    -fx-background-image: url("../images/nen1.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+    -fx-padding: 40;
+}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel {
+    -fx-background-color: #0D4B3E;
+    -fx-background-radius: 40 0 0 40;
+    -fx-border-radius: 40 0 0 40;
+    -fx-padding: 50 40;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 25, 0, -5, 0);
+}
+
+/* ===== TITLES ===== */
+.title-dark {
+    -fx-font-family: "Impact";
+    -fx-font-size: 48px;
+    -fx-fill: black;
+}
+
+.title-accent {
+    -fx-font-family: "Impact";
+    -fx-font-size: 48px;
+    -fx-fill: #E6A5A5;
+}
+
+.title-light {
+    -fx-font-family: "Impact";
+    -fx-font-size: 48px;
+    -fx-fill: #E6A5A5;
+}
+
+.welcome-text {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F3A6A6;
+}
+
+/* ===== FORM LABEL ===== */
+.form-label {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.email-label {
+    -fx-text-fill: #ffb3b3;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.countdown-label {
+    -fx-text-fill: #ffd6d6;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.expiry-label {
+    -fx-text-fill: #dbeafe;
+    -fx-font-size: 12px;
+}
+
+/* ===== INPUT ===== */
+.text-field,
+.password-field {
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-padding: 12 15 12 15;
+    -fx-font-size: 14px;
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-prompt-text-fill: #9ca3af;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #ED6637;
+    -fx-border-width: 2;
+}
+
+/* ===== BUTTON ===== */
+.login-btn {
+    -fx-background-color: #ED6637;
+    -fx-text-fill: white;
+    -fx-background-radius: 25;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
+
+.login-btn:hover {
+    -fx-background-color: #ff7b4f;
+}
+
+.secondary-btn {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0D4B3E;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #f3f4f6;
+}
