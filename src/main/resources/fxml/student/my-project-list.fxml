@@ -3,6 +3,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.aptech.projectmgmt.controller.student.MyProjectListController"
@@ -16,12 +17,12 @@
                layoutX="20" layoutY="55"
                prefWidth="840" prefHeight="540">
         <columns>
-            <TableColumn fx:id="projectNameColumn" text="Ten project" prefWidth="220.0" />
-            <TableColumn fx:id="semesterColumn" text="Hoc ky" prefWidth="100.0" />
+            <TableColumn fx:id="projectNameColumn" text="Ten project" prefWidth="200.0" />
+            <TableColumn fx:id="semesterColumn" text="Hoc ky" prefWidth="90.0" />
             <TableColumn fx:id="supervisorColumn" text="Thay huong dan" prefWidth="150.0" />
-            <TableColumn fx:id="dateRangeColumn" text="Thoi gian" prefWidth="220.0" />
+            <TableColumn fx:id="dateRangeColumn" text="Thoi gian" prefWidth="210.0" />
             <TableColumn fx:id="statusColumn" text="Trang thai" prefWidth="90.0" />
-            <TableColumn fx:id="roleColumn" text="Vai tro" prefWidth="120.0" />
+            <TableColumn fx:id="roleColumn" text="Vai tro" prefWidth="100.0" />
         </columns>
     </TableView>
 </AnchorPane>
