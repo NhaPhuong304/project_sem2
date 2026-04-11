@@ -24,7 +24,6 @@ import java.util.List;
 public class ProjectDetailController {
 
     @FXML private TextField projectNameField;
-    @FXML private TextField semesterField;
     @FXML private TextField supervisorField;
     @FXML private DatePicker startDatePicker;
     @FXML private DatePicker endDatePicker;
@@ -45,12 +44,7 @@ public class ProjectDetailController {
     private final GroupService groupService = new GroupService();
     private final ObservableList<ProjectGroup> groups = FXCollections.observableArrayList();
     private final ObservableList<String> taskStatusFilters = FXCollections.observableArrayList(
-            "Tat ca",
-            "Cho xu ly",
-            "Dang thuc hien",
-            "Dang kiem tra",
-            "Dang chinh sua",
-            "Hoan thanh"
+            "Tat ca", "Cho xu ly", "Dang thuc hien", "Dang kiem tra", "Dang chinh sua", "Hoan thanh"
     );
     private int projectId;
     private Project currentProject;
@@ -64,17 +58,9 @@ public class ProjectDetailController {
         configureGroupViews();
         updateAccessMode();
 
-        editBtn.setOnAction(e -> {
-            if (currentProject != null) {
-                setEditMode(true);
-            }
-        });
-
+        editBtn.setOnAction(e -> { if (currentProject != null) setEditMode(true); });
         saveBtn.setOnAction(e -> handleSave());
-        cancelBtn.setOnAction(e -> {
-            populateProjectInfo();
-            setEditMode(false);
-        });
+        cancelBtn.setOnAction(e -> { populateProjectInfo(); setEditMode(false); });
         completeBtn.setOnAction(e -> handleMarkCompleted());
     }
 
@@ -96,9 +82,7 @@ public class ProjectDetailController {
         Task<Project> task = new Task<>() {
             @Override
             protected Project call() {
-                if (readOnlyMode && teacherStaffId != null) {
-                    return projectService.getProjectByAdvisor(projectId, teacherStaffId);
-                }
+                if (readOnlyMode && teacherStaffId != null) return projectService.getProjectByAdvisor(projectId, teacherStaffId);
                 return projectService.getProjectById(projectId);
             }
         };
@@ -139,9 +123,7 @@ public class ProjectDetailController {
         groupListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 ProjectGroup selected = groupListView.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    openGroupDetail(selected.getGroupId(), selected.getGroupName());
-                }
+                if (selected != null) openGroupDetail(selected.getGroupId(), selected.getGroupName());
             }
         });
 
@@ -165,18 +147,14 @@ public class ProjectDetailController {
         taskStatusFilterCombo.setItems(taskStatusFilters);
         taskStatusFilterCombo.getSelectionModel().selectFirst();
         taskStatusFilterCombo.setOnAction(e -> {
-            if (activeTaskListController != null) {
-                activeTaskListController.setStatusFilter(taskStatusFilterCombo.getValue());
-            }
+            if (activeTaskListController != null) activeTaskListController.setStatusFilter(taskStatusFilterCombo.getValue());
         });
     }
 
     private void populateProjectInfo() {
-        if (currentProject == null) {
-            return;
-        }
+        if (currentProject == null) return;
         projectNameField.setText(currentProject.getProjectName());
-        semesterField.setText(currentProject.getSemester());
+      
         supervisorField.setText(currentProject.getSupervisorName());
         startDatePicker.setValue(currentProject.getStartDate());
         endDatePicker.setValue(currentProject.getEndDate());
@@ -187,7 +165,7 @@ public class ProjectDetailController {
     private void setEditMode(boolean editable) {
         boolean effectiveEditable = editable && !readOnlyMode;
         projectNameField.setEditable(effectiveEditable);
-        semesterField.setEditable(effectiveEditable);
+       
         descriptionArea.setEditable(effectiveEditable);
         startDatePicker.setDisable(!effectiveEditable);
         endDatePicker.setDisable(!effectiveEditable);
@@ -204,9 +182,7 @@ public class ProjectDetailController {
     private void loadGroups() {
         Task<List<ProjectGroup>> task = new Task<>() {
             @Override
-            protected List<ProjectGroup> call() {
-                return groupService.getGroupsByProject(projectId);
-            }
+            protected List<ProjectGroup> call() { return groupService.getGroupsByProject(projectId); }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             groups.setAll(task.getValue());
@@ -220,19 +196,15 @@ public class ProjectDetailController {
                 }
                 return;
             }
-
             ProjectGroup currentSelection = taskGroupCombo.getSelectionModel().getSelectedItem();
-            if (currentSelection == null || groups.stream().noneMatch(group -> group.getGroupId() == currentSelection.getGroupId())) {
+            if (currentSelection == null || groups.stream().noneMatch(g -> g.getGroupId() == currentSelection.getGroupId())) {
                 taskGroupCombo.getSelectionModel().selectFirst();
             } else {
                 taskGroupCombo.getSelectionModel().select(currentSelection);
             }
             loadSelectedGroupTasks();
         }));
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai danh sach nhom: " + (ex != null ? ex.getMessage() : ""));
-        }));
+        task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError("Loi tai danh sach nhom")));
         new Thread(task).start();
     }
 
@@ -240,10 +212,8 @@ public class ProjectDetailController {
         ProjectGroup selectedGroup = taskGroupCombo.getSelectionModel().getSelectedItem();
         if (selectedGroup == null) {
             taskContentPane.getChildren().setAll(taskPlaceholderLabel);
-            taskPlaceholderLabel.setText("Chon nhom de xem danh sach cong viec");
             return;
         }
-
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.TASK_LIST));
             Parent content = loader.load();
@@ -251,13 +221,11 @@ public class ProjectDetailController {
             controller.setReadOnlyMode(readOnlyMode);
             controller.initData(selectedGroup.getGroupId());
             controller.setStatusFilter(taskStatusFilterCombo.getValue());
-            if (activeTaskListController != null) {
-                activeTaskListController.onDestroy();
-            }
+            if (activeTaskListController != null) activeTaskListController.onDestroy();
             activeTaskListController = controller;
             taskContentPane.getChildren().setAll(content);
         } catch (Exception e) {
-            AlertUtil.showError("Loi tai danh sach cong viec: " + e.getMessage());
+            AlertUtil.showError("Loi tai danh sach cong viec");
         }
     }
 
@@ -267,100 +235,66 @@ public class ProjectDetailController {
             Parent root = loader.load();
             GroupDetailController controller = loader.getController();
             controller.setReadOnlyMode(readOnlyMode);
-            if (currentProject != null) {
-                controller.initData(groupId, currentProject.getProjectId(), currentProject.getClassId(), groupName);
-            } else {
-                controller.initData(groupId);
-            }
-
+            if (currentProject != null) controller.initData(groupId, currentProject.getProjectId(), currentProject.getClassId(), groupName);
+            else controller.initData(groupId);
             Stage modal = new Stage();
             modal.setTitle("Chi tiet Nhom: " + groupName);
             modal.initModality(Modality.APPLICATION_MODAL);
-            Scene scene = new Scene(root);
-            modal.setScene(scene);
+            modal.setScene(new Scene(root));
             modal.showAndWait();
             loadGroups();
         } catch (Exception e) {
-            AlertUtil.showError("Loi mo chi tiet nhom: " + e.getMessage());
+            AlertUtil.showError("Loi mo chi tiet nhom");
         }
     }
 
     private void handleSave() {
-        if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin project");
-            return;
-        }
-        if (currentProject == null) return;
+        if (readOnlyMode || currentProject == null) return;
         currentProject.setProjectName(projectNameField.getText().trim());
-        currentProject.setSemester(semesterField.getText().trim());
+        currentProject.setSemester(""); // Gán rỗng vì đã xóa UI học kỳ
         currentProject.setDescription(descriptionArea.getText() != null ? descriptionArea.getText().trim() : null);
         currentProject.setStartDate(startDatePicker.getValue());
         currentProject.setEndDate(endDatePicker.getValue());
         currentProject.setReportDate(reportDatePicker.getValue());
         Task<Void> task = new Task<>() {
             @Override
-            protected Void call() {
-                projectService.updateProject(currentProject);
-                return null;
-            }
+            protected Void call() { projectService.updateProject(currentProject); return null; }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             AlertUtil.showSuccess("Luu thanh cong");
             setEditMode(false);
             updateAccessMode();
         }));
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            Throwable ex = task.getException();
-            AlertUtil.showError("Loi luu: " + (ex != null ? ex.getMessage() : ""));
-        }));
+        task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError("Loi luu project")));
         new Thread(task).start();
     }
 
     private void handleMarkCompleted() {
-        if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin project");
-            return;
-        }
-        if (currentProject == null) {
-            return;
-        }
+        if (readOnlyMode || currentProject == null) return;
         if (!projectService.canMarkCompleted(currentProject)) {
             AlertUtil.showError("Chi duoc danh dau hoan thanh khi project da qua han ngay bao cao");
             return;
         }
-        if (!AlertUtil.showConfirm("Danh dau project nay la hoan thanh?")) {
-            return;
-        }
+        if (!AlertUtil.showConfirm("Danh dau project nay la hoan thanh?")) return;
         Task<Void> task = new Task<>() {
             @Override
-            protected Void call() {
-                projectService.markProjectCompleted(currentProject.getProjectId());
-                return null;
-            }
+            protected Void call() { projectService.markProjectCompleted(currentProject.getProjectId()); return null; }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             currentProject.setStatus(com.aptech.projectmgmt.model.ProjectStatus.COMPLETED);
             AlertUtil.showSuccess("Project da duoc danh dau hoan thanh");
             updateAccessMode();
         }));
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            Throwable ex = task.getException();
-            AlertUtil.showError("Loi danh dau hoan thanh: " + (ex != null ? ex.getMessage() : ""));
-        }));
         new Thread(task).start();
     }
 
     private void handleAddGroup() {
-        AlertUtil.showError("Schema moi chi cho moi project gan voi 1 nhom. Hay tao project moi neu can nhom khac.");
+        AlertUtil.showError("Schema moi chi cho moi project gan voi 1 nhom.");
     }
 
     private void updateAccessMode() {
-        if (readOnlyMode) {
-            setEditMode(false);
-        } else if (editBtn != null) {
-            editBtn.setVisible(true);
-            editBtn.setManaged(true);
-        }
+        if (readOnlyMode) setEditMode(false);
+        else if (editBtn != null) { editBtn.setVisible(true); editBtn.setManaged(true); }
         if (addGroupBtn != null) {
             boolean canAddGroup = !readOnlyMode && currentProject != null && currentProject.getGroupId() <= 0;
             addGroupBtn.setVisible(canAddGroup);

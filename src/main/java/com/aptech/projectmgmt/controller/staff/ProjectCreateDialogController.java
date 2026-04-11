@@ -10,14 +10,13 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
-
 import java.util.List;
 
 public class ProjectCreateDialogController {
 
     @FXML private TextField projectNameField;
     @FXML private TextArea descriptionArea;
-    @FXML private TextField semesterField;
+    
     @FXML private DatePicker startDatePicker;
     @FXML private DatePicker endDatePicker;
     @FXML private DatePicker reportDatePicker;
@@ -28,24 +27,15 @@ public class ProjectCreateDialogController {
         descriptionArea.setWrapText(true);
         supervisorCombo.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Staff staff) {
-                return staff != null ? staff.getFullName() : "";
-            }
-
+            public String toString(Staff staff) { return staff != null ? staff.getFullName() : ""; }
             @Override
-            public Staff fromString(String string) {
-                return null;
-            }
+            public Staff fromString(String string) { return null; }
         });
 
-        // Auto-fill end date = start date + 1 month, lock end date picker
         endDatePicker.setDisable(true);
         startDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                endDatePicker.setValue(newVal.plusMonths(1));
-            } else {
-                endDatePicker.setValue(null);
-            }
+            if (newVal != null) endDatePicker.setValue(newVal.plusMonths(1));
+            else endDatePicker.setValue(null);
         });
     }
 
@@ -57,16 +47,15 @@ public class ProjectCreateDialogController {
         Project project = new Project();
         project.setProjectName(projectNameField.getText() != null ? projectNameField.getText().trim() : "");
         project.setDescription(descriptionArea.getText() != null ? descriptionArea.getText().trim() : "");
-        project.setSemester(semesterField.getText() != null ? semesterField.getText().trim() : "");
+       
+        project.setSemester(""); 
         project.setClassId(classId);
         project.setStartDate(startDatePicker.getValue());
         project.setEndDate(endDatePicker.getValue());
         project.setReportDate(reportDatePicker.getValue());
         project.setStatus(ProjectStatus.ACTIVE);
         Staff supervisor = supervisorCombo.getValue();
-        if (supervisor != null) {
-            project.setSupervisorId(supervisor.getStaffId());
-        }
+        if (supervisor != null) project.setSupervisorId(supervisor.getStaffId());
         return project;
     }
 }

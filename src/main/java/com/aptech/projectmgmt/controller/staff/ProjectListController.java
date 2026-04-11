@@ -19,14 +19,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
@@ -43,11 +36,11 @@ public class ProjectListController {
     private static final int NEAR_END_THRESHOLD_DAYS = 3;
 
     @FXML private ComboBox<SchoolClass> classCombo;
-    @FXML private ComboBox<String> semesterCombo;
+ 
     @FXML private TableView<Project> projectTable;
     @FXML private Button addProjectBtn;
     @FXML private TableColumn<Project, String> projectNameColumn;
-    @FXML private TableColumn<Project, String> semesterColumn;
+
     @FXML private TableColumn<Project, String> supervisorColumn;
     @FXML private TableColumn<Project, String> startDateColumn;
     @FXML private TableColumn<Project, String> endDateColumn;
@@ -71,7 +64,7 @@ public class ProjectListController {
         configureClassCombo();
         filteredProjects = new FilteredList<>(allProjects, p -> true);
         projectTable.setItems(filteredProjects);
-        semesterCombo.setOnAction(e -> applyFilters());
+        
         addProjectBtn.setOnAction(e -> handleAddProject());
         refreshReadOnlyState();
         projectTable.setPlaceholder(new Label("Dang tai danh sach project..."));
@@ -100,7 +93,7 @@ public class ProjectListController {
 
     private void setupTableColumns() {
         projectNameColumn.setCellValueFactory(new PropertyValueFactory<>("projectName"));
-        semesterColumn.setCellValueFactory(new PropertyValueFactory<>("semester"));
+   
         supervisorColumn.setCellValueFactory(new PropertyValueFactory<>("supervisorName"));
         startDateColumn.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getStartDate() != null ? c.getValue().getStartDate().format(dateTimeFormatter) : ""));
@@ -115,13 +108,8 @@ public class ProjectListController {
         classCombo.setConverter(new StringConverter<>() {
             @Override
             public String toString(SchoolClass schoolClass) {
-                if (schoolClass == null) {
-                    return "";
-                }
-                if (schoolClass.getClassId() == ALL_CLASSES_ID) {
-                    return schoolClass.getClassName();
-                }
-                return schoolClass.getClassName() + " - " + schoolClass.getSemester();
+                if (schoolClass == null) return "";
+                return schoolClass.getClassName(); // Đã bỏ phần hiển thị học kỳ đi kèm tên lớp
             }
 
             @Override
@@ -133,7 +121,6 @@ public class ProjectListController {
             SchoolClass selected = classCombo.getValue();
             classId = selected != null ? selected.getClassId() : ALL_CLASSES_ID;
             addProjectBtn.setDisable(readOnlyMode || selected == null || selected.getClassId() == ALL_CLASSES_ID);
-            refreshSemesterOptions();
             applyFilters();
         });
     }
@@ -178,7 +165,6 @@ public class ProjectListController {
             classCombo.getSelectionModel().selectFirst();
             classId = ALL_CLASSES_ID;
             addProjectBtn.setDisable(true);
-            refreshSemesterOptions();
             applyFilters();
         }
     }
@@ -249,7 +235,6 @@ public class ProjectListController {
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             allProjects.setAll(task.getValue());
-            refreshSemesterOptions();
             applyFilters();
             if (allProjects.isEmpty()) {
                 projectTable.setPlaceholder(new Label("Chua co project nao"));
@@ -262,37 +247,13 @@ public class ProjectListController {
         new Thread(task).start();
     }
 
-    private void refreshSemesterOptions() {
-        String currentSelection = semesterCombo.getValue();
-        SchoolClass selectedClass = classCombo.getValue();
-        ObservableList<String> semesters = FXCollections.observableArrayList("Tat ca");
-        allProjects.stream()
-                .filter(project -> selectedClass == null
-                        || selectedClass.getClassId() == ALL_CLASSES_ID
-                        || project.getClassId() == selectedClass.getClassId())
-                .map(Project::getSemester)
-                .filter(semester -> semester != null && !semester.isBlank())
-                .distinct()
-                .forEach(semesters::add);
-        semesterCombo.setItems(semesters);
-        if (currentSelection != null && semesters.contains(currentSelection)) {
-            semesterCombo.getSelectionModel().select(currentSelection);
-        } else {
-            semesterCombo.getSelectionModel().selectFirst();
-        }
-    }
-
     private void applyFilters() {
         SchoolClass selectedClass = classCombo.getValue();
-        String selectedSemester = semesterCombo.getValue();
         filteredProjects.setPredicate(project -> {
             boolean classMatch = selectedClass == null
                     || selectedClass.getClassId() == ALL_CLASSES_ID
                     || project.getClassId() == selectedClass.getClassId();
-            boolean semesterMatch = selectedSemester == null
-                    || "Tat ca".equals(selectedSemester)
-                    || selectedSemester.equals(project.getSemester());
-            return classMatch && semesterMatch;
+            return classMatch; 
         });
         if (filteredProjects.isEmpty()) {
             projectTable.setPlaceholder(new Label("Khong co project phu hop"));
@@ -346,7 +307,6 @@ public class ProjectListController {
 
             Project project = controller.buildProject(classId);
 
-            // Validate: end date must be exactly 1 month after start date
             java.time.LocalDate startDate = project.getStartDate();
             java.time.LocalDate endDate = project.getEndDate();
             if (startDate == null || endDate == null) {
@@ -381,50 +341,26 @@ public class ProjectListController {
     }
 
     private String getProjectStatusDisplay(Project project) {
-        if (project == null) {
-            return "";
-        }
+        if (project == null) return "";
         LocalDate today = LocalDate.now();
-        if (project.getStatus() == ProjectStatus.COMPLETED) {
-            return "Hoan thanh";
-        }
-        if (project.getStartDate() != null && today.isBefore(project.getStartDate())) {
-            return "Chua bat dau";
-        }
-        if (project.getEndDate() == null) {
-            return "Dang hoat dong";
-        }
-        if (today.isAfter(project.getEndDate())) {
-            return "Da qua han";
-        }
+        if (project.getStatus() == ProjectStatus.COMPLETED) return "Hoan thanh";
+        if (project.getStartDate() != null && today.isBefore(project.getStartDate())) return "Chua bat dau";
+        if (project.getEndDate() == null) return "Dang hoat dong";
+        if (today.isAfter(project.getEndDate())) return "Da qua han";
         long remainingDays = ChronoUnit.DAYS.between(today, project.getEndDate());
-        if (remainingDays <= NEAR_END_THRESHOLD_DAYS) {
-            return "Sap het han";
-        }
+        if (remainingDays <= NEAR_END_THRESHOLD_DAYS) return "Sap het han";
         return "Dang hoat dong";
     }
 
     private String getProjectStatusStyle(Project project) {
-        if (project == null) {
-            return "project-status-red";
-        }
+        if (project == null) return "project-status-red";
         LocalDate today = LocalDate.now();
-        if (project.getStatus() == ProjectStatus.COMPLETED) {
-            return "project-status-green";
-        }
-        if (project.getStartDate() != null && today.isBefore(project.getStartDate())) {
-            return "project-status-red";
-        }
-        if (project.getEndDate() == null) {
-            return "project-status-green";
-        }
-        if (today.isAfter(project.getEndDate())) {
-            return "project-status-red";
-        }
+        if (project.getStatus() == ProjectStatus.COMPLETED) return "project-status-green";
+        if (project.getStartDate() != null && today.isBefore(project.getStartDate())) return "project-status-red";
+        if (project.getEndDate() == null) return "project-status-green";
+        if (today.isAfter(project.getEndDate())) return "project-status-red";
         long remainingDays = ChronoUnit.DAYS.between(today, project.getEndDate());
-        if (remainingDays <= NEAR_END_THRESHOLD_DAYS) {
-            return "project-status-yellow";
-        }
+        if (remainingDays <= NEAR_END_THRESHOLD_DAYS) return "project-status-yellow";
         return "project-status-green";
     }
 
@@ -453,9 +389,7 @@ public class ProjectListController {
     }
 
     private void refreshReadOnlyState() {
-        if (addProjectBtn == null) {
-            return;
-        }
+        if (addProjectBtn == null) return;
         addProjectBtn.setVisible(!readOnlyMode);
         addProjectBtn.setManaged(!readOnlyMode);
         addProjectBtn.setDisable(readOnlyMode || classId <= ALL_CLASSES_ID);
