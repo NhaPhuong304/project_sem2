@@ -38,7 +38,6 @@ public class ProjectCreateDialogController {
             }
         });
 
-        // Auto-fill end date = start date + 1 month, lock end date picker
         endDatePicker.setDisable(true);
         startDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {

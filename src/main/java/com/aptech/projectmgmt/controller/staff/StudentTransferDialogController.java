@@ -21,7 +21,6 @@ public class StudentTransferDialogController {
             public String toString(SchoolClass schoolClass) {
                 if (schoolClass == null) return "";
                 return schoolClass.getClassName() + " (" +
-                        schoolClass.getSemester() + " - " +
                         schoolClass.getAcademicYear() + ")";
             }
 
@@ -37,7 +36,7 @@ public class StudentTransferDialogController {
                 super.updateItem(item, empty);
                 setText(empty || item == null
                         ? null
-                        : item.getClassName() + " (" + item.getSemester() + " - " + item.getAcademicYear() + ")");
+                        : item.getClassName() + " (" + " - " + item.getAcademicYear() + ")");
             }
         });
     }

@@ -4,33 +4,57 @@ import java.time.LocalDateTime;
 
 public class SchoolClass {
 
-    private int classId;
-    private String className;
-    private String semester;
-    private String academicYear;
-    private LocalDateTime createdAt;
-    private int studentCount;
+	private int classId;
+	private String className;
+	private String academicYear;
+	private LocalDateTime createdAt;
+	private int studentCount;
 
-    public SchoolClass() {}
+	public SchoolClass() {
+	}
 
-    public int getClassId() { return classId; }
-    public void setClassId(int classId) { this.classId = classId; }
+	public int getClassId() {
+		return classId;
+	}
 
-    public String getClassName() { return className; }
-    public void setClassName(String className) { this.className = className; }
+	public void setClassId(int classId) {
+		this.classId = classId;
+	}
 
-    public String getSemester() { return semester; }
-    public void setSemester(String semester) { this.semester = semester; }
+	public String getClassName() {
+		return className;
+	}
 
-    public String getAcademicYear() { return academicYear; }
-    public void setAcademicYear(String academicYear) { this.academicYear = academicYear; }
+	public void setClassName(String className) {
+		this.className = className;
+	}
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+	public String getAcademicYear() {
+		return academicYear;
+	}
 
-    public int getStudentCount() { return studentCount; }
-    public void setStudentCount(int studentCount) { this.studentCount = studentCount; }
+	public void setAcademicYear(String academicYear) {
+		this.academicYear = academicYear;
+	}
 
-    @Override
-    public String toString() { return className + " (" + semester + " - " + academicYear + ")"; }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public int getStudentCount() {
+		return studentCount;
+	}
+
+	public void setStudentCount(int studentCount) {
+		this.studentCount = studentCount;
+	}
+
+	@Override
+	public String toString() {
+		return className + " (" + " - " + academicYear + ")";
+	}
 }

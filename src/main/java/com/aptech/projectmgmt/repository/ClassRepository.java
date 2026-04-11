@@ -13,11 +13,11 @@ public class ClassRepository extends BaseRepository {
     public static final String UNASSIGNED_CLASS_NAME = "Chua xep lop";
 
     public List<SchoolClass> findAll() {
-        String sql = "SELECT c.ClassID, c.ClassName, c.Semester, c.AcademicYear, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.CreatedAt, " +
                      "COUNT(s.StudentID) AS StudentCount " +
                      "FROM Class c LEFT JOIN Student s ON s.ClassID = c.ClassID " +
                      "WHERE c.ClassName <> ? " +
-                     "GROUP BY c.ClassID, c.ClassName, c.Semester, c.AcademicYear, c.CreatedAt " +
+                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.CreatedAt " +
                      "ORDER BY c.CreatedAt DESC";
         try {
             return executeQuery(sql, rs -> {
@@ -31,7 +31,7 @@ public class ClassRepository extends BaseRepository {
     }
 
     public List<SchoolClass> findByAdvisorId(int staffId) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.Semester, c.AcademicYear, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.CreatedAt, " +
                      "(SELECT COUNT(*) FROM Student s WHERE s.ClassID = c.ClassID) AS StudentCount " +
                      "FROM Class c " +
                      "WHERE c.ClassName <> ? " +
@@ -52,21 +52,21 @@ public class ClassRepository extends BaseRepository {
         }
     }
 
-    public int create(String className, String semester, String academicYear) {
-        String sql = "INSERT INTO Class (ClassName, Semester, AcademicYear) VALUES (?, ?, ?)";
+    public int create(String className, String academicYear) {
+        String sql = "INSERT INTO Class (ClassName, AcademicYear) VALUES (?, ?)";
         try {
-            return executeUpdateGetKey(sql, className, semester, academicYear);
+            return executeUpdateGetKey(sql, className, academicYear);
         } catch (SQLException e) {
             throw new RuntimeException("DB error in create class: " + e.getMessage(), e);
         }
     }
 
     public SchoolClass findById(int classId) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.Semester, c.AcademicYear, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.CreatedAt, " +
                      "COUNT(s.StudentID) AS StudentCount " +
                      "FROM Class c LEFT JOIN Student s ON s.ClassID = c.ClassID " +
                      "WHERE c.ClassID = ? " +
-                     "GROUP BY c.ClassID, c.ClassName, c.Semester, c.AcademicYear, c.CreatedAt";
+                     "GROUP BY c.ClassID, c.ClassName,c.AcademicYear, c.CreatedAt";
         try {
             return executeQuery(sql, rs -> {
                 if (rs.next()) return mapRow(rs);
@@ -78,7 +78,7 @@ public class ClassRepository extends BaseRepository {
     }
 
     public SchoolClass findByName(String className) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.Semester, c.AcademicYear, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.CreatedAt, " +
                      "(SELECT COUNT(*) FROM Student s WHERE s.ClassID = c.ClassID) AS StudentCount " +
                      "FROM Class c WHERE c.ClassName = ?";
         try {
@@ -98,14 +98,13 @@ public class ClassRepository extends BaseRepository {
         if (existing != null) {
             return existing.getClassId();
         }
-        return create(UNASSIGNED_CLASS_NAME, "N/A", "N/A");
+        return create(UNASSIGNED_CLASS_NAME, "N/A");
     }
 
     private SchoolClass mapRow(ResultSet rs) throws SQLException {
         SchoolClass c = new SchoolClass();
         c.setClassId(rs.getInt("ClassID"));
         c.setClassName(rs.getString("ClassName"));
-        c.setSemester(rs.getString("Semester"));
         c.setAcademicYear(rs.getString("AcademicYear"));
         Timestamp ts = rs.getTimestamp("CreatedAt");
         if (ts != null) c.setCreatedAt(ts.toLocalDateTime());

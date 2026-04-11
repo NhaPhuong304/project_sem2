@@ -7,22 +7,32 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="620" prefWidth="880" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.staff.ClassListController">
+<AnchorPane prefHeight="620.0" prefWidth="880.0"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.staff.ClassListController">
 
-    <HBox layoutX="20" layoutY="20" spacing="10">
-        <TextField fx:id="searchField" prefWidth="300" promptText="Tim kiem theo ten lop..." />
-        <Button fx:id="addClassBtn" text="+ Them lop moi" />
+    <HBox layoutX="20.0" layoutY="20.0" spacing="10.0">
+        <TextField fx:id="searchField"
+                   prefWidth="260.0"
+                   prefHeight="34.0"
+                   promptText="Tim kiem theo ten lop..." />
+        <Button fx:id="addClassBtn"
+                text="+ Them lop moi"
+                prefWidth="120.0"
+                prefHeight="34.0" />
     </HBox>
 
-    <TableView fx:id="classTable" layoutX="20" layoutY="65" prefHeight="530" prefWidth="840">
+    <TableView fx:id="classTable"
+               layoutX="20.0" layoutY="65.0"
+               prefWidth="840.0" prefHeight="530.0">
         <columns>
-            <TableColumn fx:id="noColumn" prefWidth="60.0" text="No." />
-            <TableColumn fx:id="classNameColumn" prefWidth="180.0" text="Ten lop" />
-            <TableColumn fx:id="semesterColumn" prefWidth="100.0" text="Hoc ky" />
-            <TableColumn fx:id="academicYearColumn" prefWidth="100.0" text="Nam hoc" />
-            <TableColumn fx:id="studentCountColumn" prefWidth="80.0" text="So SV" />
-            <TableColumn fx:id="createdAtColumn" prefWidth="150.0" text="Ngay tao" />
-            <TableColumn fx:id="actionColumn" prefWidth="168.57135009765625" text="Hanh dong" />
+            <TableColumn fx:id="noColumn" text="No." prefWidth="60.0" />
+            <TableColumn fx:id="classNameColumn" text="Ten lop" prefWidth="220.0" />
+            <TableColumn fx:id="academicYearColumn" text="Nam hoc" prefWidth="120.0" />
+            <TableColumn fx:id="studentCountColumn" text="So SV" prefWidth="90.0" />
+            <TableColumn fx:id="createdAtColumn" text="Ngay tao" prefWidth="180.0" />
+            <TableColumn fx:id="actionColumn" text="Hanh dong" prefWidth="170.0" />
         </columns>
     </TableView>
 </AnchorPane>
