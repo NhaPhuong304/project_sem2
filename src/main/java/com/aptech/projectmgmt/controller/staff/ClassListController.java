@@ -29,7 +29,7 @@ public class ClassListController {
     @FXML private TextField searchField;
     @FXML private TableColumn<SchoolClass, Number> noColumn;
     @FXML private TableColumn<SchoolClass, String> classNameColumn;
-    @FXML private TableColumn<SchoolClass, String> semesterColumn;
+
     @FXML private TableColumn<SchoolClass, String> academicYearColumn;
     @FXML private TableColumn<SchoolClass, Integer> studentCountColumn;
     @FXML private TableColumn<SchoolClass, String> createdAtColumn;
@@ -83,7 +83,7 @@ public class ClassListController {
             }
         });
         classNameColumn.setCellValueFactory(new PropertyValueFactory<>("className"));
-        semesterColumn.setCellValueFactory(new PropertyValueFactory<>("semester"));
+       
         academicYearColumn.setCellValueFactory(new PropertyValueFactory<>("academicYear"));
         studentCountColumn.setCellValueFactory(new PropertyValueFactory<>("studentCount"));
         createdAtColumn.setCellValueFactory(c -> new SimpleStringProperty(
@@ -181,7 +181,7 @@ public class ClassListController {
             }
 
             String className = controller.getClassName();
-            String semester = controller.getSemester();
+           
             String academicYear = controller.getAcademicYear();
             if (className.isEmpty()) {
                 AlertUtil.showError("Ten lop khong duoc de trong");
@@ -191,7 +191,8 @@ public class ClassListController {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                    classService.createClass(className, semester, academicYear);
+                    // Truyền "" hoặc null vào vị trí semester để khớp với tham số của ClassService
+                    classService.createClass(className, "", academicYear);
                     return null;
                 }
             };
