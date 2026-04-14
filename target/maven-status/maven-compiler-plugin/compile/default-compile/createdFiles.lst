@@ -87,6 +87,7 @@ com\aptech\projectmgmt\repository\AccountRepository.class
 com\aptech\projectmgmt\controller\staff\StudentListController$4.class
 com\aptech\projectmgmt\repository\MessageRepository.class
 com\aptech\projectmgmt\model\OtpDispatchInfo.class
+com\aptech\projectmgmt\model\TaskReminderInfo.class
 com\aptech\projectmgmt\model\Account.class
 com\aptech\projectmgmt\controller\LoginController$2.class
 com\aptech\projectmgmt\controller\staff\ProjectListController$4.class

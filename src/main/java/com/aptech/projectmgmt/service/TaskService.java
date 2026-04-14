@@ -29,6 +29,51 @@ public class TaskService {
         taskRepository.resetOverdueTasks(LocalDateTime.now());
     }
 
+    public void processEmailReminders() {
+        LocalDateTime now = LocalDateTime.now();
+        List<TaskReminderInfo> assignedReminders = taskRepository.getTasksForAssignedReminder(now);
+        if (!assignedReminders.isEmpty()) {
+            for (TaskReminderInfo info : assignedReminders) {
+                mailService.sendEmailQuietly(info.getStudentEmail(), "[Aptech] Nhac nho nhan task", 
+                    "Xin chao " + info.getStudentName() + ",\nBan co task '" + info.getTitle() + "' can duoc xac nhan thuc hien. Vui long kiem tra tren he thong.");
+                Message m = new Message();
+                m.setSenderId(info.getAdvisorId());
+                m.setReceiverId(info.getStudentId());
+                m.setTaskId(info.getTaskId());
+                m.setContent(NotificationUtil.buildReminderContent("[ASSIGNED] Ban co task chua xac nhan."));
+                messageRepository.insert(m, now);
+            }
+        }
+        
+        List<TaskReminderInfo> dueReminders = taskRepository.getTasksForDueReminder(now);
+        if (!dueReminders.isEmpty()) {
+            for (TaskReminderInfo info : dueReminders) {
+                mailService.sendEmailQuietly(info.getStudentEmail(), "[Aptech] Nhac nho han chot task", 
+                    "Xin chao " + info.getStudentName() + ",\nTask '" + info.getTitle() + "' cua ban chi con 30 phut nua thoi. Vui long nhanh chong hoan thanh.");
+                Message m = new Message();
+                m.setSenderId(info.getAdvisorId());
+                m.setReceiverId(info.getStudentId());
+                m.setTaskId(info.getTaskId());
+                m.setContent(NotificationUtil.buildReminderContent("[DUE] Task cua ban sap het han trong 30 phut."));
+                messageRepository.insert(m, now);
+            }
+        }
+
+        List<TaskReminderInfo> dailyReminders = taskRepository.getTasksForDailyReminder(now);
+        if (!dailyReminders.isEmpty()) {
+            for (TaskReminderInfo info : dailyReminders) {
+                mailService.sendEmailQuietly(info.getStudentEmail(), "[Aptech] Task sap het han (duoi 3 ngay)", 
+                    "Xin chao " + info.getStudentName() + ",\nTask '" + info.getTitle() + "' cua ban chi con duoi 3 ngay nua la het han. Vui long hoan thanh dung tien do.");
+                Message m = new Message();
+                m.setSenderId(info.getAdvisorId());
+                m.setReceiverId(info.getStudentId());
+                m.setTaskId(info.getTaskId());
+                m.setContent(NotificationUtil.buildReminderContent("[DAILY] Task cua ban con duoi 3 ngay nua la het han."));
+                messageRepository.insert(m, now);
+            }
+        }
+    }
+
     public void startTask(int taskId, int studentId) {
         Task task = taskRepository.findById(taskId);
         if (task == null) throw new RuntimeException("Khong tim thay task");

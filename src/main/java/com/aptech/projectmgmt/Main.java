@@ -48,7 +48,8 @@ public class Main extends Application {
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 taskService.resetOverdueTasks();
-                System.out.println("[Scheduler] Reset overdue tasks done.");
+                taskService.processEmailReminders();
+                System.out.println("[Scheduler] Scheduler jobs done.");
             } catch (Exception e) {
                 System.err.println("[Scheduler] Error: " + e.getMessage());
             }

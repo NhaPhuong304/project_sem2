@@ -17,7 +17,7 @@ public class ClassService {
         return classRepository.findByAdvisorId(staffId);
     }
 
-    public void createClass(String className, String semester, String academicYear) {
+    public void createClass(String className, String academicYear) {
         String normalizedClassName = className != null ? className.trim() : "";
         if (normalizedClassName.isEmpty()) {
             throw new RuntimeException("Ten lop khong duoc de trong");
@@ -28,7 +28,7 @@ public class ClassService {
         if (classRepository.findByName(normalizedClassName) != null) {
             throw new RuntimeException("Ten lop da ton tai");
         }
-        classRepository.create(normalizedClassName, semester, academicYear);
+        classRepository.create(normalizedClassName, academicYear);
     }
 
     public SchoolClass getClassById(int classId) {

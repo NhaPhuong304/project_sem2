@@ -18,7 +18,7 @@
         <columns>
             <TableColumn fx:id="noColumn" prefWidth="60.0" text="No." />
             <TableColumn fx:id="classNameColumn" prefWidth="180.0" text="Ten lop" />
-            <TableColumn fx:id="semesterColumn" prefWidth="100.0" text="Hoc ky" />
+
             <TableColumn fx:id="academicYearColumn" prefWidth="100.0" text="Nam hoc" />
             <TableColumn fx:id="studentCountColumn" prefWidth="80.0" text="So SV" />
             <TableColumn fx:id="createdAtColumn" prefWidth="150.0" text="Ngay tao" />

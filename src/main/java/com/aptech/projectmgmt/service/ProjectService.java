@@ -64,9 +64,13 @@ public class ProjectService {
                 && project.getEndDate().isBefore(project.getStartDate())) {
             throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
         }
-        if (project.getReportDate() != null && project.getEndDate() != null
-                && project.getReportDate().isBefore(project.getEndDate())) {
-            throw new RuntimeException("Ngay bao cao phai sau hoac bang ngay ket thuc");
+        if (project.getReportDate() != null && project.getEndDate() != null) {
+            if (project.getReportDate().isAfter(project.getEndDate())) {
+                throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
+            }
+            if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
+                throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
+            }
         }
         if (project.getStatus() == null) project.setStatus(ProjectStatus.ACTIVE);
         if (project.getCreatedByStaffId() == null) {
@@ -101,9 +105,13 @@ public class ProjectService {
                 && project.getEndDate().isBefore(project.getStartDate())) {
             throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
         }
-        if (project.getReportDate() != null && project.getEndDate() != null
-                && project.getReportDate().isBefore(project.getEndDate())) {
-            throw new RuntimeException("Ngay bao cao phai sau hoac bang ngay ket thuc");
+        if (project.getReportDate() != null && project.getEndDate() != null) {
+            if (project.getReportDate().isAfter(project.getEndDate())) {
+                throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
+            }
+            if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
+                throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
+            }
         }
         projectRepository.update(project);
     }

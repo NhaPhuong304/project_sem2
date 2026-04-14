@@ -10,9 +10,6 @@
     <Label text="Ten lop:" layoutX="20" layoutY="24" />
     <TextField fx:id="classNameField" layoutX="130" layoutY="20" prefWidth="250" promptText="Vi du: SE1901" />
 
-    <Label text="Hoc ky:" layoutX="20" layoutY="68" />
-    <TextField fx:id="semesterField" layoutX="130" layoutY="64" prefWidth="250" promptText="Vi du: HK1" />
-
-    <Label text="Nam hoc:" layoutX="20" layoutY="112" />
-    <TextField fx:id="academicYearField" layoutX="130" layoutY="108" prefWidth="250" promptText="Vi du: 2024-2025" />
+    <Label text="Nam hoc:" layoutX="20" layoutY="68" />
+    <TextField fx:id="academicYearField" layoutX="130" layoutY="64" prefWidth="250" promptText="Vi du: 2024-2025" />
 </AnchorPane>

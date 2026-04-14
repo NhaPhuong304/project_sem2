@@ -102,7 +102,6 @@ GO
 CREATE TABLE Class (
     ClassID      INT           IDENTITY(1,1) PRIMARY KEY,
     ClassName    NVARCHAR(100) NOT NULL,
-    Semester     NVARCHAR(20)  NOT NULL,
     AcademicYear NVARCHAR(10)  NOT NULL,
     CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
 );
@@ -159,7 +158,7 @@ CREATE TABLE Project (
     CreatedBy     INT           NOT NULL REFERENCES Staff(StaffID),
     [Status]      TINYINT       NOT NULL DEFAULT 1 CHECK ([Status] IN (1, 2)),
     CreatedAt     DATETIME      NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT CK_Project_Dates CHECK (StartDate <= EndDate AND EndDate <= ReportDate)
+    CONSTRAINT CK_Project_Dates CHECK (StartDate <= EndDate AND ReportDate >= DATEADD(day, -3, EndDate) AND ReportDate <= EndDate)
 );
 GO
 
@@ -629,8 +628,8 @@ DECLARE @Student3AccountID INT;
 DECLARE @Student4AccountID INT;
 DECLARE @Student5AccountID INT;
 
-INSERT INTO Class (ClassName, Semester, AcademicYear)
-VALUES (N'T2305M_SEM2', N'Semester 2', N'2025-2026');
+INSERT INTO Class (ClassName, AcademicYear)
+VALUES (N'T2305M_SEM2', N'2025-2026');
 SET @SeedClassID = SCOPE_IDENTITY();
 
 -- Admin
