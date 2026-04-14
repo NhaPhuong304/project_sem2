@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+	xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.aptech.projectmgmt.controller.student.StudentProjectDetailController"
+	prefWidth="880.0" prefHeight="620.0">
+
+	<children>
+		<TabPane AnchorPane.topAnchor="0.0"
+			AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+			AnchorPane.leftAnchor="0.0">
+
+			<tabs>
+				<Tab text="Project Info" closable="false">
+					<content>
+						<VBox spacing="16.0" style="-fx-padding: 20;">
+							<Label text="Thong tin project"
+								style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+							<GridPane hgap="14.0" vgap="12.0">
+								<padding>
+									<Insets top="10" right="10" bottom="10" left="10" />
+								</padding>
+
+								<Label text="Ten project:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+								<Label fx:id="projectTitleLabel" text="-" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+								<Label text="Hoc ky:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+								<Label fx:id="semesterLabel" text="-" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+								<Label text="Ngay bat dau:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+								<Label fx:id="startDateLabel" text="-" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+								<Label text="Ngay ket thuc:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+								<Label fx:id="endDateLabel" text="-" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+								<Label text="Ngay bao cao:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+								<Label fx:id="reportDateLabel" text="-" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+								<Label text="Thay huong dan:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+								<Label fx:id="advisorLabel" text="-" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+								<Label text="Vai tro cua toi:" GridPane.rowIndex="2" GridPane.columnIndex="2" />
+								<Label fx:id="myRoleLabel" text="-" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+
+							</GridPane>
+
+							<Label text="Mo ta project:" style="-fx-font-weight: bold;" />
+
+							<TextArea fx:id="descriptionArea" editable="false"
+								wrapText="true" prefHeight="220.0" />
+						</VBox>
+					</content>
+				</Tab>
+
+				<Tab text="Task List" closable="false">
+					<content>
+						<fx:include fx:id="myTaskList" source="/fxml/student/my-task-list.fxml" />
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+	</children>
+</AnchorPane>

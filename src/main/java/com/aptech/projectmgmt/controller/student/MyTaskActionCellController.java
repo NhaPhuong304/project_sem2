@@ -12,6 +12,7 @@ public class MyTaskActionCellController {
     @FXML private Button completeButton;
     @FXML private Button resubmitButton;
     @FXML private Button detailButton;
+    @FXML private Button assignButton;
     @FXML private Tooltip startTooltip;
 
     public void configure(
@@ -22,12 +23,14 @@ public class MyTaskActionCellController {
             boolean canComplete,
             boolean canResubmit,
             boolean canViewDetail,
+            boolean canAssign,
             Runnable onStart,
             Runnable onSubmitReview,
             Runnable onRequestRevision,
             Runnable onComplete,
             Runnable onResubmit,
-            Runnable onViewDetail) {
+            Runnable onViewDetail,
+            Runnable onAssign) {
 
         boolean showStartButton = showDisabledStart || canStart;
         configureButton(startButton, showStartButton, canStart, onStart);
@@ -38,6 +41,7 @@ public class MyTaskActionCellController {
         configureButton(completeButton, canComplete, true, onComplete);
         configureButton(resubmitButton, canResubmit, true, onResubmit);
         configureButton(detailButton, canViewDetail, true, onViewDetail);
+        configureButton(assignButton, canAssign, true, onAssign);
     }
 
     private void configureButton(Button button, boolean visible, boolean enabled, Runnable action) {

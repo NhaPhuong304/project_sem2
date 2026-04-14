@@ -55,6 +55,7 @@ C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\proj
 C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\model\DisplayColor.java
 C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\controller\SplashController.java
 C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\controller\staff\ProjectDetailController.java
+C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\controller\student\StudentProjectDetailController.java
 C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\service\ProjectService.java
 C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\repository\StaffRepository.java
 C:\Users\Nha Phuong\eclipse-workspace\project-sem2\src\main\java\com\aptech\projectmgmt\controller\staff\StudentTransferDialogController.java
