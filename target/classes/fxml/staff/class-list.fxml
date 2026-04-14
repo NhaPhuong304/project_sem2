@@ -33,6 +33,7 @@
             <TableColumn fx:id="studentCountColumn" text="So SV" prefWidth="90.0" />
             <TableColumn fx:id="createdAtColumn" text="Ngay tao" prefWidth="180.0" />
             <TableColumn fx:id="actionColumn" text="Hanh dong" prefWidth="170.0" />
+
         </columns>
     </TableView>
 </AnchorPane>

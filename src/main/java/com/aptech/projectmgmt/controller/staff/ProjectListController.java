@@ -121,7 +121,8 @@ public class ProjectListController {
                 if (schoolClass.getClassId() == ALL_CLASSES_ID) {
                     return schoolClass.getClassName();
                 }
-                return schoolClass.getClassName() + " - ";
+                return schoolClass.getClassName() + " (" + schoolClass.getAcademicYear() + ")";
+
             }
 
             @Override

@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class SchoolClass {
 
-	private int classId;
-	private String className;
-	private String academicYear;
-	private LocalDateTime createdAt;
-	private int studentCount;
+    private int classId;
+    private String className;
+    private String academicYear;
+    private LocalDateTime createdAt;
+    private int studentCount;
 
 	public SchoolClass() {
 	}
@@ -25,6 +25,7 @@ public class SchoolClass {
 		return className;
 	}
 
+
 	public void setClassName(String className) {
 		this.className = className;
 	}
@@ -36,7 +37,6 @@ public class SchoolClass {
 	public void setAcademicYear(String academicYear) {
 		this.academicYear = academicYear;
 	}
-
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
@@ -53,8 +53,8 @@ public class SchoolClass {
 		this.studentCount = studentCount;
 	}
 
-	@Override
-	public String toString() {
-		return className + " (" + " - " + academicYear + ")";
-	}
+
+    @Override
+    public String toString() { return className + " (" + academicYear + ")"; }
+
 }

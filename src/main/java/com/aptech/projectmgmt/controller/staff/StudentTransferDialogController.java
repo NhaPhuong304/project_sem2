@@ -36,7 +36,7 @@ public class StudentTransferDialogController {
                 super.updateItem(item, empty);
                 setText(empty || item == null
                         ? null
-                        : item.getClassName() + " (" + " - " + item.getAcademicYear() + ")");
+                        : item.getClassName() + " (" + item.getAcademicYear() + ")");
             }
         });
     }

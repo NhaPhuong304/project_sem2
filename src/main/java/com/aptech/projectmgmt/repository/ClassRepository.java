@@ -66,7 +66,8 @@ public class ClassRepository extends BaseRepository {
                      "COUNT(s.StudentID) AS StudentCount " +
                      "FROM Class c LEFT JOIN Student s ON s.ClassID = c.ClassID " +
                      "WHERE c.ClassID = ? " +
-                     "GROUP BY c.ClassID, c.ClassName,c.AcademicYear, c.CreatedAt";
+                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.CreatedAt";
+
         try {
             return executeQuery(sql, rs -> {
                 if (rs.next()) return mapRow(rs);

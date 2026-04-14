@@ -11,7 +11,6 @@ public class ClassCreateDialogController {
     public String getClassName() {
         return classNameField.getText() != null ? classNameField.getText().trim() : "";
     }
-
     public String getAcademicYear() {
         return academicYearField.getText() != null ? academicYearField.getText().trim() : "";
     }

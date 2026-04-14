@@ -17,19 +17,19 @@ public class ClassService {
 		return classRepository.findByAdvisorId(staffId);
 	}
 
-	public void createClass(String className, String academicYear) {
-		String normalizedClassName = className != null ? className.trim() : "";
-		if (normalizedClassName.isEmpty()) {
-			throw new RuntimeException("Ten lop khong duoc de trong");
-		}
-		if (ClassRepository.UNASSIGNED_CLASS_NAME.equalsIgnoreCase(normalizedClassName)) {
-			throw new RuntimeException("Ten lop nay duoc he thong du phong, vui long chon ten khac");
-		}
-		if (classRepository.findByName(normalizedClassName) != null) {
-			throw new RuntimeException("Ten lop da ton tai");
-		}
-		classRepository.create(normalizedClassName, academicYear);
-	}
+    public void createClass(String className, String academicYear) {
+        String normalizedClassName = className != null ? className.trim() : "";
+        if (normalizedClassName.isEmpty()) {
+            throw new RuntimeException("Ten lop khong duoc de trong");
+        }
+        if (ClassRepository.UNASSIGNED_CLASS_NAME.equalsIgnoreCase(normalizedClassName)) {
+            throw new RuntimeException("Ten lop nay duoc he thong du phong, vui long chon ten khac");
+        }
+        if (classRepository.findByName(normalizedClassName) != null) {
+            throw new RuntimeException("Ten lop da ton tai");
+        }
+        classRepository.create(normalizedClassName, academicYear);
+    }
 
 	public SchoolClass getClassById(int classId) {
 		return classRepository.findById(classId);
