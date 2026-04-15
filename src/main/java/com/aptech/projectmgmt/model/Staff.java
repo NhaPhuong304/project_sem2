@@ -9,6 +9,7 @@ public class Staff {
     private String username;
     private String photoUrl;
     private boolean active;
+    private UserRole role;
 
     public Staff() {}
 
@@ -32,4 +33,7 @@ public class Staff {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public UserRole getRole() { return role; }
+    public void setRole(UserRole role) { this.role = role; }
 }

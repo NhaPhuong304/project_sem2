@@ -2,12 +2,21 @@ package com.aptech.projectmgmt.controller.staff;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import com.aptech.projectmgmt.model.UserRole;
+import javafx.scene.control.ComboBox;
 
 public class TeacherCreateDialogController {
 
     @FXML private TextField usernameField;
     @FXML private TextField fullNameField;
     @FXML private TextField emailField;
+    @FXML private ComboBox<String> roleComboBox;
+
+    @FXML
+    public void initialize() {
+        roleComboBox.getItems().addAll("Giáo viên", "Giáo vụ");
+        roleComboBox.setValue("Giáo viên");
+    }
 
     public String getUsername() {
         return usernameField.getText() != null ? usernameField.getText().trim() : "";
@@ -19,5 +28,12 @@ public class TeacherCreateDialogController {
 
     public String getEmail() {
         return emailField.getText() != null ? emailField.getText().trim() : "";
+    }
+
+    public UserRole getRole() {
+        if ("Giáo vụ".equals(roleComboBox.getValue())) {
+            return UserRole.STAFF;
+        }
+        return UserRole.TEACHER;
     }
 }

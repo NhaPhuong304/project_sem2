@@ -12,7 +12,7 @@ public class StaffRepository extends BaseRepository {
 
     public Staff findByAccountId(int accountId) {
         String sql = "SELECT s.StaffID, s.FullName, s.Email, s.AccountID, " +
-                     "a.Username, a.PhotoUrl, a.IsActive " +
+                     "a.Username, a.PhotoUrl, a.IsActive, a.[Role] " +
                      "FROM Staff s " +
                      "LEFT JOIN Account a ON a.AccountID = s.AccountID " +
                      "WHERE s.AccountID = ?";
@@ -28,7 +28,7 @@ public class StaffRepository extends BaseRepository {
 
     public Staff findById(int staffId) {
         String sql = "SELECT s.StaffID, s.FullName, s.Email, s.AccountID, " +
-                     "a.Username, a.PhotoUrl, a.IsActive " +
+                     "a.Username, a.PhotoUrl, a.IsActive, a.[Role] " +
                      "FROM Staff s " +
                      "LEFT JOIN Account a ON a.AccountID = s.AccountID " +
                      "WHERE s.StaffID = ?";
@@ -44,7 +44,7 @@ public class StaffRepository extends BaseRepository {
 
     public List<Staff> findAll() {
         String sql = "SELECT s.StaffID, s.FullName, s.Email, s.AccountID, " +
-                     "a.Username, a.PhotoUrl, a.IsActive " +
+                     "a.Username, a.PhotoUrl, a.IsActive, a.[Role] " +
                      "FROM Staff s " +
                      "LEFT JOIN Account a ON a.AccountID = s.AccountID " +
                      "ORDER BY s.FullName";
@@ -61,7 +61,7 @@ public class StaffRepository extends BaseRepository {
 
     public List<Staff> findByRole(UserRole role) {
         String sql = "SELECT s.StaffID, s.FullName, s.Email, s.AccountID, " +
-                     "a.Username, a.PhotoUrl, a.IsActive " +
+                     "a.Username, a.PhotoUrl, a.IsActive, a.[Role] " +
                      "FROM Staff s " +
                      "INNER JOIN Account a ON a.AccountID = s.AccountID " +
                      "WHERE a.[Role] = ? " +
@@ -79,7 +79,7 @@ public class StaffRepository extends BaseRepository {
 
     public Staff findByEmail(String email) {
         String sql = "SELECT s.StaffID, s.FullName, s.Email, s.AccountID, " +
-                     "a.Username, a.PhotoUrl, a.IsActive " +
+                     "a.Username, a.PhotoUrl, a.IsActive, a.[Role] " +
                      "FROM Staff s " +
                      "LEFT JOIN Account a ON a.AccountID = s.AccountID " +
                      "WHERE s.Email = ?";
@@ -123,6 +123,10 @@ public class StaffRepository extends BaseRepository {
         s.setUsername(rs.getString("Username"));
         s.setPhotoUrl(rs.getString("PhotoUrl"));
         s.setActive(rs.getBoolean("IsActive"));
+        int roleInt = rs.getInt("Role");
+        if (!rs.wasNull()) {
+            s.setRole(UserRole.fromValue(roleInt));
+        }
         return s;
     }
 }

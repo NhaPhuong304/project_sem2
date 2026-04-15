@@ -32,6 +32,7 @@ public class TeacherListController {
     @FXML private TableColumn<Staff, String> usernameColumn;
     @FXML private TableColumn<Staff, String> fullNameColumn;
     @FXML private TableColumn<Staff, String> emailColumn;
+    @FXML private TableColumn<Staff, String> roleColumn;
     @FXML private TableColumn<Staff, String> accountStatusColumn;
 
     private final StaffService staffService = new StaffService();
@@ -75,6 +76,12 @@ public class TeacherListController {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        roleColumn.setCellValueFactory(c -> {
+            com.aptech.projectmgmt.model.UserRole r = c.getValue().getRole();
+            if (r == com.aptech.projectmgmt.model.UserRole.STAFF) return new SimpleStringProperty("Giao vu");
+            if (r == com.aptech.projectmgmt.model.UserRole.TEACHER) return new SimpleStringProperty("Giao vien");
+            return new SimpleStringProperty("");
+        });
         accountStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().isActive() ? "Hoat dong" : "Da khoa"
         ));
@@ -84,7 +91,7 @@ public class TeacherListController {
         Task<List<Staff>> task = new Task<>() {
             @Override
             protected List<Staff> call() {
-                return staffService.getTeachers();
+                return staffService.getTeachersAndStaffs();
             }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
@@ -102,7 +109,7 @@ public class TeacherListController {
             TeacherCreateDialogController controller = loader.getController();
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Them giao vien");
+            dialog.setTitle("Them Nhan su");
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialogPane.setContent(content);
@@ -114,10 +121,11 @@ public class TeacherListController {
                 Task<TeacherCreationResult> task = new Task<>() {
                     @Override
                     protected TeacherCreationResult call() {
-                        return staffService.createTeacher(
+                        return staffService.createStaffMember(
                                 controller.getUsername(),
                                 controller.getFullName(),
-                                controller.getEmail()
+                                controller.getEmail(),
+                                controller.getRole()
                         );
                     }
                 };
@@ -129,7 +137,7 @@ public class TeacherListController {
                     okButton.setDisable(false);
                     dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
                     TeacherCreationResult resultInfo = task.getValue();
-                    String successMessage = "Them giao vien thanh cong. Tai khoan mac dinh: " +
+                    String successMessage = "Them nhan su thanh cong. Tai khoan mac dinh: " +
                             resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
                     if (resultInfo.isNotificationEmailSent()) {
                         successMessage += ". Da gui email thong bao.";

@@ -8,6 +8,7 @@ import com.aptech.projectmgmt.repository.StaffRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StaffService {
 
@@ -23,7 +24,13 @@ public class StaffService {
         return staffRepository.findByRole(UserRole.TEACHER);
     }
 
-    public TeacherCreationResult createTeacher(String username, String fullName, String email) {
+    public List<Staff> getTeachersAndStaffs() {
+        return staffRepository.findAll().stream()
+                .filter(s -> s.getRole() == UserRole.TEACHER || s.getRole() == UserRole.STAFF)
+                .collect(Collectors.toList());
+    }
+
+    public TeacherCreationResult createStaffMember(String username, String fullName, String email, UserRole role) {
         String normalizedUsername = username != null ? username.trim() : "";
         String normalizedFullName = fullName != null ? fullName.trim() : "";
         String normalizedEmail = email != null ? email.trim() : "";
@@ -54,7 +61,7 @@ public class StaffService {
             accountId = accountRepository.insertAccount(
                     normalizedUsername,
                     passwordHash,
-                    UserRole.TEACHER.getValue(),
+                    role.getValue(),
                     true
             );
         } catch (RuntimeException ex) {
@@ -78,11 +85,10 @@ public class StaffService {
                 normalizedEmail,
                 "[Aptech] Tai khoan giao vien da duoc tao",
                 "Xin chao " + normalizedFullName + ",\n\n" +
-                "Tai khoan giao vien cua ban da duoc tao thanh cong.\n" +
+                "Tai khoan cua ban da duoc tao thanh cong tren he thong.\n" +
                 "Username: " + normalizedUsername + "\n" +
                 "Mat khau tam thoi: " + temporaryPassword + "\n\n" +
-                "Vui long dang nhap vao he thong va doi mat khau ngay trong lan dau tien de bao mat tai khoan.\n" +
-                "Sau khi dang nhap, ban se chi xem duoc lop va project ma minh dang huong dan.\n\n" +
+                "Vui long dang nhap vao he thong va doi mat khau ngay trong lan dau tien de bao mat tai khoan.\n\n" +
                 "Tran trong."
         );
 
