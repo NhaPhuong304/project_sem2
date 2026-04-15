@@ -13,11 +13,15 @@ public class ClassService {
 		return classRepository.findAll();
 	}
 
+	public List<SchoolClass> getClassesByManager(int managerId) {
+		return classRepository.findByManagerId(managerId);
+	}
+
 	public List<SchoolClass> getClassesByAdvisor(int staffId) {
 		return classRepository.findByAdvisorId(staffId);
 	}
 
-    public void createClass(String className, String academicYear) {
+    public void createClass(String className, String academicYear, Integer managerId) {
         String normalizedClassName = className != null ? className.trim() : "";
         if (normalizedClassName.isEmpty()) {
             throw new RuntimeException("Ten lop khong duoc de trong");
@@ -28,7 +32,7 @@ public class ClassService {
         if (classRepository.findByName(normalizedClassName) != null) {
             throw new RuntimeException("Ten lop da ton tai");
         }
-        classRepository.create(normalizedClassName, academicYear);
+        classRepository.create(normalizedClassName, academicYear, managerId);
     }
 
 	public SchoolClass getClassById(int classId) {

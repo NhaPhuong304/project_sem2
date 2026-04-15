@@ -12,11 +12,13 @@ GO
 -- ============================================================
 --  HỆ THỐNG QUẢN LÝ DỰ ÁN SINH VIÊN APTECH - SEMESTER 2
 --  Database: SQL Server 2019+
---  Version: 3.0
---    + Account.PhotoUrl       (avatar)
---    + OtpVerification        (xác thực OTP qua email)
---    + sp_GenerateOtp         (tạo mã OTP, trả về cho backend gửi mail)
---    + sp_VerifyOtp           (xác thực mã OTP, đổi mật khẩu)
+--  Version: 3.1 (Updated by AntiGravity AI)
+--    + Account.Role:          Thêm Role = 4 (Staff / Giáo vụ)
+--    + Class.ManagerID:       Khóa ngoại tham chiếu đến Staff(StaffID) để xác định Giáo vụ quản lý lớp
+--    + Account.PhotoUrl:      (avatar) URL/path
+--    + OtpVerification:       (xác thực OTP qua email)
+--    + sp_GenerateOtp:        (tạo mã OTP, trả về cho backend gửi mail)
+--    + sp_VerifyOtp:          (xác thực mã OTP, đổi mật khẩu)
 -- ============================================================
 
 USE master;
@@ -28,10 +30,10 @@ USE ProjectManagementDB;
 GO
 
 -- ============================================================
--- 1. ACCOUNT  [v3: thêm PhotoUrl]
+-- 1. ACCOUNT  [v3.1: Thêm Role 4 cho Giáo vụ]
 -- ============================================================
 /*
-  Role:        1 = Admin, 2 = Student, 3 = Teacher
+  Role:        1 = Admin, 2 = Student, 3 = Teacher, 4 = Staff (Giáo vụ)
   IsFirstLogin: bắt buộc đổi mật khẩu lần đầu
   PhotoUrl:    đường dẫn avatar (lưu URL/path, không lưu binary trong DB)
                NULL = dùng avatar mặc định phía frontend
@@ -42,7 +44,7 @@ CREATE TABLE Account (
     AccountID    INT            IDENTITY(1,1) PRIMARY KEY,
     Username     NVARCHAR(50)   NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255)  NOT NULL,
-    [Role]       TINYINT        NOT NULL CHECK ([Role] IN (1, 2, 3)),
+    [Role]       TINYINT        NOT NULL CHECK ([Role] IN (1, 2, 3, 4)),
     IsFirstLogin BIT            NOT NULL DEFAULT 1,
     PhotoUrl     NVARCHAR(500)  NULL,                -- [v3] avatar URL/path
     IsActive     BIT            NOT NULL DEFAULT 1,
@@ -97,12 +99,13 @@ CREATE INDEX IX_OtpVerification_AccountID_Purpose
 GO
 
 -- ============================================================
--- 3. CLASS
+-- 3. CLASS [v3.1: Thêm ManagerID để Giáo vụ quản lý lớp độc lập]
 -- ============================================================
 CREATE TABLE Class (
     ClassID      INT           IDENTITY(1,1) PRIMARY KEY,
     ClassName    NVARCHAR(100) NOT NULL,
     AcademicYear NVARCHAR(10)  NOT NULL,
+    ManagerID    INT           NULL REFERENCES Staff(StaffID), -- Giáo vụ phụ trách lớp
     CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
 );
 GO
@@ -567,8 +570,7 @@ GO
 -- ============================================================
 -- DATA ENUM REFERENCE
 -- ============================================================
-/*
-  Account.Role:         1=Admin, 2=Student, 3=Teacher
+  Account.Role:         1=Admin, 2=Student, 3=Teacher, 4=Staff
   Account.PhotoUrl:     NULL = dùng avatar mặc định (frontend tự xử lý)
   GroupMember.Role:     1=Leader, 2=Member
   GroupMember.Status:   1=Active, 2=Excluded
@@ -606,6 +608,9 @@ GO
 -- Tai khoan tao san:
 --   Admin:
 --     admin / 123
+--   Staff:
+--     staff001 / 123
+--     staff002 / 123
 --   Teacher:
 --     gv001 / 123
 --     gv002 / 123
@@ -617,28 +622,46 @@ GO
 --     st005 / 123
 -- ============================================================
 DECLARE @SeedPasswordHash NVARCHAR(255) = N'$2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm';
-DECLARE @SeedClassID INT;
+DECLARE @SeedClassID1 INT, @SeedClassID2 INT, @SeedClassID3 INT;
 
 DECLARE @AdminAccountID   INT;
+DECLARE @Staff1AccountID  INT;
+DECLARE @Staff2AccountID  INT;
 DECLARE @Teacher1AccountID INT;
 DECLARE @Teacher2AccountID INT;
-DECLARE @Student1AccountID INT;
-DECLARE @Student2AccountID INT;
-DECLARE @Student3AccountID INT;
-DECLARE @Student4AccountID INT;
-DECLARE @Student5AccountID INT;
-
-INSERT INTO Class (ClassName, AcademicYear)
-VALUES (N'T2305M_SEM2', N'2025-2026');
-SET @SeedClassID = SCOPE_IDENTITY();
+DECLARE @Student1AccountID INT, @Student2AccountID INT, @Student3AccountID INT, @Student4AccountID INT, @Student5AccountID INT;
+DECLARE @Staff1ID INT, @Staff2ID INT;
 
 -- Admin
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'admin', @SeedPasswordHash, 1, 0, N'no-image.jpg', 1);
 SET @AdminAccountID = SCOPE_IDENTITY();
+INSERT INTO Staff (FullName, Email, AccountID) VALUES (N'Nguyen Minh Quan', N'admin@aptech.local', @AdminAccountID);
 
-INSERT INTO Staff (FullName, Email, AccountID)
-VALUES (N'Nguyen Minh Quan', N'admin@aptech.local', @AdminAccountID);
+-- Staff 1 (Giáo vụ 1)
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
+VALUES (N'staff001', @SeedPasswordHash, 4, 0, N'no-image.jpg', 1);
+SET @Staff1AccountID = SCOPE_IDENTITY();
+INSERT INTO Staff (FullName, Email, AccountID) VALUES (N'Tran Giao Vu', N'giaovu1@aptech.local', @Staff1AccountID);
+SET @Staff1ID = SCOPE_IDENTITY();
+
+-- Staff 2 (Giáo vụ 2)
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
+VALUES (N'staff002', @SeedPasswordHash, 4, 0, N'no-image.jpg', 1);
+SET @Staff2AccountID = SCOPE_IDENTITY();
+INSERT INTO Staff (FullName, Email, AccountID) VALUES (N'Le Quan Ly', N'giaovu2@aptech.local', @Staff2AccountID);
+SET @Staff2ID = SCOPE_IDENTITY();
+
+
+-- Tạo các Lớp và phân công cho Staff quản lý
+INSERT INTO Class (ClassName, AcademicYear, ManagerID) VALUES (N'T2305M01', N'2025-2026', @Staff1ID);
+SET @SeedClassID1 = SCOPE_IDENTITY();
+
+INSERT INTO Class (ClassName, AcademicYear, ManagerID) VALUES (N'T2305M02', N'2025-2026', @Staff1ID);
+SET @SeedClassID2 = SCOPE_IDENTITY();
+
+INSERT INTO Class (ClassName, AcademicYear, ManagerID) VALUES (N'T2401M01', N'2025-2026', @Staff2ID);
+SET @SeedClassID3 = SCOPE_IDENTITY();
 
 -- Teachers
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
@@ -655,41 +678,29 @@ SET @Teacher2AccountID = SCOPE_IDENTITY();
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Le Thi H', N'gv002@aptech.local', @Teacher2AccountID);
 
--- Students
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
-VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+
+-- Students cho Lop 1
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student1AccountID = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID);
 
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID)
-VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID, @Student1AccountID);
-
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
-VALUES (N'st002', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st002', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student2AccountID = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID);
 
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID)
-VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID, @Student2AccountID);
-
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
-VALUES (N'st003', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st003', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student3AccountID = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID);
 
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID)
-VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID, @Student3AccountID);
-
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
-VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+-- Students cho Lop 2
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student4AccountID = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID);
 
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID)
-VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID, @Student4AccountID);
-
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
-VALUES (N'st005', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st005', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student5AccountID = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID);
 
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID)
-VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID, @Student5AccountID);
 GO
 
 

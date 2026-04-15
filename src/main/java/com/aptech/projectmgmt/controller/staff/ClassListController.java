@@ -18,9 +18,12 @@ import java.util.Optional;
 
 import com.aptech.projectmgmt.controller.SingleActionCellController;
 import com.aptech.projectmgmt.model.SchoolClass;
+import com.aptech.projectmgmt.model.UserRole;
+import com.aptech.projectmgmt.model.Staff;
 import com.aptech.projectmgmt.service.ClassService;
 import com.aptech.projectmgmt.util.AlertUtil;
 import com.aptech.projectmgmt.util.SceneManager;
+import com.aptech.projectmgmt.util.SessionManager;
 
 public class ClassListController {
 
@@ -141,8 +144,15 @@ public class ClassListController {
         Task<List<SchoolClass>> task = new Task<>() {
             @Override
             protected List<SchoolClass> call() {
+                var account = SessionManager.getInstance().getCurrentAccount();
                 if (readOnlyMode && teacherStaffId != null) {
                     return classService.getClassesByAdvisor(teacherStaffId);
+                }
+                if (account != null && account.getRole() == UserRole.STAFF) {
+                    Staff staff = SessionManager.getInstance().getCurrentStaff();
+                    if (staff != null) {
+                        return classService.getClassesByManager(staff.getStaffId());
+                    }
                 }
                 return classService.getAllClasses();
             }
@@ -199,7 +209,13 @@ public class ClassListController {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                    classService.createClass(className, academicYear);
+                    Integer managerId = null;
+                    var account = SessionManager.getInstance().getCurrentAccount();
+                    if (account != null && account.getRole() == UserRole.STAFF) {
+                        Staff staff = SessionManager.getInstance().getCurrentStaff();
+                        if (staff != null) managerId = staff.getStaffId();
+                    }
+                    classService.createClass(className, academicYear, managerId);
                     return null;
                 }
             };

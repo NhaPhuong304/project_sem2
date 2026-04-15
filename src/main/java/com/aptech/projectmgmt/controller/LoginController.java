@@ -88,7 +88,7 @@ public class LoginController {
 
 			if (account.isFirstLogin()) {
 				navigateToOtp(account.getAccountId(), OtpPurpose.FIRST_LOGIN);
-			} else if (account.getRole() == UserRole.ADMIN) {
+			} else if (account.getRole() == UserRole.ADMIN || account.getRole() == UserRole.STAFF) {
 				navigateToStaffDashboard();
 			} else if (account.getRole() == UserRole.TEACHER) {
 				navigateToTeacherDashboard();

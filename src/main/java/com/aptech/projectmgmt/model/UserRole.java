@@ -1,7 +1,7 @@
 package com.aptech.projectmgmt.model;
 
 public enum UserRole {
-    ADMIN(1), STUDENT(2), TEACHER(3);
+    ADMIN(1), STUDENT(2), TEACHER(3), STAFF(4);
 
     private final int value;
 
@@ -10,7 +10,7 @@ public enum UserRole {
     public int getValue() { return value; }
 
     public boolean isStaffRole() {
-        return this == ADMIN || this == TEACHER;
+        return this == ADMIN || this == TEACHER || this == STAFF;
     }
 
     public static UserRole fromValue(int value) {

@@ -42,9 +42,19 @@ public class StaffDashboardController {
         loadAvatar();
         avatarImageView.setOnMouseClicked(e -> handleChangeAvatar());
         logoutBtn.setOnAction(e -> handleLogout());
-        // Load class list by default
-        setActiveMenu(classListBtn);
-        loadContent(SceneManager.CLASS_LIST);
+        
+        var account = SessionManager.getInstance().getCurrentAccount();
+        if (account != null && account.getRole() == com.aptech.projectmgmt.model.UserRole.ADMIN) {
+            classListBtn.setVisible(false); classListBtn.setManaged(false);
+            projectListBtn.setVisible(false); projectListBtn.setManaged(false);
+            studentManagementBtn.setVisible(false); studentManagementBtn.setManaged(false);
+            setActiveMenu(teacherListBtn);
+            loadContent(SceneManager.TEACHER_LIST);
+        } else {
+            teacherListBtn.setVisible(false); teacherListBtn.setManaged(false);
+            setActiveMenu(classListBtn);
+            loadContent(SceneManager.CLASS_LIST);
+        }
     }
 
     public void loadContent(String fxmlPath) {
