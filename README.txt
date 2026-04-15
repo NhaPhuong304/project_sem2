@@ -5,8 +5,9 @@ JavaFX 21 + SceneBuilder + SQL Server 2019 + Maven
 
 1. GIOI THIEU
 Project nay la desktop app quan ly du an sinh vien Aptech.
-He thong hien tai ho tro 3 nhom nguoi dung:
-- Admin (Giao vu)
+He thong hien tai ho tro 4 nhom nguoi dung:
+- Admin (Quan tri vien)
+- Staff (Giao vu)
 - Teacher (Giao vien)
 - Student (Sinh vien)
 
@@ -76,17 +77,17 @@ Khuyen nghi:
 =========================================================
 
 Thu muc quan trong:
-- [src/main/java/com/aptech/projectmgmt](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt)
-- [src/main/resources/fxml](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/fxml)
-- [src/main/resources/css/style.css](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/css/style.css)
-- [src/main/resources/db/ProjectManagement_DDL_v3.sql](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/db/ProjectManagement_DDL_v3.sql)
-- [src/main/resources/database.properties](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/database.properties)
-- [src/main/resources/application.properties](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/application.properties)
-- [uploads/avatars](/Users/yennhn/eclipse-workspace/project-sem2/uploads/avatars)
+- src/main/java/com/aptech/projectmgmt
+- src/main/resources/fxml
+- src/main/resources/css/style.css
+- src/main/resources/db/ProjectManagement_DDL_v3.sql
+- src/main/resources/database.properties
+- src/main/resources/application.properties
+- uploads/avatars
 
 Entry point:
 - Maven JavaFX run: `com.aptech.projectmgmt.Main`
-- Eclipse Java Application nen chay: [AppLauncher.java](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/AppLauncher.java)
+- Eclipse Java Application nen chay: src/main/java/com/aptech/projectmgmt/AppLauncher.java
 
 
 =========================================================
@@ -95,10 +96,10 @@ Entry point:
 
 5.1. Cau hinh database
 File:
-- [src/main/resources/database.properties](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/database.properties)
+- src/main/resources/database.properties
 
 Format hien tai:
-  db.url=jdbc:sqlserver://localhost:1433;databaseName=ProjectManagementDB;encrypt=false;trustServerCertificate=true
+  db.url=jdbc:sqlserver://DESKTOP-QMKQ2M3:1433;databaseName=ProjectManagementDB;encrypt=true;trustServerCertificate=true
   db.username=sa
   db.password=Password123!
   db.poolSize=10
@@ -110,7 +111,7 @@ cho dung voi may cua ban.
 
 5.2. Cau hinh mail OTP
 File:
-- [src/main/resources/application.properties](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/application.properties)
+- src/main/resources/application.properties
 
 Can co cac key:
   smtp.host=smtp.gmail.com
@@ -129,7 +130,7 @@ Luu y:
 =========================================================
 
 File SQL chinh:
-- [ProjectManagement_DDL_v3.sql](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/db/ProjectManagement_DDL_v3.sql)
+- src/main/resources/db/ProjectManagement_DDL_v3.sql
 
 File nay se:
 - Tao database `ProjectManagementDB`
@@ -165,24 +166,21 @@ Mat khau cho tat ca tai khoan test:
 - username: `admin`
 - password: `123`
 
-7.2. Teacher
-- username: `gv001`
+7.2. Staff (Giao vu)
+- username: `staff001`
+- password: `123`
+- username: `staff002`
 - password: `123`
 
+7.3. Teacher
+- username: `gv001`
+- password: `123`
 - username: `gv002`
 - password: `123`
 
-7.3. Student
-- username: `st001`
-- password: `123`
-- username: `st002`
-- password: `123`
-- username: `st003`
-- password: `123`
-- username: `st004`
-- password: `123`
-- username: `st005`
-- password: `123`
+7.4. Student
+- username: `st001`, `st002`, `st003`, `st004`, `st005`
+- password: `123` (cho tat ca)
 
 Luu y:
 - Cac tai khoan seed trong DDL dang de `IsFirstLogin = 0`
@@ -198,7 +196,7 @@ Luu y:
 2. Chon:
    File > Import > Maven > Existing Maven Projects
 3. Chon thu muc project:
-   `/Users/yennhn/eclipse-workspace/project-sem2`
+   (duong dan toi project-sem2 tren may cua ban)
 4. Finish
 5. Chuot phai project > Maven > Update Project
 
@@ -261,7 +259,7 @@ Hoac:
 
 9.3. Chay trong Eclipse bang Java Application
 Neu muon bam Run truc tiep trong Eclipse:
-- Hay chay [AppLauncher.java](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/AppLauncher.java)
+- Hay chay src/main/java/com/aptech/projectmgmt/AppLauncher.java
 - Khong nen chay truc tiep `Main.java` neu launch config cua Eclipse chua dung
 
 Main class nen chon:
@@ -281,9 +279,9 @@ Khi chay app:
 3. Sau khoang 5 giay moi vao man login
 
 File lien quan:
-- [Main.java](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/Main.java)
-- [SplashController.java](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/controller/SplashController.java)
-- [splash.fxml](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/fxml/splash.fxml)
+- src/main/java/com/aptech/projectmgmt/Main.java
+- src/main/java/com/aptech/projectmgmt/controller/SplashController.java
+- src/main/resources/fxml/splash.fxml
 
 
 =========================================================
@@ -292,19 +290,22 @@ File lien quan:
 
 11.1. Admin
 - Dang nhap vao dashboard admin
-- Quan ly lop
+- Quan tri he thong
+
+11.2. Staff (Giao vu)
+- Dang nhap vao dashboard Staff
+- Quan ly lop (co ManagerID de xac dinh lop do tung staff phu trach)
 - Quan ly sinh vien
 - Quan ly giao vien
-- Quan ly project
-- Quan ly nhom
-- Xem va quan ly task
+- Quan ly project, nhom
+- Xem va quan ly task cua cac nhom
 
-11.2. Teacher
+11.3. Teacher
 - Dang nhap vao dashboard teacher rieng
 - Chi xem duoc lop va project ma minh huong dan
-- Khong tao lop, khong them sinh vien, khong tao project nhu admin
+- Khong tao lop, khong them sinh vien, khong tao project nhu admin/staff
 
-11.3. Student
+11.4. Student
 - Dang nhap vao dashboard sinh vien
 - Xem project cua minh
 - Xem task
@@ -323,7 +324,7 @@ File lien quan:
 - User bam vao avatar o header
 - Chon anh tu may
 - App se copy anh vao:
-  [uploads/avatars](/Users/yennhn/eclipse-workspace/project-sem2/uploads/avatars)
+  uploads/avatars
 - Ten file duoc tao ngau nhien, khong trung
 - Neu user da co avatar cu do project quan ly thi app se xoa file cu
 - DB chi luu path tuong doi, vi du:
@@ -359,6 +360,9 @@ Neu mail khong gui duoc:
 Admin:
 - Login
 - OTP
+- Cài đặt hệ thống
+
+Staff:
 - Staff Dashboard
 - Quan ly lop
 - Quan ly sinh vien
@@ -385,7 +389,7 @@ Student:
 =========================================================
 
 Java source:
-- [src/main/java/com/aptech/projectmgmt](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt)
+- src/main/java/com/aptech/projectmgmt
 
 Package chinh:
 - `config`     : cau hinh DB
@@ -396,10 +400,10 @@ Package chinh:
 - `util`       : SceneManager, SessionManager, AlertUtil, AvatarUtil...
 
 Resource:
-- [src/main/resources/fxml](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/fxml)
-- [src/main/resources/css/style.css](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/css/style.css)
-- [src/main/resources/images](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/images)
-- [src/main/resources/db](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/db)
+- src/main/resources/fxml
+- src/main/resources/css/style.css
+- src/main/resources/images
+- src/main/resources/db
 
 
 =========================================================
@@ -442,13 +446,13 @@ Copy toan bo thu muc project, bao gom:
 17.3. Chay database
 1. Mo SQL tool
 2. Chay file:
-   [ProjectManagement_DDL_v3.sql](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/db/ProjectManagement_DDL_v3.sql)
+   src/main/resources/db/ProjectManagement_DDL_v3.sql
 3. File nay tao DB va seed luon account test
 
 17.4. Sua cau hinh
 Sua file:
-- [database.properties](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/database.properties)
-- [application.properties](/Users/yennhn/eclipse-workspace/project-sem2/src/main/resources/application.properties)
+- src/main/resources/database.properties
+- src/main/resources/application.properties
 
 17.5. Import vao Eclipse
 - Import Maven project
@@ -470,7 +474,7 @@ Kiem tra:
 Cach khac phuc:
 - Chay bang `mvn javafx:run`
 hoac
-- Chay [AppLauncher.java](/Users/yennhn/eclipse-workspace/project-sem2/src/main/java/com/aptech/projectmgmt/AppLauncher.java) thay vi `Main.java`
+- Chay AppLauncher.java thay vi `Main.java`
 
 18.3. Khong gui duoc mail
 Kiem tra:
