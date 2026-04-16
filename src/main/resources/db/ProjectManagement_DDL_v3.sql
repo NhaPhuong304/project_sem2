@@ -1,117 +1,42 @@
+-- ============================================================
+-- PHẦN 1: XÓA DATABASE CŨ (NẾU CÓ)
+-- ============================================================
 USE master;
 GO
 
-ALTER DATABASE ProjectManagementDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'ProjectManagementDB')
+BEGIN
+    ALTER DATABASE ProjectManagementDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE ProjectManagementDB;
+END
 GO
-
-DROP DATABASE ProjectManagementDB;
-GO
-
-
 
 -- ============================================================
---  HỆ THỐNG QUẢN LÝ DỰ ÁN SINH VIÊN APTECH - SEMESTER 2
---  Database: SQL Server 2019+
---  Version: 3.1 (Updated by AntiGravity AI)
---    + Account.Role:          Thêm Role = 4 (Staff / Giáo vụ)
---    + Class.ManagerID:       Khóa ngoại tham chiếu đến Staff(StaffID) để xác định Giáo vụ quản lý lớp
---    + Account.PhotoUrl:      (avatar) URL/path
---    + OtpVerification:       (xác thực OTP qua email)
---    + sp_GenerateOtp:        (tạo mã OTP, trả về cho backend gửi mail)
---    + sp_VerifyOtp:          (xác thực mã OTP, đổi mật khẩu)
+-- PHẦN 2: TẠO DATABASE MỚI
 -- ============================================================
+CREATE DATABASE ProjectManagementDB COLLATE Vietnamese_CI_AS;
+GO
 
-USE master;
-GO
-CREATE DATABASE ProjectManagementDB
-    COLLATE Vietnamese_CI_AS;
-GO
 USE ProjectManagementDB;
 GO
 
 -- ============================================================
--- 1. ACCOUNT  [v3.1: Thêm Role 4 cho Giáo vụ]
+-- PHẦN 3: TẠO BẢNG ACCOUNT (Không phụ thuộc bảng nào)
 -- ============================================================
-/*
-  Role:        1 = Admin, 2 = Student, 3 = Teacher, 4 = Staff (Giáo vụ)
-  IsFirstLogin: bắt buộc đổi mật khẩu lần đầu
-  PhotoUrl:    đường dẫn avatar (lưu URL/path, không lưu binary trong DB)
-               NULL = dùng avatar mặc định phía frontend
-               VD: '/uploads/avatars/acc_42.jpg'
-                   'https://cdn.example.com/avatars/acc_42.webp'
-*/
 CREATE TABLE Account (
     AccountID    INT            IDENTITY(1,1) PRIMARY KEY,
     Username     NVARCHAR(50)   NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255)  NOT NULL,
     [Role]       TINYINT        NOT NULL CHECK ([Role] IN (1, 2, 3, 4)),
     IsFirstLogin BIT            NOT NULL DEFAULT 1,
-    PhotoUrl     NVARCHAR(500)  NULL,                -- [v3] avatar URL/path
+    PhotoUrl     NVARCHAR(500)  NULL,
     IsActive     BIT            NOT NULL DEFAULT 1,
     CreatedAt    DATETIME       NOT NULL DEFAULT GETDATE()
 );
 GO
 
 -- ============================================================
--- 2. OTP_VERIFICATION  [v3: bảng mới]
--- ============================================================
-/*
-  Dùng cho 2 luồng:
-    Purpose 1 = ChangePassword  (student/staff muốn đổi mật khẩu)
-    Purpose 2 = FirstLogin      (sinh viên đăng nhập lần đầu bị ép đổi pass)
-
-  Luồng chuẩn:
-    1. Backend nhận yêu cầu từ client → gọi sp_GenerateOtp(@AccountID, @Purpose)
-    2. SP insert bản ghi OTP, trả về OtpCode (6 chữ số)
-    3. Backend gửi email chứa mã OTP đến địa chỉ của account
-    4. User nhập mã → client gọi sp_VerifyOtp(@AccountID, @Purpose, @InputCode, @NewPasswordHash)
-    5. SP kiểm tra mã → nếu đúng: đổi pass + đánh dấu IsUsed = 1
-
-  Bảo vệ brute-force:
-    AttemptCount tăng mỗi lần nhập sai.
-    Khi AttemptCount >= 5 → OTP bị khóa (IsUsed = 1) dù chưa dùng đúng.
-
-  Mỗi lần gọi sp_GenerateOtp sẽ vô hiệu hóa các OTP cũ cùng AccountID + Purpose
-  (set IsUsed = 1) trước khi tạo mới, tránh nhiều OTP active song song.
-
-  Không lưu trực tiếp OtpCode dạng plain — lưu hash nếu muốn bảo mật cao hơn.
-  Ở đây lưu plain để đơn giản cho dự án sinh viên (OTP 6 số, TTL 5 phút, max 5 lần thử).
-*/
-CREATE TABLE OtpVerification (
-    OtpID        INT           IDENTITY(1,1) PRIMARY KEY,
-    AccountID    INT           NOT NULL REFERENCES Account(AccountID),
-    Email        NVARCHAR(100) NOT NULL,               -- email nhận OTP (snapshot tại thời điểm tạo)
-    OtpCode      NVARCHAR(6)   NOT NULL,               -- 6 chữ số, VD: '483921'
-    Purpose      TINYINT       NOT NULL
-                               CHECK (Purpose IN (1, 2)),
-                                                       -- 1=ChangePassword, 2=FirstLogin
-    ExpiresAt    DATETIME      NOT NULL,               -- GETDATE() + 5 phút
-    IsUsed       BIT           NOT NULL DEFAULT 0,     -- 1 = đã dùng hoặc bị khóa
-    AttemptCount INT           NOT NULL DEFAULT 0,     -- số lần nhập sai
-    CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
-);
-GO
-
--- Index để query nhanh OTP còn hiệu lực của một account
-CREATE INDEX IX_OtpVerification_AccountID_Purpose
-    ON OtpVerification(AccountID, Purpose)
-    INCLUDE (OtpCode, ExpiresAt, IsUsed, AttemptCount);
-GO
-
--- ============================================================
--- 3. CLASS [v3.1: Thêm ManagerID để Giáo vụ quản lý lớp độc lập]
--- ============================================================
-CREATE TABLE Class (
-    ClassID      INT           IDENTITY(1,1) PRIMARY KEY,
-    ClassName    NVARCHAR(100) NOT NULL,
-    AcademicYear NVARCHAR(10)  NOT NULL,
-    ManagerID    INT           NULL REFERENCES Staff(StaffID), -- Giáo vụ phụ trách lớp
-    CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
-);
-GO
-
--- ============================================================
--- 4. STAFF
+-- PHẦN 4: TẠO BẢNG STAFF (Tham chiếu Account)
 -- ============================================================
 CREATE TABLE Staff (
     StaffID   INT           IDENTITY(1,1) PRIMARY KEY,
@@ -122,7 +47,19 @@ CREATE TABLE Staff (
 GO
 
 -- ============================================================
--- 5. STUDENT
+-- PHẦN 5: TẠO BẢNG CLASS (Tham chiếu Staff.ManagerID)
+-- ============================================================
+CREATE TABLE Class (
+    ClassID      INT           IDENTITY(1,1) PRIMARY KEY,
+    ClassName    NVARCHAR(100) NOT NULL,
+    AcademicYear NVARCHAR(10)  NOT NULL,
+    ManagerID    INT           NULL REFERENCES Staff(StaffID),
+    CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
+);
+GO
+
+-- ============================================================
+-- PHẦN 6: TẠO BẢNG STUDENT (Tham chiếu Account và Class)
 -- ============================================================
 CREATE TABLE Student (
     StudentID   INT           IDENTITY(1,1) PRIMARY KEY,
@@ -135,7 +72,28 @@ CREATE TABLE Student (
 GO
 
 -- ============================================================
--- 6. PROJECT_GROUP
+-- PHẦN 7: TẠO BẢNG OTP_VERIFICATION
+-- ============================================================
+CREATE TABLE OtpVerification (
+    OtpID        INT           IDENTITY(1,1) PRIMARY KEY,
+    AccountID    INT           NOT NULL REFERENCES Account(AccountID),
+    Email        NVARCHAR(100) NOT NULL,
+    OtpCode      NVARCHAR(6)   NOT NULL,
+    Purpose      TINYINT       NOT NULL CHECK (Purpose IN (1, 2)),
+    ExpiresAt    DATETIME      NOT NULL,
+    IsUsed       BIT           NOT NULL DEFAULT 0,
+    AttemptCount INT           NOT NULL DEFAULT 0,
+    CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE INDEX IX_OtpVerification_AccountID_Purpose
+    ON OtpVerification(AccountID, Purpose)
+    INCLUDE (OtpCode, ExpiresAt, IsUsed, AttemptCount);
+GO
+
+-- ============================================================
+-- PHẦN 8: TẠO BẢNG PROJECT_GROUP
 -- ============================================================
 CREATE TABLE ProjectGroup (
     GroupID   INT           IDENTITY(1,1) PRIMARY KEY,
@@ -146,7 +104,7 @@ CREATE TABLE ProjectGroup (
 GO
 
 -- ============================================================
--- 7. PROJECT
+-- PHẦN 9: TẠO BẢNG PROJECT
 -- ============================================================
 CREATE TABLE Project (
     ProjectID     INT           IDENTITY(1,1) PRIMARY KEY,
@@ -166,7 +124,7 @@ CREATE TABLE Project (
 GO
 
 -- ============================================================
--- 8. GROUP_MEMBER
+-- PHẦN 10: TẠO BẢNG GROUP_MEMBER
 -- ============================================================
 CREATE TABLE GroupMember (
     MemberID       INT           IDENTITY(1,1) PRIMARY KEY,
@@ -189,7 +147,7 @@ CREATE UNIQUE INDEX UX_GroupMember_OneLeader
 GO
 
 -- ============================================================
--- 9. TASK
+-- PHẦN 11: TẠO BẢNG TASK
 -- ============================================================
 CREATE TABLE Task (
     TaskID             INT           IDENTITY(1,1) PRIMARY KEY,
@@ -201,8 +159,8 @@ CREATE TABLE Task (
     ActualStartDate    DATETIME      NULL,
     ActualEndDate      DATETIME      NULL,
     [Status]           TINYINT       NOT NULL DEFAULT 1 CHECK ([Status] IN (1,2,3,4,5)),
-    AssignedTo         INT           NULL     REFERENCES Student(StudentID),
-    ReviewedBy         INT           NULL     REFERENCES Student(StudentID),
+    AssignedTo         INT           NULL REFERENCES Student(StudentID),
+    ReviewedBy         INT           NULL REFERENCES Student(StudentID),
     CreatedBy          INT           NOT NULL REFERENCES Student(StudentID),
     IsLate             BIT           NOT NULL DEFAULT 0,
     CreatedAt          DATETIME      NOT NULL DEFAULT GETDATE(),
@@ -211,7 +169,7 @@ CREATE TABLE Task (
 GO
 
 -- ============================================================
--- 10. TASK_REVISION
+-- PHẦN 12: TẠO BẢNG TASK_REVISION
 -- ============================================================
 CREATE TABLE TaskRevision (
     RevisionID INT           IDENTITY(1,1) PRIMARY KEY,
@@ -223,7 +181,7 @@ CREATE TABLE TaskRevision (
 GO
 
 -- ============================================================
--- 11. TASK_STATUS_HISTORY
+-- PHẦN 13: TẠO BẢNG TASK_STATUS_HISTORY
 -- ============================================================
 CREATE TABLE TaskStatusHistory (
     HistoryID  INT           IDENTITY(1,1) PRIMARY KEY,
@@ -237,7 +195,7 @@ CREATE TABLE TaskStatusHistory (
 GO
 
 -- ============================================================
--- 12. TASK_ABANDON_LOG
+-- PHẦN 14: TẠO BẢNG TASK_ABANDON_LOG
 -- ============================================================
 CREATE TABLE TaskAbandonLog (
     LogID       INT           IDENTITY(1,1) PRIMARY KEY,
@@ -249,13 +207,13 @@ CREATE TABLE TaskAbandonLog (
 GO
 
 -- ============================================================
--- 13. MESSAGE
+-- PHẦN 15: TẠO BẢNG MESSAGE
 -- ============================================================
 CREATE TABLE [Message] (
     MessageID  INT           IDENTITY(1,1) PRIMARY KEY,
     SenderID   INT           NOT NULL REFERENCES Staff(StaffID),
     ReceiverID INT           NOT NULL REFERENCES Student(StudentID),
-    TaskID     INT           NULL     REFERENCES Task(TaskID),
+    TaskID     INT           NULL REFERENCES Task(TaskID),
     Content    NVARCHAR(MAX) NOT NULL,
     SentAt     DATETIME      NOT NULL DEFAULT GETDATE(),
     IsRead     BIT           NOT NULL DEFAULT 0
@@ -263,7 +221,7 @@ CREATE TABLE [Message] (
 GO
 
 -- ============================================================
--- INDEXES
+-- PHẦN 16: TẠO INDEXES
 -- ============================================================
 CREATE INDEX IX_Student_ClassID          ON Student(ClassID);
 CREATE INDEX IX_Project_GroupID          ON Project(GroupID);
@@ -285,29 +243,16 @@ CREATE INDEX IX_Message_TaskID           ON [Message](TaskID);
 GO
 
 -- ============================================================
--- STORED PROCEDURE: Tạo OTP mới  [v3]
+-- PHẦN 17: STORED PROCEDURES
 -- ============================================================
-/*
-  Gọi khi:
-    - Sinh viên/Staff yêu cầu đổi mật khẩu    → @Purpose = 1
-    - Sinh viên đăng nhập lần đầu (IsFirstLogin) → @Purpose = 2
-
-  Trả về: OtpCode (backend đọc và gửi email, không lưu plain trên client)
-
-  Backend flow (Java/Spring):
-    1. EXEC sp_GenerateOtp @AccountID=42, @Purpose=1, @OtpCode OUTPUT
-    2. Dùng JavaMailSender gửi email: "Mã OTP của bạn là: " + @OtpCode
-    3. OTP hết hạn sau 5 phút — hiển thị countdown ở client
-*/
 CREATE OR ALTER PROCEDURE sp_GenerateOtp
     @AccountID INT,
-    @Purpose   TINYINT,           -- 1=ChangePassword, 2=FirstLogin
-    @OtpCode   NVARCHAR(6) OUTPUT -- trả về cho backend gửi mail
+    @Purpose   TINYINT,
+    @OtpCode   NVARCHAR(6) OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Lấy email tương ứng với account (ưu tiên Student, fallback Staff)
     DECLARE @Email NVARCHAR(100);
     SELECT @Email = COALESCE(
         (SELECT Email FROM Student WHERE AccountID = @AccountID),
@@ -320,41 +265,25 @@ BEGIN
         RETURN;
     END
 
-    -- Vô hiệu hóa tất cả OTP cũ còn active của account này + purpose này
     UPDATE OtpVerification
     SET IsUsed = 1
     WHERE AccountID = @AccountID
       AND Purpose   = @Purpose
       AND IsUsed    = 0;
 
-    -- Sinh mã OTP 6 chữ số ngẫu nhiên (000000 → 999999)
     SET @OtpCode = RIGHT('000000' + CAST(ABS(CHECKSUM(NEWID())) % 1000000 AS NVARCHAR), 6);
 
-    -- Lưu OTP vào bảng (TTL = 5 phút)
     INSERT INTO OtpVerification (AccountID, Email, OtpCode, Purpose, ExpiresAt)
     VALUES (@AccountID, @Email, @OtpCode, @Purpose, DATEADD(MINUTE, 5, GETDATE()));
 END;
 GO
 
--- ============================================================
--- STORED PROCEDURE: Xác thực OTP và đổi mật khẩu  [v3]
--- ============================================================
-/*
-  Trả về ResultCode:
-    0 = Thành công — đổi mật khẩu xong
-    1 = Mã OTP không đúng (còn lượt thử)
-    2 = Mã OTP không đúng, đã bị khóa (AttemptCount >= 5)
-    3 = OTP hết hạn hoặc đã dùng rồi
-    4 = Không tồn tại OTP hợp lệ cho account + purpose này
-
-  @NewPasswordHash: bcrypt hash từ backend — SP không hash, chỉ lưu
-*/
 CREATE OR ALTER PROCEDURE sp_VerifyOtp
     @AccountID       INT,
     @Purpose         TINYINT,
     @InputCode       NVARCHAR(6),
     @NewPasswordHash NVARCHAR(255),
-    @ResultCode      INT OUTPUT        -- 0=OK, 1=WrongCode, 2=Locked, 3=Expired, 4=NotFound
+    @ResultCode      INT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -366,7 +295,6 @@ BEGIN
     DECLARE @IsUsed       BIT;
     DECLARE @AttemptCount INT;
 
-    -- Lấy OTP mới nhất còn hiệu lực của account + purpose
     SELECT TOP 1
         @OtpID        = OtpID,
         @OtpCode      = OtpCode,
@@ -378,7 +306,6 @@ BEGIN
       AND Purpose   = @Purpose
     ORDER BY CreatedAt DESC;
 
-    -- Không tìm thấy OTP nào
     IF @OtpID IS NULL
     BEGIN
         SET @ResultCode = 4;
@@ -386,7 +313,6 @@ BEGIN
         RETURN;
     END
 
-    -- OTP đã dùng hoặc hết hạn
     IF @IsUsed = 1 OR @ExpiresAt < GETDATE()
     BEGIN
         SET @ResultCode = 3;
@@ -394,7 +320,6 @@ BEGIN
         RETURN;
     END
 
-    -- Mã không đúng
     IF @OtpCode != @InputCode
     BEGIN
         DECLARE @NewAttempt INT = @AttemptCount + 1;
@@ -409,14 +334,13 @@ BEGIN
         RETURN;
     END
 
-    -- OTP đúng → đổi mật khẩu + đánh dấu OTP đã dùng
     UPDATE OtpVerification
     SET IsUsed = 1
     WHERE OtpID = @OtpID;
 
     UPDATE Account
     SET PasswordHash = @NewPasswordHash,
-        IsFirstLogin = 0              -- tắt cờ bắt đổi mật khẩu lần đầu
+        IsFirstLogin = 0
     WHERE AccountID = @AccountID;
 
     SET @ResultCode = 0;
@@ -425,7 +349,7 @@ END;
 GO
 
 -- ============================================================
--- TRIGGER: Xử lý khi sinh viên bỏ task
+-- PHẦN 18: TRIGGERS
 -- ============================================================
 CREATE OR ALTER TRIGGER trg_TaskAbandonLog_AfterInsert
 ON TaskAbandonLog
@@ -464,9 +388,6 @@ BEGIN
 END;
 GO
 
--- ============================================================
--- TRIGGER: Đặt IsLate khi task hoàn thành trễ
--- ============================================================
 CREATE OR ALTER TRIGGER trg_Task_CheckLate
 ON Task
 AFTER UPDATE
@@ -483,34 +404,7 @@ END;
 GO
 
 -- ============================================================
--- STORED PROCEDURE: Reset task quá 1 giờ không xác nhận
--- ============================================================
-CREATE OR ALTER PROCEDURE sp_ResetOverdueTasks
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    DECLARE @OverdueTasks TABLE (TaskID INT, StudentID INT);
-
-    INSERT INTO @OverdueTasks (TaskID, StudentID)
-    SELECT TaskID, AssignedTo
-    FROM Task
-    WHERE [Status]      = 1
-      AND AssignedTo    IS NOT NULL
-      AND EstimatedStartDate <= DATEADD(HOUR, -1, GETDATE());
-
-    INSERT INTO TaskAbandonLog (TaskID, StudentID, Note)
-    SELECT TaskID, StudentID, N'Tự động: quá 1 giờ không xác nhận thực hiện'
-    FROM @OverdueTasks;
-
-    UPDATE Task
-    SET AssignedTo = NULL
-    WHERE TaskID IN (SELECT TaskID FROM @OverdueTasks);
-END;
-GO
-
--- ============================================================
--- VIEW: Tổng quan task
+-- PHẦN 19: VIEW
 -- ============================================================
 CREATE OR ALTER VIEW vw_TaskOverview AS
 SELECT
@@ -536,7 +430,6 @@ SELECT
         WHEN 5 THEN N'Hoàn thành'
     END                  AS TaskStatusLabel,
     t.IsLate,
-    -- Avatar: join về Account để lấy PhotoUrl
     s_exec.FullName      AS AssignedToName,
     a_exec.PhotoUrl      AS AssignedToPhoto,
     s_rev.FullName       AS ReviewedByName,
@@ -568,58 +461,7 @@ LEFT  JOIN (
 GO
 
 -- ============================================================
--- DATA ENUM REFERENCE
--- ============================================================
-  Account.Role:         1=Admin, 2=Student, 3=Teacher, 4=Staff
-  Account.PhotoUrl:     NULL = dùng avatar mặc định (frontend tự xử lý)
-  GroupMember.Role:     1=Leader, 2=Member
-  GroupMember.Status:   1=Active, 2=Excluded
-  Project.Status:       1=Active, 2=Completed
-  Task.Status:          1=Pending → 2=InProgress → 3=Reviewing → 4=Revising / 5=Completed
-
-  OtpVerification.Purpose:
-    1 = ChangePassword   (user chủ động đổi pass)
-    2 = FirstLogin       (sinh viên login lần đầu bị ép đổi)
-
-  OTP flow (backend Spring Boot):
-    // Bước 1: Tạo OTP
-    String otpCode = otpRepo.callGenerateOtp(accountId, purpose);
-    mailService.sendOtp(email, otpCode);        // JavaMailSender
-
-    // Bước 2: User nhập mã → verify
-    int result = otpRepo.callVerifyOtp(accountId, purpose, inputCode, newHash);
-    // result: 0=OK, 1=WrongCode, 2=Locked, 3=Expired, 4=NotFound
-
-  Scheduler:
-    SQL Server Agent / @Scheduled Spring: EXEC sp_ResetOverdueTasks  (mỗi 1 phút)
-
-  Avatar:
-    Upload lên server (Multipart) → lưu file → UPDATE Account SET PhotoUrl = '/uploads/...'
-    Hoặc dùng cloud storage (S3, Cloudinary) → lưu URL đầy đủ
-*/
-
--- ============================================================
--- SEED DATA: TEST ACCOUNTS
--- Chay cung file DDL nay tren may moi se co san tai khoan de test.
---
--- Password cho tat ca tai khoan: 123
--- BCrypt hash: $2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm
---
--- Tai khoan tao san:
---   Admin:
---     admin / 123
---   Staff:
---     staff001 / 123
---     staff002 / 123
---   Teacher:
---     gv001 / 123
---     gv002 / 123
---   Student:
---     st001 / 123
---     st002 / 123
---     st003 / 123
---     st004 / 123
---     st005 / 123
+-- PHẦN 20: SEED DATA
 -- ============================================================
 DECLARE @SeedPasswordHash NVARCHAR(255) = N'$2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm';
 DECLARE @SeedClassID1 INT, @SeedClassID2 INT, @SeedClassID3 INT;
@@ -638,22 +480,21 @@ VALUES (N'admin', @SeedPasswordHash, 1, 0, N'no-image.jpg', 1);
 SET @AdminAccountID = SCOPE_IDENTITY();
 INSERT INTO Staff (FullName, Email, AccountID) VALUES (N'Nguyen Minh Quan', N'admin@aptech.local', @AdminAccountID);
 
--- Staff 1 (Giáo vụ 1)
+-- Staff 1
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'staff001', @SeedPasswordHash, 4, 0, N'no-image.jpg', 1);
 SET @Staff1AccountID = SCOPE_IDENTITY();
 INSERT INTO Staff (FullName, Email, AccountID) VALUES (N'Tran Giao Vu', N'giaovu1@aptech.local', @Staff1AccountID);
 SET @Staff1ID = SCOPE_IDENTITY();
 
--- Staff 2 (Giáo vụ 2)
+-- Staff 2
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'staff002', @SeedPasswordHash, 4, 0, N'no-image.jpg', 1);
 SET @Staff2AccountID = SCOPE_IDENTITY();
 INSERT INTO Staff (FullName, Email, AccountID) VALUES (N'Le Quan Ly', N'giaovu2@aptech.local', @Staff2AccountID);
 SET @Staff2ID = SCOPE_IDENTITY();
 
-
--- Tạo các Lớp và phân công cho Staff quản lý
+-- Classes
 INSERT INTO Class (ClassName, AcademicYear, ManagerID) VALUES (N'T2305M01', N'2025-2026', @Staff1ID);
 SET @SeedClassID1 = SCOPE_IDENTITY();
 
@@ -667,40 +508,49 @@ SET @SeedClassID3 = SCOPE_IDENTITY();
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'gv001', @SeedPasswordHash, 3, 0, N'no-image.jpg', 1);
 SET @Teacher1AccountID = SCOPE_IDENTITY();
-
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Tran Van K', N'gv001@aptech.local', @Teacher1AccountID);
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'gv002', @SeedPasswordHash, 3, 0, N'no-image.jpg', 1);
 SET @Teacher2AccountID = SCOPE_IDENTITY();
-
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Le Thi H', N'gv002@aptech.local', @Teacher2AccountID);
 
-
--- Students cho Lop 1
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+-- Students for Class 1
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
+VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student1AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
+VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID);
 
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st002', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
+VALUES (N'st002', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student2AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
+VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID);
 
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st003', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
+VALUES (N'st003', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student3AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
+VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID);
 
--- Students cho Lop 2
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+-- Students for Class 2
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
+VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student4AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
+VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID);
 
-INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st005', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
+VALUES (N'st005', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student5AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID);
-
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
+VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID);
 GO
 
-
+PRINT 'Database created successfully!';
+PRINT 'Test accounts:';
+PRINT '  admin/123, staff001/123, staff002/123, gv001/123, gv002/123, st001/123, st002/123, st003/123, st004/123, st005/123';
+GO
