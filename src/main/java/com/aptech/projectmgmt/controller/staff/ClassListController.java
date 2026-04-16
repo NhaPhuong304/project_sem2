@@ -1,5 +1,6 @@
 package com.aptech.projectmgmt.controller.staff;
 
+import com.aptech.projectmgmt.controller.admin.AdminClassCreateDialogController;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -34,6 +35,7 @@ public class ClassListController {
     @FXML private TableColumn<SchoolClass, String> classNameColumn;
     @FXML private TableColumn<SchoolClass, String> academicYearColumn;
     @FXML private TableColumn<SchoolClass, Integer> studentCountColumn;
+    @FXML private TableColumn<SchoolClass, String> managerColumn;
     @FXML private TableColumn<SchoolClass, String> createdAtColumn;
     @FXML private TableColumn<SchoolClass, Void> actionColumn;
 
@@ -87,6 +89,7 @@ public class ClassListController {
         classNameColumn.setCellValueFactory(new PropertyValueFactory<>("className"));
         academicYearColumn.setCellValueFactory(new PropertyValueFactory<>("academicYear"));
         studentCountColumn.setCellValueFactory(new PropertyValueFactory<>("studentCount"));
+        managerColumn.setCellValueFactory(new PropertyValueFactory<>("managerName"));
         createdAtColumn.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getCreatedAt() != null ? c.getValue().getCreatedAt().format(dateTimeFormatter) : ""));
         actionColumn.setCellFactory(col -> createActionCell());
@@ -173,13 +176,18 @@ public class ClassListController {
             return;
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.CLASS_CREATE_DIALOG));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_CLASS_CREATE_DIALOG));
             Parent content = loader.load();
-            ClassCreateDialogController controller = loader.getController();
+            AdminClassCreateDialogController controller = loader.getController();
 
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("Them lop moi");
             dialog.setHeaderText("Nhap thong tin lop moi");
+            
+            var account = SessionManager.getInstance().getCurrentAccount();
+            boolean isAdmin = account != null && account.getRole() == UserRole.ADMIN;
+            controller.initData(isAdmin);
+
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialog.getDialogPane().setContent(content);
 
@@ -214,6 +222,8 @@ public class ClassListController {
                     if (account != null && account.getRole() == UserRole.STAFF) {
                         Staff staff = SessionManager.getInstance().getCurrentStaff();
                         if (staff != null) managerId = staff.getStaffId();
+                    } else if (account != null && account.getRole() == UserRole.ADMIN) {
+                        managerId = controller.getManagerId();
                     }
                     classService.createClass(className, academicYear, managerId);
                     return null;
@@ -261,8 +271,11 @@ public class ClassListController {
         if (addClassBtn == null) {
             return;
         }
-        addClassBtn.setVisible(!readOnlyMode);
-        addClassBtn.setManaged(!readOnlyMode);
-        addClassBtn.setDisable(readOnlyMode);
+        var account = SessionManager.getInstance().getCurrentAccount();
+        boolean isAdmin = account != null && account.getRole() == UserRole.ADMIN;
+        
+        addClassBtn.setVisible(isAdmin && !readOnlyMode);
+        addClassBtn.setManaged(isAdmin && !readOnlyMode);
+        addClassBtn.setDisable(!isAdmin || readOnlyMode);
     }
 }

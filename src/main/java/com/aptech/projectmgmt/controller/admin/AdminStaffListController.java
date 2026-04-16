@@ -1,4 +1,4 @@
-package com.aptech.projectmgmt.controller.staff;
+package com.aptech.projectmgmt.controller.admin;
 
 import com.aptech.projectmgmt.controller.AvatarCellController;
 import com.aptech.projectmgmt.model.Staff;
@@ -24,7 +24,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import java.util.List;
 
-public class TeacherListController {
+public class AdminStaffListController {
 
     @FXML private TableView<Staff> teacherTable;
     @FXML private Button addTeacherBtn;
@@ -32,6 +32,7 @@ public class TeacherListController {
     @FXML private TableColumn<Staff, String> usernameColumn;
     @FXML private TableColumn<Staff, String> fullNameColumn;
     @FXML private TableColumn<Staff, String> emailColumn;
+    @FXML private TableColumn<Staff, String> roleColumn;
     @FXML private TableColumn<Staff, String> accountStatusColumn;
 
     private final StaffService staffService = new StaffService();
@@ -75,6 +76,12 @@ public class TeacherListController {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        roleColumn.setCellValueFactory(c -> {
+            com.aptech.projectmgmt.model.UserRole r = c.getValue().getRole();
+            if (r == com.aptech.projectmgmt.model.UserRole.STAFF) return new SimpleStringProperty("Giao vu");
+            if (r == com.aptech.projectmgmt.model.UserRole.TEACHER) return new SimpleStringProperty("Giao vien");
+            return new SimpleStringProperty("");
+        });
         accountStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().isActive() ? "Hoat dong" : "Da khoa"
         ));
@@ -84,7 +91,7 @@ public class TeacherListController {
         Task<List<Staff>> task = new Task<>() {
             @Override
             protected List<Staff> call() {
-                return staffService.getTeachers();
+                return staffService.getStaffs();
             }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
@@ -97,12 +104,12 @@ public class TeacherListController {
 
     private void handleAddTeacher() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.TEACHER_CREATE_DIALOG));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_STAFF_CREATE_DIALOG));
             Parent content = loader.load();
-            TeacherCreateDialogController controller = loader.getController();
+            AdminStaffCreateDialogController controller = loader.getController();
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Them giao vien");
+            dialog.setTitle("Them giao vu");
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialogPane.setContent(content);
@@ -118,7 +125,7 @@ public class TeacherListController {
                                 controller.getUsername(),
                                 controller.getFullName(),
                                 controller.getEmail(),
-                                com.aptech.projectmgmt.model.UserRole.TEACHER
+                                com.aptech.projectmgmt.model.UserRole.STAFF
                         );
                     }
                 };
@@ -130,7 +137,7 @@ public class TeacherListController {
                     okButton.setDisable(false);
                     dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
                     TeacherCreationResult resultInfo = task.getValue();
-                    String successMessage = "Them giao vien thanh cong. Tai khoan mac dinh: " +
+                    String successMessage = "Them nhan su thanh cong. Tai khoan mac dinh: " +
                             resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
                     if (resultInfo.isNotificationEmailSent()) {
                         successMessage += ". Da gui email thong bao.";

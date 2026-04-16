@@ -1,5 +1,5 @@
-package com.aptech.projectmgmt.controller.staff;
-
+package com.aptech.projectmgmt.controller.admin;
+import com.aptech.projectmgmt.controller.staff.StudentListController;
 import com.aptech.projectmgmt.model.Staff;
 import com.aptech.projectmgmt.service.AccountService;
 import com.aptech.projectmgmt.util.AlertUtil;
@@ -20,15 +20,14 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
-public class StaffDashboardController {
+public class AdminDashboardController {
 
     @FXML private Label staffNameLabel;
     @FXML private ImageView avatarImageView;
     @FXML private Button logoutBtn;
     @FXML private Button classListBtn;
-    @FXML private Button projectListBtn;
-    @FXML private Button studentManagementBtn;
     @FXML private Button teacherListBtn;
+    @FXML private Button staffListBtn;
     @FXML private StackPane contentArea;
 
     private final AccountService accountService = new AccountService();
@@ -42,10 +41,10 @@ public class StaffDashboardController {
         loadAvatar();
         avatarImageView.setOnMouseClicked(e -> handleChangeAvatar());
         logoutBtn.setOnAction(e -> handleLogout());
-        
-        teacherListBtn.setVisible(false); teacherListBtn.setManaged(false);
-        setActiveMenu(classListBtn);
-        loadContent(SceneManager.CLASS_LIST);
+        teacherListBtn.setVisible(true); teacherListBtn.setManaged(true);
+        staffListBtn.setVisible(true); staffListBtn.setManaged(true);
+        setActiveMenu(staffListBtn);
+        loadContent(SceneManager.ADMIN_STAFF_LIST);
     }
 
     public void loadContent(String fxmlPath) {
@@ -68,32 +67,6 @@ public class StaffDashboardController {
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Loi tai danh sach sinh vien: " + e.getMessage());
-        }
-    }
-
-    public void loadProjectList(int classId) {
-        setActiveMenu(projectListBtn);
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.PROJECT_LIST));
-            Node content = loader.load();
-            ProjectListController controller = loader.getController();
-            controller.initData(classId);
-            contentArea.getChildren().setAll(content);
-        } catch (Exception e) {
-            AlertUtil.showError("Loi tai danh sach project: " + e.getMessage());
-        }
-    }
-
-    public void loadProjectDetail(int projectId) {
-        setActiveMenu(projectListBtn);
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.PROJECT_DETAIL));
-            Node content = loader.load();
-            ProjectDetailController controller = loader.getController();
-            controller.initData(projectId);
-            contentArea.getChildren().setAll(content);
-        } catch (Exception e) {
-            AlertUtil.showError("Loi tai chi tiet project: " + e.getMessage());
         }
     }
 
@@ -154,35 +127,26 @@ public class StaffDashboardController {
     }
 
     @FXML
-    public void onProjectListClick() {
-        setActiveMenu(projectListBtn);
-        loadContent(SceneManager.PROJECT_LIST);
-    }
-
-    @FXML
-    public void onStudentManagementClick() {
-        setActiveMenu(studentManagementBtn);
-        loadContent(SceneManager.STUDENT_MANAGEMENT);
-    }
-
-    @FXML
     public void onTeacherListClick() {
         setActiveMenu(teacherListBtn);
-        loadContent(SceneManager.TEACHER_LIST);
+        loadContent(SceneManager.ADMIN_TEACHER_LIST);
+    }
+
+    @FXML
+    public void onStaffListClick() {
+        setActiveMenu(staffListBtn);
+        loadContent(SceneManager.ADMIN_STAFF_LIST);
     }
 
     private void setActiveMenu(Button activeButton) {
         if (classListBtn != null) {
             classListBtn.getStyleClass().remove("sidebar-btn-active");
         }
-        if (projectListBtn != null) {
-            projectListBtn.getStyleClass().remove("sidebar-btn-active");
-        }
-        if (studentManagementBtn != null) {
-            studentManagementBtn.getStyleClass().remove("sidebar-btn-active");
-        }
         if (teacherListBtn != null) {
             teacherListBtn.getStyleClass().remove("sidebar-btn-active");
+        }
+        if (staffListBtn != null) {
+            staffListBtn.getStyleClass().remove("sidebar-btn-active");
         }
         if (activeButton != null && !activeButton.getStyleClass().contains("sidebar-btn-active")) {
             activeButton.getStyleClass().add("sidebar-btn-active");

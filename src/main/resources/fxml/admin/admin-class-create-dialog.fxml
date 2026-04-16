@@ -4,10 +4,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.control.ComboBox?>
+
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.staff.ClassCreateDialogController"
-            prefWidth="420.0" prefHeight="160.0"
+            fx:controller="com.aptech.projectmgmt.controller.admin.AdminClassCreateDialogController"
+            prefWidth="420.0" prefHeight="220.0"
             style="-fx-background-color: white;">
 
     <Label text="Ten lop:"
@@ -25,4 +27,11 @@
                layoutX="120.0" layoutY="76.0"
                prefWidth="250.0" prefHeight="34.0"
                promptText="Vi du: 2024-2025" />
+
+    <Label fx:id="managerLabel" text="Giao vu:"
+           layoutX="20.0" layoutY="136.0"
+           style="-fx-font-size: 13px; -fx-font-weight: bold;" />
+    <ComboBox fx:id="managerComboBox"
+              layoutX="120.0" layoutY="130.0"
+              prefWidth="250.0" prefHeight="34.0" />
 </AnchorPane>

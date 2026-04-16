@@ -10,7 +10,7 @@ public class AccountRepository extends BaseRepository {
 	private static final String DEFAULT_ACCOUNT_PHOTO = "no-image.jpg";
 
 	public Account findByUsername(String username) {
-		String sql = "SELECT AccountID, Username, PasswordHash, Role, IsActive, IsFirstLogin, PhotoUrl "
+		String sql = "SELECT AccountID, Username, PasswordHash, [Role], IsActive, IsFirstLogin, PhotoUrl "
 				+ "FROM Account WHERE Username = ?";
 		try {
 			return executeQuery(sql, rs -> {
@@ -42,7 +42,7 @@ public class AccountRepository extends BaseRepository {
 	}
 
 	public int insertAccount(String username, String passwordHash, int role, boolean isFirstLogin) {
-		String sql = "INSERT INTO Account (Username, PasswordHash, Role, IsActive, IsFirstLogin, PhotoUrl) "
+		String sql = "INSERT INTO Account (Username, PasswordHash, [Role], IsActive, IsFirstLogin, PhotoUrl) "
 				+ "VALUES (?, ?, ?, 1, ?, ?)";
 		try {
 			return executeUpdateGetKey(sql, username, passwordHash, role, isFirstLogin ? 1 : 0, DEFAULT_ACCOUNT_PHOTO);

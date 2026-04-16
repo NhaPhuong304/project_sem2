@@ -20,6 +20,10 @@ public class StaffService {
         return staffRepository.findAll();
     }
 
+    public List<Staff> getStaffs() {
+        return staffRepository.findByRole(UserRole.STAFF);
+    }
+
     public List<Staff> getTeachers() {
         return staffRepository.findByRole(UserRole.TEACHER);
     }

@@ -18,10 +18,15 @@ public class SceneManager {
     public static final String PERSON_DISPLAY_CELL = "/fxml/person-display-cell.fxml";
     public static final String SINGLE_ACTION_CELL = "/fxml/single-action-cell.fxml";
     public static final String TEXT_PROMPT_DIALOG = "/fxml/text-prompt-dialog.fxml";
+    public static final String ADMIN_DASHBOARD  = "/fxml/admin/admin-dashboard.fxml";
+    public static final String ADMIN_TEACHER_LIST = "/fxml/admin/admin-teacher-list.fxml";
+    public static final String ADMIN_STAFF_LIST   = "/fxml/admin/admin-staff-list.fxml";
+    public static final String ADMIN_TEACHER_CREATE_DIALOG = "/fxml/admin/admin-teacher-create-dialog.fxml";
+    public static final String ADMIN_STAFF_CREATE_DIALOG   = "/fxml/admin/admin-staff-create-dialog.fxml";
     public static final String STAFF_DASHBOARD  = "/fxml/staff/staff-dashboard.fxml";
     public static final String TEACHER_DASHBOARD = "/fxml/teacher/teacher-dashboard.fxml";
     public static final String CLASS_LIST       = "/fxml/staff/class-list.fxml";
-    public static final String CLASS_CREATE_DIALOG = "/fxml/staff/class-create-dialog.fxml";
+    public static final String ADMIN_CLASS_CREATE_DIALOG = "/fxml/admin/admin-class-create-dialog.fxml";
     public static final String STUDENT_LIST     = "/fxml/staff/student-list.fxml";
     public static final String STUDENT_CREATE_DIALOG = "/fxml/staff/student-create-dialog.fxml";
     public static final String STUDENT_ASSIGN_DIALOG = "/fxml/staff/student-assign-dialog.fxml";

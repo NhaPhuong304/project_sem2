@@ -88,7 +88,9 @@ public class LoginController {
 
 			if (account.isFirstLogin()) {
 				navigateToOtp(account.getAccountId(), OtpPurpose.FIRST_LOGIN);
-			} else if (account.getRole() == UserRole.ADMIN || account.getRole() == UserRole.STAFF) {
+			} else if (account.getRole() == UserRole.ADMIN) {
+				navigateToAdminDashboard();
+			} else if (account.getRole() == UserRole.STAFF) {
 				navigateToStaffDashboard();
 			} else if (account.getRole() == UserRole.TEACHER) {
 				navigateToTeacherDashboard();
@@ -141,6 +143,15 @@ public class LoginController {
 			stage.show();
 		} catch (Exception ex) {
 			showError("Loi chuyen man hinh OTP: " + ex.getMessage());
+		}
+	}
+
+	private void navigateToAdminDashboard() {
+		try {
+			Stage stage = (Stage) loginBtn.getScene().getWindow();
+			SceneManager.switchScene(stage, SceneManager.ADMIN_DASHBOARD);
+		} catch (Exception ex) {
+			showError("Loi chuyen man hinh: " + ex.getMessage());
 		}
 	}
 

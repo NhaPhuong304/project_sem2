@@ -13,11 +13,12 @@ public class ClassRepository extends BaseRepository {
     public static final String UNASSIGNED_CLASS_NAME = "Chua xep lop";
 
     public List<SchoolClass> findAll() {
-        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName AS ManagerName, c.CreatedAt, " +
                      "COUNT(s.StudentID) AS StudentCount " +
                      "FROM Class c LEFT JOIN Student s ON s.ClassID = c.ClassID " +
+                     "LEFT JOIN Staff st ON st.StaffID = c.ManagerID " +
                      "WHERE c.ClassName <> ? " +
-                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt " +
+                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName, c.CreatedAt " +
                      "ORDER BY c.CreatedAt DESC";
         try {
             return executeQuery(sql, rs -> {
@@ -31,11 +32,12 @@ public class ClassRepository extends BaseRepository {
     }
 
     public List<SchoolClass> findByManagerId(int managerId) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName AS ManagerName, c.CreatedAt, " +
                      "COUNT(s.StudentID) AS StudentCount " +
                      "FROM Class c LEFT JOIN Student s ON s.ClassID = c.ClassID " +
+                     "LEFT JOIN Staff st ON st.StaffID = c.ManagerID " +
                      "WHERE c.ClassName <> ? AND c.ManagerID = ? " +
-                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt " +
+                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName, c.CreatedAt " +
                      "ORDER BY c.CreatedAt DESC";
         try {
             return executeQuery(sql, rs -> {
@@ -49,9 +51,10 @@ public class ClassRepository extends BaseRepository {
     }
 
     public List<SchoolClass> findByAdvisorId(int staffId) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName AS ManagerName, c.CreatedAt, " +
                      "(SELECT COUNT(*) FROM Student s WHERE s.ClassID = c.ClassID) AS StudentCount " +
                      "FROM Class c " +
+                     "LEFT JOIN Staff st ON st.StaffID = c.ManagerID " +
                      "WHERE c.ClassName <> ? " +
                      "AND EXISTS (" +
                      "    SELECT 1 FROM Project p " +
@@ -80,11 +83,12 @@ public class ClassRepository extends BaseRepository {
     }
 
     public SchoolClass findById(int classId) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName AS ManagerName, c.CreatedAt, " +
                      "COUNT(s.StudentID) AS StudentCount " +
                      "FROM Class c LEFT JOIN Student s ON s.ClassID = c.ClassID " +
+                     "LEFT JOIN Staff st ON st.StaffID = c.ManagerID " +
                      "WHERE c.ClassID = ? " +
-                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt";
+                     "GROUP BY c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName, c.CreatedAt";
 
         try {
             return executeQuery(sql, rs -> {
@@ -97,9 +101,11 @@ public class ClassRepository extends BaseRepository {
     }
 
     public SchoolClass findByName(String className) {
-        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, c.CreatedAt, " +
+        String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName AS ManagerName, c.CreatedAt, " +
                      "(SELECT COUNT(*) FROM Student s WHERE s.ClassID = c.ClassID) AS StudentCount " +
-                     "FROM Class c WHERE c.ClassName = ?";
+                     "FROM Class c " +
+                     "LEFT JOIN Staff st ON st.StaffID = c.ManagerID " +
+                     "WHERE c.ClassName = ?";
         try {
             return executeQuery(sql, rs -> {
                 if (rs.next()) {
@@ -126,6 +132,13 @@ public class ClassRepository extends BaseRepository {
         c.setClassName(rs.getString("ClassName"));
         c.setAcademicYear(rs.getString("AcademicYear"));
         c.setManagerId((Integer) rs.getObject("ManagerID"));
+        
+        try {
+            c.setManagerName(rs.getString("ManagerName"));
+        } catch (SQLException ignored) {
+            // column might not exist in some partial queries
+        }
+        
         Timestamp ts = rs.getTimestamp("CreatedAt");
         if (ts != null) c.setCreatedAt(ts.toLocalDateTime());
         c.setStudentCount(rs.getInt("StudentCount"));

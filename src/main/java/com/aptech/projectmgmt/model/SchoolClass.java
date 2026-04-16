@@ -8,6 +8,7 @@ public class SchoolClass {
     private String className;
     private String academicYear;
     private Integer managerId;
+    private String managerName;
     private LocalDateTime createdAt;
     private int studentCount;
 
@@ -41,6 +42,8 @@ public class SchoolClass {
 
     public Integer getManagerId() { return managerId; }
     public void setManagerId(Integer managerId) { this.managerId = managerId; }
+    public String getManagerName() { return managerName; }
+    public void setManagerName(String managerName) { this.managerName = managerName; }
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
