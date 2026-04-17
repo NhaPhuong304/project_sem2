@@ -8,6 +8,7 @@ import com.aptech.projectmgmt.model.MemberRole;
 import com.aptech.projectmgmt.model.MemberStatus;
 import com.aptech.projectmgmt.model.Student;
 import com.aptech.projectmgmt.service.GroupService;
+import com.aptech.projectmgmt.service.ProjectService;
 import com.aptech.projectmgmt.util.AlertUtil;
 import com.aptech.projectmgmt.util.SceneManager;
 import com.aptech.projectmgmt.util.SessionManager;
@@ -49,11 +50,13 @@ public class GroupDetailController {
 	private TableColumn<GroupMember, Void> actionColumn;
 
 	private final GroupService groupService = new GroupService();
+	private final ProjectService projectService = new ProjectService();
 	private int groupId;
 	private int classId;
 	private String groupName;
 	private final ObservableList<GroupMember> memberList = FXCollections.observableArrayList();
 	private boolean readOnlyMode;
+	private boolean projectHasStarted = true;
 
 	@FXML
 	public void initialize() {
@@ -76,7 +79,14 @@ public class GroupDetailController {
 		this.groupId = groupId;
 		this.classId = classId;
 		this.groupName = groupName;
+		com.aptech.projectmgmt.model.Project project = projectService.getProjectById(projectId);
+		if (project != null && project.getStartDate() != null && project.getStartDate().isAfter(java.time.LocalDate.now())) {
+			this.projectHasStarted = false;
+		} else {
+			this.projectHasStarted = true;
+		}
 		loadMembers();
+		updateAccessMode();
 	}
 
 	public void setReadOnlyMode(boolean readOnlyMode) {
@@ -139,11 +149,15 @@ public class GroupDetailController {
 							getClass().getResource(com.aptech.projectmgmt.util.SceneManager.SINGLE_ACTION_CELL));
 					actionView = loader.load();
 					controller = loader.getController();
-					controller.setActionText("Huy quyen");
+					controller.setActionText(projectHasStarted ? "Huy quyen" : "Xoa");
 					controller.setOnAction(() -> {
 						GroupMember member = getTableRow() != null ? getTableRow().getItem() : null;
 						if (member != null) {
-							handleExclude(member);
+							if (projectHasStarted) {
+								handleExclude(member);
+							} else {
+								handleHardDelete(member);
+							}
 						}
 					});
 				} catch (Exception ex) {
@@ -246,6 +260,32 @@ public class GroupDetailController {
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
 			AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+		}));
+		new Thread(task).start();
+	}
+
+	private void handleHardDelete(GroupMember member) {
+		if (readOnlyMode) {
+			AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin nhom");
+			return;
+		}
+		if (!AlertUtil.showConfirm("Ban co chac muon xoa " + member.getStudentFullName() + " khoi nhom?")) {
+			return;
+		}
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				groupService.removeMember(member.getMemberId());
+				return null;
+			}
+		};
+		task.setOnSucceeded(e -> Platform.runLater(() -> {
+			AlertUtil.showSuccess("Da xoa thanh vien khoi nhom");
+			loadMembers();
+		}));
+		task.setOnFailed(e -> Platform.runLater(() -> {
+			Throwable ex = task.getException();
+			AlertUtil.showError("Loi xoa thanh vien: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
@@ -378,11 +418,13 @@ public class GroupDetailController {
 
 	private void updateAccessMode() {
 		if (addMemberBtn != null) {
-			addMemberBtn.setVisible(!readOnlyMode);
-			addMemberBtn.setManaged(!readOnlyMode);
+			boolean canEdit = !readOnlyMode && !projectHasStarted;
+			addMemberBtn.setVisible(canEdit);
+			addMemberBtn.setManaged(canEdit);
 		}
 		if (actionColumn != null) {
-			actionColumn.setVisible(!readOnlyMode);
+			boolean canEdit = !readOnlyMode && !projectHasStarted;
+			actionColumn.setVisible(canEdit);
 		}
 		if (groupNameLabel != null) {
 			updateGroupNameLabel();

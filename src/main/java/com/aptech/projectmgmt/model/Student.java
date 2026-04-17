@@ -11,8 +11,26 @@ public class Student {
 	private String photoUrl;
 	private String className;
 	private boolean active;
+	private Integer createdByStaffId;
+	private String createdByStaffName;
 
 	public Student() {
+	}
+
+	public Integer getCreatedByStaffId() {
+		return createdByStaffId;
+	}
+
+	public void setCreatedByStaffId(Integer createdByStaffId) {
+		this.createdByStaffId = createdByStaffId;
+	}
+
+	public String getCreatedByStaffName() {
+		return createdByStaffName;
+	}
+
+	public void setCreatedByStaffName(String createdByStaffName) {
+		this.createdByStaffName = createdByStaffName;
 	}
 
 	public boolean isActive() {

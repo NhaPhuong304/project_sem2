@@ -5,6 +5,7 @@ import com.aptech.projectmgmt.model.StudentCreationResult;
 import com.aptech.projectmgmt.model.UserRole;
 import com.aptech.projectmgmt.repository.AccountRepository;
 import com.aptech.projectmgmt.repository.StudentRepository;
+import com.aptech.projectmgmt.util.SessionManager;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
@@ -81,9 +82,15 @@ public class StudentService {
 		int accountId = accountRepository.insertAccount(normalizedStudentCode, passwordHash,
 				UserRole.STUDENT.getValue(), true);
 
+		Integer createdByStaffId = null;
+		var currentStaff = SessionManager.getInstance().getCurrentStaff();
+		if (currentStaff != null) {
+			createdByStaffId = currentStaff.getStaffId();
+		}
+
 		try {
 			studentRepository.create(normalizedStudentCode, normalizedFullName, normalizedEmail, unassignedClassId,
-					accountId);
+					accountId, createdByStaffId);
 		} catch (RuntimeException ex) {
 			if (accountId > 0) {
 				try {

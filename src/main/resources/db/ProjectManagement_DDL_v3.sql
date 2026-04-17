@@ -12,9 +12,10 @@ GO
 -- ============================================================
 --  HỆ THỐNG QUẢN LÝ DỰ ÁN SINH VIÊN APTECH - SEMESTER 2
 --  Database: SQL Server 2019+
---  Version: 3.1 (Updated by AntiGravity AI)
+--  Version: 3.2 (Updated by AntiGravity AI)
 --    + Account.Role:          Thêm Role = 4 (Staff / Giáo vụ)
 --    + Class.ManagerID:       Khóa ngoại tham chiếu đến Staff(StaffID) để xác định Giáo vụ quản lý lớp
+--    + Student.CreatedByStaffId: Khóa ngoại tham chiếu đến Staff(StaffID) để theo dõi ai tạo sinh viên
 --    + Account.PhotoUrl:      (avatar) URL/path
 --    + OtpVerification:       (xác thực OTP qua email)
 --    + sp_GenerateOtp:        (tạo mã OTP, trả về cho backend gửi mail)
@@ -125,12 +126,13 @@ GO
 -- 5. STUDENT
 -- ============================================================
 CREATE TABLE Student (
-    StudentID   INT           IDENTITY(1,1) PRIMARY KEY,
-    StudentCode NVARCHAR(20)  NOT NULL UNIQUE,
-    FullName    NVARCHAR(100) NOT NULL,
-    Email       NVARCHAR(100) NOT NULL UNIQUE,
-    ClassID     INT           NOT NULL REFERENCES Class(ClassID),
-    AccountID   INT           NOT NULL UNIQUE REFERENCES Account(AccountID)
+    StudentID        INT           IDENTITY(1,1) PRIMARY KEY,
+    StudentCode      NVARCHAR(20)  NOT NULL UNIQUE,
+    FullName         NVARCHAR(100) NOT NULL,
+    Email            NVARCHAR(100) NOT NULL UNIQUE,
+    ClassID          INT           NOT NULL REFERENCES Class(ClassID),
+    AccountID        INT           NOT NULL UNIQUE REFERENCES Account(AccountID),
+    CreatedByStaffId INT           NULL REFERENCES Staff(StaffID)
 );
 GO
 
@@ -664,12 +666,14 @@ INSERT INTO Class (ClassName, AcademicYear, ManagerID) VALUES (N'T2401M01', N'20
 SET @SeedClassID3 = SCOPE_IDENTITY();
 
 -- Teachers
+DECLARE @Teacher1ID INT, @Teacher2ID INT;
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'gv001', @SeedPasswordHash, 3, 0, N'no-image.jpg', 1);
 SET @Teacher1AccountID = SCOPE_IDENTITY();
 
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Tran Van K', N'gv001@aptech.local', @Teacher1AccountID);
+SET @Teacher1ID = SCOPE_IDENTITY();
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'gv002', @SeedPasswordHash, 3, 0, N'no-image.jpg', 1);
@@ -677,29 +681,69 @@ SET @Teacher2AccountID = SCOPE_IDENTITY();
 
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Le Thi H', N'gv002@aptech.local', @Teacher2AccountID);
+SET @Teacher2ID = SCOPE_IDENTITY();
 
-
--- Students cho Lop 1
+-- Students cho Lop 1 (Created by Staff 1 - Giáo vụ 1)
+DECLARE @St1ID INT, @St2ID INT, @St3ID INT, @St4ID INT, @St5ID INT;
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student1AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID, @Staff1ID);
+SET @St1ID = SCOPE_IDENTITY();
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st002', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student2AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID, @Staff1ID);
+SET @St2ID = SCOPE_IDENTITY();
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st003', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student3AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID, @Staff1ID);
+SET @St3ID = SCOPE_IDENTITY();
 
--- Students cho Lop 2
+-- Thêm sinh viên chưa có nhóm
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'stUnassigned1', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+DECLARE @UnAcc1 INT = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'STU01', N'Van A', N'stu1@aptech.local', @SeedClassID1, @UnAcc1, @Staff1ID);
+
+-- Students cho Lop 2 (Created by Staff 2 - Giáo vụ 2)
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student4AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID, @Staff2ID);
+SET @St4ID = SCOPE_IDENTITY();
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st005', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student5AccountID = SCOPE_IDENTITY();
-INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID);
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID, @Staff2ID);
+SET @St5ID = SCOPE_IDENTITY();
+
+-- Test Data: Project Groups, Projects, Group Members
+DECLARE @GroupID1 INT, @GroupID2 INT;
+
+-- Group 1
+INSERT INTO ProjectGroup (ClassID, GroupName) VALUES (@SeedClassID1, N'Nhom Alpha (Project Da Bat Dau)');
+SET @GroupID1 = SCOPE_IDENTITY();
+
+-- Group 2
+INSERT INTO ProjectGroup (ClassID, GroupName) VALUES (@SeedClassID2, N'Nhom Beta (Project Chua Bat Dau)');
+SET @GroupID2 = SCOPE_IDENTITY();
+
+---------- Projects ----------
+-- Project 1 (Thực tế, đã bắt đầu từ 2024, bạn không có quyền sửa thành viên)
+INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status)
+VALUES (@GroupID1, N'Website TMDT Ban Hang', N'Xay dung ung dung web TMDT', N'S2', '2024-01-01', '2027-12-31', '2027-12-29', @Teacher1ID, @Staff1ID, 1);
+
+-- Project 2 (Dự kiến, chưa bắt đầu, ở tương lai 2030, có thể Test Xóa/Thêm thành viên)
+INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status)
+VALUES (@GroupID2, N'Ung Dung Java Quan Ly', N'Viet app Java desktop', N'S2', '2030-01-01', '2030-06-30', '2030-06-25', @Teacher2ID, @Staff2ID, 1);
+
+---------- Members ----------
+-- Members for Group 1 
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID1, @St1ID, 1, 1); -- Leader
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID1, @St2ID, 2, 1); -- Member
+
+-- Members for Group 2
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID2, @St4ID, 1, 1); -- Leader
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID2, @St5ID, 2, 1); -- Member
 
 GO
 

@@ -20,6 +20,7 @@
             <TableColumn fx:id="emailColumn" prefWidth="190.0" text="Email" />
             <TableColumn fx:id="classNameColumn" prefWidth="95.0" text="Lop" />
             <TableColumn fx:id="accountStatusColumn" prefWidth="105.0" text="Tai khoan" />
+            <TableColumn fx:id="createdByColumn" prefWidth="120.0" text="Nguoi tao" />
             <TableColumn fx:id="actionColumn" prefWidth="123.0" text="Action" />
         </columns>
     </TableView>

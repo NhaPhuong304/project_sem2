@@ -9,9 +9,10 @@ import java.util.List;
 public class StudentRepository extends BaseRepository {
 
 	public Student findByAccountId(int accountId) {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "WHERE s.AccountID = ?";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "WHERE s.AccountID = ?";
 		try {
 			return executeQuery(sql, rs -> {
 				if (rs.next())
@@ -24,9 +25,10 @@ public class StudentRepository extends BaseRepository {
 	}
 
 	public Student findById(int studentId) {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "WHERE s.StudentID = ?";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "WHERE s.StudentID = ?";
 		try {
 			return executeQuery(sql, rs -> {
 				if (rs.next())
@@ -39,9 +41,10 @@ public class StudentRepository extends BaseRepository {
 	}
 
 	public List<Student> findByClassId(int classId) {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "WHERE s.ClassID = ? ORDER BY s.FullName";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "WHERE s.ClassID = ? ORDER BY s.FullName";
 		try {
 			return executeQuery(sql, rs -> {
 				List<Student> list = new ArrayList<>();
@@ -55,9 +58,10 @@ public class StudentRepository extends BaseRepository {
 	}
 
 	public List<Student> findWithoutAccount(int classId) {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "WHERE s.ClassID = ? AND s.AccountID IS NULL";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "WHERE s.ClassID = ? AND s.AccountID IS NULL";
 		try {
 			return executeQuery(sql, rs -> {
 				List<Student> list = new ArrayList<>();
@@ -71,9 +75,10 @@ public class StudentRepository extends BaseRepository {
 	}
 
 	public Student findByStudentCode(String studentCode) {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "WHERE s.StudentCode = ?";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "WHERE s.StudentCode = ?";
 		try {
 			return executeQuery(sql, rs -> {
 				if (rs.next()) {
@@ -87,9 +92,10 @@ public class StudentRepository extends BaseRepository {
 	}
 
 	public Student findByEmail(String email) {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "WHERE s.Email = ?";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "WHERE s.Email = ?";
 		try {
 			return executeQuery(sql, rs -> {
 				if (rs.next()) {
@@ -118,10 +124,10 @@ public class StudentRepository extends BaseRepository {
 		}
 	}
 
-	public int create(String studentCode, String fullName, String email, int classId, int accountId) {
-		String sql = "INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) VALUES (?, ?, ?, ?, ?)";
+	public int create(String studentCode, String fullName, String email, int classId, int accountId, Integer createdByStaffId) {
+		String sql = "INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (?, ?, ?, ?, ?, ?)";
 		try {
-			return executeUpdateGetKey(sql, studentCode, fullName, email, classId, accountId);
+			return executeUpdateGetKey(sql, studentCode, fullName, email, classId, accountId, createdByStaffId);
 		} catch (SQLException e) {
 			throw new RuntimeException("DB error in create student: " + e.getMessage(), e);
 		}
@@ -146,9 +152,10 @@ public class StudentRepository extends BaseRepository {
 	}
 
 	public List<Student> findAll() {
-		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName "
+		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "
 				+ "FROM Student s " + "LEFT JOIN Account a ON a.AccountID = s.AccountID "
-				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID " + "ORDER BY s.StudentCode ASC";
+				+ "LEFT JOIN Class c ON c.ClassID = s.ClassID "
+				+ "LEFT JOIN Staff st ON st.StaffID = s.CreatedByStaffId " + "ORDER BY s.StudentCode ASC";
 		try {
 			return executeQuery(sql, rs -> {
 				List<Student> list = new ArrayList<>();
@@ -223,6 +230,12 @@ public class StudentRepository extends BaseRepository {
 		if (!rs.wasNull()) {
 			s.setActive(isActive);
 		}
+
+		int createdById = rs.getInt("CreatedByStaffId");
+		if (!rs.wasNull()) {
+			s.setCreatedByStaffId(createdById);
+		}
+		s.setCreatedByStaffName(rs.getString("CreatedByStaffName"));
 
 		return s;
 	}

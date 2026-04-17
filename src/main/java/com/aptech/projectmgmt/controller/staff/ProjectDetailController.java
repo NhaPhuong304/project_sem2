@@ -137,7 +137,7 @@ public class ProjectDetailController {
         });
         addGroupBtn.setOnAction(e -> handleAddGroup());
         groupListView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
+            if (event.getClickCount() >= 1) {
                 ProjectGroup selected = groupListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
                     openGroupDetail(selected.getGroupId(), selected.getGroupName());
@@ -186,11 +186,12 @@ public class ProjectDetailController {
 
     private void setEditMode(boolean editable) {
         boolean effectiveEditable = editable && !readOnlyMode;
+        boolean hasNotStarted = currentProject != null && (currentProject.getStartDate() == null || !currentProject.getStartDate().isBefore(java.time.LocalDate.now()));
         projectNameField.setEditable(effectiveEditable);
         semesterField.setEditable(effectiveEditable);
         descriptionArea.setEditable(effectiveEditable);
-        startDatePicker.setDisable(!effectiveEditable);
-        endDatePicker.setDisable(!effectiveEditable);
+        startDatePicker.setDisable(!effectiveEditable || !hasNotStarted);
+        endDatePicker.setDisable(!effectiveEditable || !hasNotStarted);
         reportDatePicker.setDisable(!effectiveEditable);
         supervisorField.setEditable(false);
         saveBtn.setVisible(effectiveEditable);

@@ -45,6 +45,8 @@ public class StudentManagementController {
 	@FXML
 	private TableColumn<Student, String> accountStatusColumn;
 	@FXML
+	private TableColumn<Student, String> createdByColumn;
+	@FXML
 	private TableColumn<Student, Void> actionColumn;
 
 	private final ClassService classService = new ClassService();
@@ -142,6 +144,8 @@ public class StudentManagementController {
 				c -> new SimpleStringProperty(c.getValue().getClassName() != null ? c.getValue().getClassName() : ""));
 		accountStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(
 				c.getValue().getAccountId() != null ? "Co tai khoan" : "Chua co tai khoan"));
+		createdByColumn.setCellValueFactory(c -> new SimpleStringProperty(
+				c.getValue().getCreatedByStaffName() != null ? c.getValue().getCreatedByStaffName() : ""));
 	}
 
 	private void loadStudents() {

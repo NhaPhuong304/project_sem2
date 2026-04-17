@@ -166,6 +166,15 @@ public class GroupRepository extends BaseRepository {
         }
     }
 
+    public void removeMember(int memberId) {
+        String sql = "DELETE FROM GroupMember WHERE MemberID = ?";
+        try {
+            executeUpdate(sql, memberId);
+        } catch (SQLException e) {
+            throw new RuntimeException("DB error in removeMember: " + e.getMessage(), e);
+        }
+    }
+
     public List<Student> findAvailableStudentsForClass(int classId) {
         String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl " +
                      "FROM Student s " +

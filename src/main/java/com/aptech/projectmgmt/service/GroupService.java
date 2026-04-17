@@ -130,4 +130,12 @@ public class GroupService {
 		}
 		groupRepository.excludeMember(memberId, staffId, normalizedReason);
 	}
+
+	public void removeMember(int memberId) {
+		GroupMember member = groupRepository.findMemberById(memberId);
+		if (member == null) {
+			throw new RuntimeException("Khong tim thay thanh vien");
+		}
+		groupRepository.removeMember(memberId);
+	}
 }
