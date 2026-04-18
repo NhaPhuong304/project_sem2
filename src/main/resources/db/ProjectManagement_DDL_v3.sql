@@ -100,7 +100,18 @@ CREATE INDEX IX_OtpVerification_AccountID_Purpose
 GO
 
 -- ============================================================
--- 3. CLASS [v3.1: Thêm ManagerID để Giáo vụ quản lý lớp độc lập]
+-- 3. STAFF
+-- ============================================================
+CREATE TABLE Staff (
+    StaffID   INT           IDENTITY(1,1) PRIMARY KEY,
+    FullName  NVARCHAR(100) NOT NULL,
+    Email     NVARCHAR(100) NOT NULL UNIQUE,
+    AccountID INT           NOT NULL UNIQUE REFERENCES Account(AccountID)
+);
+GO
+
+-- ============================================================
+-- 4. CLASS [v3.1: Thêm ManagerID để Giáo vụ quản lý lớp độc lập]
 -- ============================================================
 CREATE TABLE Class (
     ClassID      INT           IDENTITY(1,1) PRIMARY KEY,
@@ -108,17 +119,6 @@ CREATE TABLE Class (
     AcademicYear NVARCHAR(10)  NOT NULL,
     ManagerID    INT           NULL REFERENCES Staff(StaffID), -- Giáo vụ phụ trách lớp
     CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
-);
-GO
-
--- ============================================================
--- 4. STAFF
--- ============================================================
-CREATE TABLE Staff (
-    StaffID   INT           IDENTITY(1,1) PRIMARY KEY,
-    FullName  NVARCHAR(100) NOT NULL,
-    Email     NVARCHAR(100) NOT NULL UNIQUE,
-    AccountID INT           NOT NULL UNIQUE REFERENCES Account(AccountID)
 );
 GO
 
@@ -572,6 +572,7 @@ GO
 -- ============================================================
 -- DATA ENUM REFERENCE
 -- ============================================================
+/*
   Account.Role:         1=Admin, 2=Student, 3=Teacher, 4=Staff
   Account.PhotoUrl:     NULL = dùng avatar mặc định (frontend tự xử lý)
   GroupMember.Role:     1=Leader, 2=Member
@@ -734,7 +735,7 @@ VALUES (@GroupID1, N'Website TMDT Ban Hang', N'Xay dung ung dung web TMDT', N'S2
 
 -- Project 2 (Dự kiến, chưa bắt đầu, ở tương lai 2030, có thể Test Xóa/Thêm thành viên)
 INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status)
-VALUES (@GroupID2, N'Ung Dung Java Quan Ly', N'Viet app Java desktop', N'S2', '2030-01-01', '2030-06-30', '2030-06-25', @Teacher2ID, @Staff2ID, 1);
+VALUES (@GroupID2, N'Ung Dung Java Quan Ly', N'Viet app Java desktop', N'S2', '2030-01-01', '2030-06-30', '2030-06-28', @Teacher2ID, @Staff2ID, 1);
 
 ---------- Members ----------
 -- Members for Group 1 

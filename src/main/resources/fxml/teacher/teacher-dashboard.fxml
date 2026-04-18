@@ -9,10 +9,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
-<BorderPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.teacher.TeacherDashboardController"
-            prefWidth="1100" prefHeight="700">
+<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.teacher.TeacherDashboardController">
+<BorderPane prefWidth="1100" prefHeight="700">
 
     <top>
         <AnchorPane style="-fx-background-color: #00897b;" prefHeight="60">
@@ -65,3 +63,5 @@
         <StackPane fx:id="contentArea" style="-fx-background-color: white;" />
     </center>
 </BorderPane>
+    <fx:include source="../ai-chatbot.fxml" />
+</StackPane>
