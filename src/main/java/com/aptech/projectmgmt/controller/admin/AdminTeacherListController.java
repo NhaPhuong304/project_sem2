@@ -22,6 +22,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.util.List;
 
 public class AdminTeacherListController {
@@ -34,6 +35,7 @@ public class AdminTeacherListController {
     @FXML private TableColumn<Staff, String> emailColumn;
     @FXML private TableColumn<Staff, String> roleColumn;
     @FXML private TableColumn<Staff, String> accountStatusColumn;
+    @FXML private TableColumn<Staff, Void> actionColumn;
 
     private final StaffService staffService = new StaffService();
     private final ObservableList<Staff> teacherList = FXCollections.observableArrayList();
@@ -73,18 +75,57 @@ public class AdminTeacherListController {
                 setGraphic(avatarView);
             }
         });
+
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+
         roleColumn.setCellValueFactory(c -> {
             com.aptech.projectmgmt.model.UserRole r = c.getValue().getRole();
-            if (r == com.aptech.projectmgmt.model.UserRole.STAFF) return new SimpleStringProperty("Giao vu");
-            if (r == com.aptech.projectmgmt.model.UserRole.TEACHER) return new SimpleStringProperty("Giao vien");
+            if (r == com.aptech.projectmgmt.model.UserRole.STAFF) {
+                return new SimpleStringProperty("Giao vu");
+            }
+            if (r == com.aptech.projectmgmt.model.UserRole.TEACHER) {
+                return new SimpleStringProperty("Giao vien");
+            }
             return new SimpleStringProperty("");
         });
-        accountStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(
-                c.getValue().isActive() ? "Hoat dong" : "Da khoa"
-        ));
+
+        accountStatusColumn.setCellValueFactory(c ->
+                new SimpleStringProperty(c.getValue().isActive() ? "Hoat dong" : "Da khoa")
+        );
+
+        actionColumn.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("Sua");
+            private final Button lockBtn = new Button("Khoa/Mo");
+
+            {
+                editBtn.setOnAction(e -> {
+                    Staff teacher = getTableRow().getItem();
+                    if (teacher != null) {
+                        handleEditTeacher(teacher);
+                    }
+                });
+
+                lockBtn.setOnAction(e -> {
+                    Staff teacher = getTableRow().getItem();
+                    if (teacher != null) {
+                        handleToggleStatus(teacher);
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                    return;
+                }
+                javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, editBtn, lockBtn);
+                setGraphic(box);
+            }
+        });
     }
 
     private void loadTeachers() {
@@ -94,11 +135,14 @@ public class AdminTeacherListController {
                 return staffService.getTeachers();
             }
         };
+
         task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
+
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
             AlertUtil.showError("Loi tai danh sach giao vien: " + (ex != null ? ex.getMessage() : ""));
         }));
+
         new Thread(task).start();
     }
 
@@ -136,28 +180,35 @@ public class AdminTeacherListController {
                 task.setOnSucceeded(e -> Platform.runLater(() -> {
                     okButton.setDisable(false);
                     dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
+
                     TeacherCreationResult resultInfo = task.getValue();
-                    String successMessage = "Them nhan su thanh cong. Tai khoan mac dinh: " +
-                            resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
+                    String successMessage = "Them nhan su thanh cong. Tai khoan mac dinh: "
+                            + resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
+
                     if (resultInfo.isNotificationEmailSent()) {
                         successMessage += ". Da gui email thong bao.";
                     } else {
                         successMessage += ". Chua gui duoc email thong bao.";
                     }
+
+                    String finalSuccessMessage = successMessage;
+
                     dialog.setResult(ButtonType.OK);
                     dialog.close();
-                    String finalSuccessMessage = successMessage;
+
                     Platform.runLater(() -> {
                         AlertUtil.showSuccess(finalSuccessMessage);
                         loadTeachers();
                     });
                 }));
+
                 task.setOnFailed(e -> Platform.runLater(() -> {
                     okButton.setDisable(false);
                     dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
                     Throwable ex = task.getException();
                     AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
                 }));
+
                 new Thread(task).start();
             });
 
@@ -165,5 +216,94 @@ public class AdminTeacherListController {
         } catch (Exception ex) {
             AlertUtil.showError("Khong the mo form them giao vien: " + ex.getMessage());
         }
+    }
+
+    private void handleEditTeacher(Staff teacher) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_TEACHER_CREATE_DIALOG));
+            Parent content = loader.load();
+            AdminTeacherCreateDialogController controller = loader.getController();
+
+            controller.setData(teacher);
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Sua giao vien");
+            DialogPane dialogPane = dialog.getDialogPane();
+            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            dialogPane.setContent(content);
+
+            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                event.consume();
+
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() {
+                    	staffService.updateTeacherFullName(
+                    		    teacher.getStaffId(),
+                    		    controller.getFullName()
+                    		);
+                        return null;
+                    }
+                };
+
+                okButton.setDisable(true);
+                dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
+
+                task.setOnSucceeded(e -> Platform.runLater(() -> {
+                    dialog.setResult(ButtonType.OK);
+                    dialog.close();
+
+                    Platform.runLater(() -> {
+                        AlertUtil.showSuccess("Cap nhat giao vien thanh cong");
+                        loadTeachers();
+                    });
+                }));
+
+                task.setOnFailed(e -> Platform.runLater(() -> {
+                    okButton.setDisable(false);
+                    dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
+                    Throwable ex = task.getException();
+                    AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+                }));
+
+                new Thread(task).start();
+            });
+
+            dialog.showAndWait();
+        } catch (Exception ex) {
+            AlertUtil.showError("Khong the mo form sua giao vien: " + ex.getMessage());
+        }
+    }
+
+    private void handleToggleStatus(Staff teacher) {
+        String message = teacher.isActive()
+                ? "Ban co chac muon khoa tai khoan giao vien nay?"
+                : "Ban co chac muon mo khoa tai khoan giao vien nay?";
+
+        boolean confirmed = AlertUtil.showConfirm(message);
+        if (!confirmed) {
+            return;
+        }
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                staffService.toggleStaffStatus(teacher.getStaffId());
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            AlertUtil.showSuccess("Cap nhat trang thai giao vien thanh cong");
+            loadTeachers();
+        }));
+
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            Throwable ex = task.getException();
+            AlertUtil.showError("Loi cap nhat trang thai: " + (ex != null ? ex.getMessage() : ""));
+        }));
+
+        new Thread(task).start();
     }
 }

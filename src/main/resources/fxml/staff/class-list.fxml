@@ -27,14 +27,13 @@
                layoutX="20.0" layoutY="65.0"
                prefWidth="840.0" prefHeight="530.0">
         <columns>
-            <TableColumn fx:id="noColumn" text="STT" prefWidth="50.0" />
-            <TableColumn fx:id="classNameColumn" text="Ten lop" prefWidth="180.0" />
-            <TableColumn fx:id="academicYearColumn" text="Nam hoc" prefWidth="150.0" />
-            <TableColumn fx:id="studentCountColumn" text="SL Sinh vien" prefWidth="100.0" />
-            <TableColumn fx:id="managerColumn" text="Giao vu" prefWidth="150.0" />
-            <TableColumn fx:id="createdAtColumn" text="Ngay tao" prefWidth="150.0" />
-            <TableColumn fx:id="actionColumn" text="Hanh dong" prefWidth="120.0" />
-
+            <TableColumn fx:id="noColumn" text="STT" prefWidth="45.0" />
+            <TableColumn fx:id="classNameColumn" text="Ten lop" prefWidth="165.0" />
+            <TableColumn fx:id="academicYearColumn" text="Nam hoc" prefWidth="130.0" />
+            <TableColumn fx:id="studentCountColumn" text="SL Sinh vien" prefWidth="95.0" />
+            <TableColumn fx:id="managerColumn" text="Giao vu" prefWidth="145.0" />
+            <TableColumn fx:id="createdAtColumn" text="Ngay tao" prefWidth="140.0" />
+            <TableColumn fx:id="actionColumn" text="Hanh dong" prefWidth="100.0" />
         </columns>
     </TableView>
 </AnchorPane>

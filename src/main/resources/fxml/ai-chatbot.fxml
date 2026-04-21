@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.effect.DropShadow?>
+
+<!-- Thay bằng StackPane để làm Overlay hoàn hảo trong mọi kích thước màn hình -->
+<StackPane pickOnBounds="false" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.AIChatBotController">
+   
+   <!-- HỘP THOẠI CHAT (Ẩn mặc định) -->
+   <!-- Cố định kích thước bằng maxHeight/maxWidth để không bị giãn theo màn hình -->
+   <VBox fx:id="chatWindow" visible="false" spacing="0" 
+         maxHeight="450.0" maxWidth="350.0" 
+         StackPane.alignment="CENTER_LEFT"
+         style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #DDDDDD; -fx-border-width: 1;">
+       
+       <!-- Viền đổ bóng cho khung chat -->
+       <effect>
+           <DropShadow color="#00000040" radius="15" spread="0.1" />
+       </effect>
+
+       <!-- Đẩy khung chat nhích ra từ lề trái, kế bên vị trí con Robot -->
+       <StackPane.margin>
+           <Insets left="110.0" />
+       </StackPane.margin>
+
+       <!-- Header -->
+       <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2F80ED; -fx-background-radius: 15 15 0 0; -fx-padding: 15;">
+           <Label text="AI Assistant" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;" HBox.hgrow="ALWAYS" />
+           <Button text="X" onAction="#toggleChat" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
+       </HBox>
+
+       <!-- Vùng hiện tin nhắn -->
+       <ListView fx:id="chatListView" VBox.vgrow="ALWAYS" style="-fx-background-insets: 0; -fx-padding: 10;" />
+
+       <!-- Vùng nhập chat -->
+       <HBox spacing="10" style="-fx-background-color: #F8F9FA; -fx-background-radius: 0 0 15 15; -fx-padding: 10;">
+           <TextField fx:id="inputField" promptText="Trợ lý ơi..." HBox.hgrow="ALWAYS" onAction="#sendMessage" style="-fx-background-radius: 20; -fx-padding: 8 15;" />
+           <Button text="Gửi" onAction="#sendMessage" style="-fx-background-color: #2F80ED; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;" />
+       </HBox>
+   </VBox>
+
+   <!-- NÚT ROBOT VẪY TAY -->
+   <!-- Đẩy sang giữa lề trái màn hình -->
+   <Button fx:id="chatbotBtn" onAction="#toggleChat" 
+           StackPane.alignment="CENTER_LEFT"
+           style="-fx-background-color: transparent; -fx-cursor: hand;">
+       
+       <StackPane.margin>
+           <Insets left="20.0" />
+       </StackPane.margin>
+
+       <graphic>
+           <ImageView fx:id="robotIcon" fitHeight="80.0" fitWidth="80.0" preserveRatio="true">
+               <image>
+                   <Image url="@/images/chatbot.png" />
+               </image>
+           </ImageView>
+       </graphic>
+       <!-- Đổ bóng nút Robot -->
+       <effect>
+           <DropShadow color="#00000060" radius="10" spread="0.2"/>
+       </effect>
+   </Button>
+
+</StackPane>

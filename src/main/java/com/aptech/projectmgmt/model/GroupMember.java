@@ -12,7 +12,6 @@ public class GroupMember {
     private int abandonCount;
     private Integer excludedBy;
     private LocalDateTime excludedAt;
-    // Non-DB fields populated via JOIN
     private String studentCode;
     private String studentFullName;
     private String studentPhotoUrl;

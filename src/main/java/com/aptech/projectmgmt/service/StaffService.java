@@ -57,7 +57,7 @@ public class StaffService {
         if (staffRepository.findByEmail(normalizedEmail) != null) {
             throw new RuntimeException("Email giao vien da ton tai");
         }
-
+       
         String temporaryPassword = "123";
         String passwordHash = BCrypt.hashpw(temporaryPassword, BCrypt.gensalt());
         int accountId;
@@ -112,5 +112,21 @@ public class StaffService {
             );
         }
         return ex;
+    }
+    public Staff findById(int staffId) {
+        return staffRepository.findById(staffId);
+    }
+    public void updateStaffFullName(int staffId, String fullName) {
+        staffRepository.updateStaffFullName(staffId, fullName);
+    }
+    public void updateStaff(int staffId, String username, String fullName, String email) {
+        staffRepository.updateStaff(staffId, username, fullName, email);
+    }
+    public void updateTeacherFullName(int staffId, String fullName) {
+        staffRepository.updateTeacherFullName(staffId, fullName);
+    }
+
+    public void toggleStaffStatus(int staffId) {
+        staffRepository.toggleStaffStatus(staffId);
     }
 }

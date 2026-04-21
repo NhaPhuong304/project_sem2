@@ -13,6 +13,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -24,126 +25,152 @@ import java.io.File;
 
 public class TeacherDashboardController {
 
-    @FXML private Label teacherNameLabel;
-    @FXML private ImageView avatarImageView;
-    @FXML private Button logoutBtn;
-    @FXML private Button myClassesBtn;
-    @FXML private Button myProjectsBtn;
-    @FXML private StackPane contentArea;
+	@FXML
+	private Label teacherNameLabel;
+	@FXML
+	private ImageView avatarImageView;
+	@FXML
+	private Button logoutBtn;
+	@FXML
+	private Button myClassesBtn;
+	@FXML
+	private Button myProjectsBtn;
+	@FXML
+	private StackPane contentArea;
+	@FXML
+	private Button inboxBtn;
 
-    private final AccountService accountService = new AccountService();
-    private Integer currentTeacherStaffId;
+	@FXML
+	private Label msgBadge;
 
-    @FXML
-    public void initialize() {
-        Staff staff = SessionManager.getInstance().getCurrentStaff();
-        if (staff != null) {
-            teacherNameLabel.setText(staff.getFullName());
-            currentTeacherStaffId = staff.getStaffId();
-        }
-        loadAvatar();
-        avatarImageView.setOnMouseClicked(e -> handleChangeAvatar());
-        logoutBtn.setOnAction(e -> handleLogout());
-        setActiveMenu(myClassesBtn);
-        loadTeacherClasses();
-    }
+	private final AccountService accountService = new AccountService();
+	private Integer currentTeacherStaffId;
 
-    @FXML
-    public void onMyClassesClick() {
-        setActiveMenu(myClassesBtn);
-        loadTeacherClasses();
-    }
+	@FXML
+	public void initialize() {
+		Staff staff = SessionManager.getInstance().getCurrentStaff();
+		if (staff != null) {
+			teacherNameLabel.setText(staff.getFullName());
+			currentTeacherStaffId = staff.getStaffId();
+		}
+		loadAvatar();
+		avatarImageView.setOnMouseClicked(e -> handleChangeAvatar());
+		logoutBtn.setOnAction(e -> handleLogout());
+		setActiveMenu(myClassesBtn);
+		loadTeacherClasses();
+	}
 
-    @FXML
-    public void onMyProjectsClick() {
-        setActiveMenu(myProjectsBtn);
-        loadTeacherProjects();
-    }
+	@FXML
+	private void onInboxClick() {
+		loadContent("/fxml/teacher/teacher-inbox.fxml");
+	}
 
-    private void loadTeacherClasses() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.CLASS_LIST));
-            Node content = loader.load();
-            ClassListController controller = loader.getController();
-            controller.setReadOnlyMode(true);
-            controller.setTeacherStaffId(currentTeacherStaffId);
-            contentArea.getChildren().setAll(content);
-        } catch (Exception e) {
-            AlertUtil.showError("Loi tai danh sach lop cua giao vien: " + e.getMessage());
-        }
-    }
+	private void loadContent(String fxmlPath) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+			Parent view = loader.load();
+			contentArea.getChildren().setAll(view);
+		} catch (Exception e) {
+			e.printStackTrace();
+			AlertUtil.showError("Khong the tai giao dien: " + e.getMessage());
+		}
+	}
 
-    private void loadTeacherProjects() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.PROJECT_LIST));
-            Node content = loader.load();
-            ProjectListController controller = loader.getController();
-            controller.setReadOnlyMode(true);
-            controller.setTeacherStaffId(currentTeacherStaffId);
-            contentArea.getChildren().setAll(content);
-        } catch (Exception e) {
-            AlertUtil.showError("Loi tai danh sach project huong dan: " + e.getMessage());
-        }
-    }
+	@FXML
+	public void onMyClassesClick() {
+		setActiveMenu(myClassesBtn);
+		loadTeacherClasses();
+	}
 
-    private void loadAvatar() {
-        var account = SessionManager.getInstance().getCurrentAccount();
-        AvatarUtil.applyAvatar(avatarImageView, account != null ? account.getPhotoUrl() : null);
-    }
+	@FXML
+	public void onMyProjectsClick() {
+		setActiveMenu(myProjectsBtn);
+		loadTeacherProjects();
+	}
 
-    private void handleChangeAvatar() {
-        File selectedFile = chooseAvatarFile();
-        if (selectedFile == null) {
-            return;
-        }
+	private void loadTeacherClasses() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.CLASS_LIST));
+			Node content = loader.load();
+			ClassListController controller = loader.getController();
+			controller.setReadOnlyMode(true);
+			controller.setTeacherStaffId(currentTeacherStaffId);
+			contentArea.getChildren().setAll(content);
+		} catch (Exception e) {
+			AlertUtil.showError("Loi tai danh sach lop cua giao vien: " + e.getMessage());
+		}
+	}
 
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                accountService.updateCurrentAvatar(selectedFile.getAbsolutePath());
-                return null;
-            }
-        };
-        task.setOnSucceeded(e -> Platform.runLater(() -> {
-            loadAvatar();
-            AlertUtil.showSuccess("Cap nhat avatar thanh cong");
-        }));
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            Throwable ex = task.getException();
-            AlertUtil.showError("Loi cap nhat avatar: " + (ex != null ? ex.getMessage() : ""));
-        }));
-        new Thread(task).start();
-    }
+	private void loadTeacherProjects() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.PROJECT_LIST));
+			Node content = loader.load();
+			ProjectListController controller = loader.getController();
+			controller.setReadOnlyMode(true);
+			controller.setTeacherStaffId(currentTeacherStaffId);
+			contentArea.getChildren().setAll(content);
+		} catch (Exception e) {
+			AlertUtil.showError("Loi tai danh sach project huong dan: " + e.getMessage());
+		}
+	}
 
-    private File chooseAvatarFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chon avatar");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
-        );
-        Stage stage = (Stage) avatarImageView.getScene().getWindow();
-        return fileChooser.showOpenDialog(stage);
-    }
+	private void loadAvatar() {
+		var account = SessionManager.getInstance().getCurrentAccount();
+		AvatarUtil.applyAvatar(avatarImageView, account != null ? account.getPhotoUrl() : null);
+	}
 
-    private void handleLogout() {
-        SessionManager.getInstance().clearSession();
-        try {
-            Stage stage = (Stage) logoutBtn.getScene().getWindow();
-            SceneManager.switchScene(stage, SceneManager.LOGIN);
-        } catch (Exception e) {
-            AlertUtil.showError("Loi dang xuat: " + e.getMessage());
-        }
-    }
+	private void handleChangeAvatar() {
+		File selectedFile = chooseAvatarFile();
+		if (selectedFile == null) {
+			return;
+		}
 
-    private void setActiveMenu(Button activeButton) {
-        if (myClassesBtn != null) {
-            myClassesBtn.getStyleClass().remove("sidebar-btn-active");
-        }
-        if (myProjectsBtn != null) {
-            myProjectsBtn.getStyleClass().remove("sidebar-btn-active");
-        }
-        if (activeButton != null && !activeButton.getStyleClass().contains("sidebar-btn-active")) {
-            activeButton.getStyleClass().add("sidebar-btn-active");
-        }
-    }
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				accountService.updateCurrentAvatar(selectedFile.getAbsolutePath());
+				return null;
+			}
+		};
+		task.setOnSucceeded(e -> Platform.runLater(() -> {
+			loadAvatar();
+			AlertUtil.showSuccess("Cap nhat avatar thanh cong");
+		}));
+		task.setOnFailed(e -> Platform.runLater(() -> {
+			Throwable ex = task.getException();
+			AlertUtil.showError("Loi cap nhat avatar: " + (ex != null ? ex.getMessage() : ""));
+		}));
+		new Thread(task).start();
+	}
+
+	private File chooseAvatarFile() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Chon avatar");
+		fileChooser.getExtensionFilters()
+				.add(new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"));
+		Stage stage = (Stage) avatarImageView.getScene().getWindow();
+		return fileChooser.showOpenDialog(stage);
+	}
+
+	private void handleLogout() {
+		SessionManager.getInstance().clearSession();
+		try {
+			Stage stage = (Stage) logoutBtn.getScene().getWindow();
+			SceneManager.switchScene(stage, SceneManager.LOGIN);
+		} catch (Exception e) {
+			AlertUtil.showError("Loi dang xuat: " + e.getMessage());
+		}
+	}
+
+	private void setActiveMenu(Button activeButton) {
+		if (myClassesBtn != null) {
+			myClassesBtn.getStyleClass().remove("sidebar-btn-active");
+		}
+		if (myProjectsBtn != null) {
+			myProjectsBtn.getStyleClass().remove("sidebar-btn-active");
+		}
+		if (activeButton != null && !activeButton.getStyleClass().contains("sidebar-btn-active")) {
+			activeButton.getStyleClass().add("sidebar-btn-active");
+		}
+	}
 }

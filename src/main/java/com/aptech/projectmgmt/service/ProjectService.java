@@ -11,126 +11,129 @@ import java.util.List;
 
 public class ProjectService {
 
-    private final ProjectRepository projectRepository = new ProjectRepository();
-    private final GroupRepository groupRepository = new GroupRepository();
+	private final ProjectRepository projectRepository = new ProjectRepository();
+	private final GroupRepository groupRepository = new GroupRepository();
 
-    public List<Project> getProjectsByClass(int classId) {
-        return projectRepository.findByClassId(classId);
-    }
+	public List<Project> getProjectsByClass(int classId) {
+		return projectRepository.findByClassId(classId);
+	}
 
-    public List<Project> getAllProjects() {
-        return projectRepository.findAll();
-    }
+	public List<Project> getAllProjects() {
+		return projectRepository.findAll();
+	}
 
-    public List<Project> getProjectsByAdvisor(int staffId) {
-        return projectRepository.findByAdvisorId(staffId);
-    }
+	public List<Project> getProjectsByAdvisor(int staffId) {
+		return projectRepository.findByAdvisorId(staffId);
+	}
 
-    public List<Project> getProjectsByStudent(int studentId) {
-        return projectRepository.findByStudentId(studentId);
-    }
+	public List<Project> getProjectsByCreatedStaff(int staffId) {
+		return projectRepository.findByCreatedByStaffId(staffId);
+	}
 
-    public Project getProjectById(int projectId) {
-        return projectRepository.findById(projectId);
-    }
+	public List<Project> getProjectsByStudent(int studentId) {
+		return projectRepository.findByStudentId(studentId);
+	}
 
-    public Project getProjectByAdvisor(int projectId, int staffId) {
-        return projectRepository.findByIdAndAdvisorId(projectId, staffId);
-    }
+	public Project getProjectById(int projectId) {
+		return projectRepository.findById(projectId);
+	}
 
-    public void createProject(Project project) {
-        if (project.getProjectName() == null || project.getProjectName().trim().isEmpty()) {
-            throw new RuntimeException("Ten project khong duoc de trong");
-        }
-        if (project.getSemester() == null || project.getSemester().trim().isEmpty()) {
-            throw new RuntimeException("Hoc ky khong duoc de trong");
-        }
-        if (project.getClassId() <= 0) {
-            throw new RuntimeException("Project phai gan voi mot lop hop le");
-        }
-        if (project.getSupervisorId() == null) {
-            throw new RuntimeException("Vui long chon giao vien huong dan");
-        }
-        if (project.getStartDate() == null) {
-            throw new RuntimeException("Vui long chon ngay bat dau");
-        }
-        if (project.getEndDate() == null) {
-            throw new RuntimeException("Vui long chon ngay ket thuc");
-        }
-        if (project.getReportDate() == null) {
-            throw new RuntimeException("Vui long chon ngay bao cao");
-        }
-        if (project.getEndDate() != null && project.getStartDate() != null
-                && project.getEndDate().isBefore(project.getStartDate())) {
-            throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
-        }
-        if (project.getReportDate() != null && project.getEndDate() != null) {
-            if (project.getReportDate().isAfter(project.getEndDate())) {
-                throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
-            }
-            if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
-                throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
-            }
-        }
-        if (project.getStatus() == null) project.setStatus(ProjectStatus.ACTIVE);
-        if (project.getCreatedByStaffId() == null) {
-            var currentStaff = SessionManager.getInstance().getCurrentStaff();
-            if (currentStaff != null) {
-                project.setCreatedByStaffId(currentStaff.getStaffId());
-            }
-        }
+	public Project getProjectByAdvisor(int projectId, int staffId) {
+		return projectRepository.findByIdAndAdvisorId(projectId, staffId);
+	}
 
-        String defaultGroupName = "Nhom - " + project.getProjectName().trim();
-        if (groupRepository.existsGroupName(project.getClassId(), defaultGroupName)) {
-            defaultGroupName = defaultGroupName + " - " + System.currentTimeMillis();
-        }
-        int groupId = groupRepository.createStandaloneGroup(project.getClassId(), defaultGroupName);
-        project.setGroupId(groupId);
+	public void createProject(Project project) {
+		if (project.getProjectName() == null || project.getProjectName().trim().isEmpty()) {
+			throw new RuntimeException("Ten project khong duoc de trong");
+		}
+		if (project.getSemester() == null || project.getSemester().trim().isEmpty()) {
+			throw new RuntimeException("Hoc ky khong duoc de trong");
+		}
+		if (project.getClassId() <= 0) {
+			throw new RuntimeException("Project phai gan voi mot lop hop le");
+		}
+		if (project.getSupervisorId() == null) {
+			throw new RuntimeException("Vui long chon giao vien huong dan");
+		}
+		if (project.getStartDate() == null) {
+			throw new RuntimeException("Vui long chon ngay bat dau");
+		}
+		if (project.getEndDate() == null) {
+			throw new RuntimeException("Vui long chon ngay ket thuc");
+		}
+		if (project.getReportDate() == null) {
+			throw new RuntimeException("Vui long chon ngay bao cao");
+		}
+		if (project.getEndDate() != null && project.getStartDate() != null
+				&& project.getEndDate().isBefore(project.getStartDate())) {
+			throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
+		}
+		if (project.getReportDate() != null && project.getEndDate() != null) {
+			if (project.getReportDate().isAfter(project.getEndDate())) {
+				throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
+			}
+			if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
+				throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
+			}
+		}
+		if (project.getStatus() == null)
+			project.setStatus(ProjectStatus.ACTIVE);
+		if (project.getCreatedByStaffId() == null) {
+			var currentStaff = SessionManager.getInstance().getCurrentStaff();
+			if (currentStaff != null) {
+				project.setCreatedByStaffId(currentStaff.getStaffId());
+			}
+		}
 
-        int projectId = projectRepository.create(project);
-        project.setProjectId(projectId);
-    }
+		String defaultGroupName = "Nhom - " + project.getProjectName().trim();
+		if (groupRepository.existsGroupName(project.getClassId(), defaultGroupName)) {
+			defaultGroupName = defaultGroupName + " - " + System.currentTimeMillis();
+		}
+		int groupId = groupRepository.createStandaloneGroup(project.getClassId(), defaultGroupName);
+		project.setGroupId(groupId);
 
-    public void updateProject(Project project) {
-        if (project.getProjectName() == null || project.getProjectName().trim().isEmpty()) {
-            throw new RuntimeException("Ten project khong duoc de trong");
-        }
-        if (project.getSemester() == null || project.getSemester().trim().isEmpty()) {
-            throw new RuntimeException("Hoc ky khong duoc de trong");
-        }
-        if (project.getStartDate() == null || project.getEndDate() == null || project.getReportDate() == null) {
-            throw new RuntimeException("Vui long nhap day du ngay bat dau, ket thuc va bao cao");
-        }
-        if (project.getEndDate() != null && project.getStartDate() != null
-                && project.getEndDate().isBefore(project.getStartDate())) {
-            throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
-        }
-        if (project.getReportDate() != null && project.getEndDate() != null) {
-            if (project.getReportDate().isAfter(project.getEndDate())) {
-                throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
-            }
-            if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
-                throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
-            }
-        }
-        projectRepository.update(project);
-    }
+		int projectId = projectRepository.create(project);
+		project.setProjectId(projectId);
+	}
 
-    public boolean canMarkCompleted(Project project) {
-        return project != null
-                && project.getStatus() == ProjectStatus.ACTIVE
-                && project.getReportDate() != null
-                && project.getReportDate().isBefore(LocalDate.now());
-    }
+	public void updateProject(Project project) {
+		if (project.getProjectName() == null || project.getProjectName().trim().isEmpty()) {
+			throw new RuntimeException("Ten project khong duoc de trong");
+		}
+		if (project.getSemester() == null || project.getSemester().trim().isEmpty()) {
+			throw new RuntimeException("Hoc ky khong duoc de trong");
+		}
+		if (project.getStartDate() == null || project.getEndDate() == null || project.getReportDate() == null) {
+			throw new RuntimeException("Vui long nhap day du ngay bat dau, ket thuc va bao cao");
+		}
+		if (project.getEndDate() != null && project.getStartDate() != null
+				&& project.getEndDate().isBefore(project.getStartDate())) {
+			throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
+		}
+		if (project.getReportDate() != null && project.getEndDate() != null) {
+			if (project.getReportDate().isAfter(project.getEndDate())) {
+				throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
+			}
+			if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
+				throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
+			}
+		}
+		projectRepository.update(project);
+	}
 
-    public void markProjectCompleted(int projectId) {
-        Project project = projectRepository.findById(projectId);
-        if (project == null) {
-            throw new RuntimeException("Khong tim thay project");
-        }
-        if (!canMarkCompleted(project)) {
-            throw new RuntimeException("Chi duoc danh dau hoan thanh khi project da qua han bao cao");
-        }
-        projectRepository.markCompleted(projectId);
-    }
+	public boolean canMarkCompleted(Project project) {
+		return project != null && project.getStatus() == ProjectStatus.ACTIVE && project.getReportDate() != null
+				&& project.getReportDate().isBefore(LocalDate.now());
+	}
+
+	public void markProjectCompleted(int projectId) {
+		Project project = projectRepository.findById(projectId);
+		if (project == null) {
+			throw new RuntimeException("Khong tim thay project");
+		}
+		if (!canMarkCompleted(project)) {
+			throw new RuntimeException("Chi duoc danh dau hoan thanh khi project da qua han bao cao");
+		}
+		projectRepository.markCompleted(projectId);
+	}
 }

@@ -11,36 +11,106 @@ public class Message {
     private String content;
     private boolean isRead;
     private LocalDateTime sentAt;
-    // Non-DB fields populated via JOIN
     private String senderName;
     private String taskTitle;
 
     public Message() {}
 
-    public int getMessageId() { return messageId; }
-    public void setMessageId(int messageId) { this.messageId = messageId; }
+    public int getMessageId() {
+        return messageId;
+    }
 
-    public int getSenderId() { return senderId; }
-    public void setSenderId(int senderId) { this.senderId = senderId; }
+    public void setMessageId(int messageId) {
+        this.messageId = messageId;
+    }
 
-    public int getReceiverId() { return receiverId; }
-    public void setReceiverId(int receiverId) { this.receiverId = receiverId; }
+    public int getSenderId() {
+        return senderId;
+    }
 
-    public Integer getTaskId() { return taskId; }
-    public void setTaskId(Integer taskId) { this.taskId = taskId; }
+    public void setSenderId(int senderId) {
+        this.senderId = senderId;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
+    public int getReceiverId() {
+        return receiverId;
+    }
 
-    public boolean isRead() { return isRead; }
-    public void setRead(boolean read) { isRead = read; }
+    public void setReceiverId(int receiverId) {
+        this.receiverId = receiverId;
+    }
 
-    public LocalDateTime getSentAt() { return sentAt; }
-    public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
+    public Integer getTaskId() {
+        return taskId;
+    }
 
-    public String getSenderName() { return senderName; }
-    public void setSenderName(String senderName) { this.senderName = senderName; }
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
 
-    public String getTaskTitle() { return taskTitle; }
-    public void setTaskTitle(String taskTitle) { this.taskTitle = taskTitle; }
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
+    }
+
+    public LocalDateTime getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getTaskTitle() {
+        return taskTitle;
+    }
+
+    public void setTaskTitle(String taskTitle) {
+        this.taskTitle = taskTitle;
+    }
+
+    public String getMessageType() {
+        if (content == null || !content.contains("|")) {
+            return "";
+        }
+        return content.substring(0, content.indexOf("|"));
+    }
+
+    public String getDisplayContent() {
+        if (content == null || !content.contains("|")) {
+            return content != null ? content : "";
+        }
+        return content.substring(content.indexOf("|") + 1);
+    }
+
+    public boolean isQuestion() {
+        return "QUESTION".equalsIgnoreCase(getMessageType());
+    }
+
+    public boolean isAnswer() {
+        return "ANSWER".equalsIgnoreCase(getMessageType());
+    }
+
+    public boolean isSystemReminder() {
+        return "SYSTEM_REMINDER".equalsIgnoreCase(getMessageType());
+    }
 }

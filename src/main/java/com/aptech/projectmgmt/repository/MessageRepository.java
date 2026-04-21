@@ -66,6 +66,79 @@ public class MessageRepository extends BaseRepository {
             throw new RuntimeException("DB error in insert message: " + e.getMessage(), e);
         }
     }
+    public int createMessage(int senderId, int receiverId, Integer taskId, String content) {
+        String sql = "INSERT INTO Message (SenderID, ReceiverID, TaskID, Content, SentAt, IsRead) "
+                   + "VALUES (?, ?, ?, ?, GETDATE(), 0)";
+        try {
+            return executeUpdateGetKey(sql, senderId, receiverId, taskId, content);
+        } catch (SQLException e) {
+            throw new RuntimeException("DB error in createMessage: " + e.getMessage(), e);
+        }
+    }
+    public List<Message> findQuestionsByTeacher(int teacherId) {
+        String sql = "SELECT m.MessageID, m.SenderID, m.ReceiverID, m.TaskID, m.Content, m.SentAt, m.IsRead, "
+                   + "s.FullName AS SenderName, t.Title AS TaskTitle "
+                   + "FROM Message m "
+                   + "LEFT JOIN Student st ON st.StudentID = m.SenderID "
+                   + "LEFT JOIN Staff s ON s.StaffID = m.SenderID "
+                   + "LEFT JOIN Task t ON t.TaskID = m.TaskID "
+                   + "WHERE m.ReceiverID = ? AND m.Content LIKE 'QUESTION|%' "
+                   + "ORDER BY m.SentAt DESC";
+        try {
+            return executeQuery(sql, rs -> {
+                List<Message> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }, teacherId);
+        } catch (SQLException e) {
+            throw new RuntimeException("DB error in findQuestionsByTeacher: " + e.getMessage(), e);
+        }
+    }
+    public List<Message> findAnswersByStudent(int studentId) {
+        String sql = "SELECT m.MessageID, m.SenderID, m.ReceiverID, m.TaskID, m.Content, m.SentAt, m.IsRead, "
+                   + "s.FullName AS SenderName, t.Title AS TaskTitle "
+                   + "FROM Message m "
+                   + "LEFT JOIN Staff s ON s.StaffID = m.SenderID "
+                   + "LEFT JOIN Task t ON t.TaskID = m.TaskID "
+                   + "WHERE m.ReceiverID = ? AND m.Content LIKE 'ANSWER|%' "
+                   + "ORDER BY m.SentAt DESC";
+        try {
+            return executeQuery(sql, rs -> {
+                List<Message> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }, studentId);
+        } catch (SQLException e) {
+            throw new RuntimeException("DB error in findAnswersByStudent: " + e.getMessage(), e);
+        }
+    }
+    public List<Message> findConversationByTask(int taskId) {
+        String sql = "SELECT m.MessageID, m.SenderID, m.ReceiverID, m.TaskID, m.Content, m.SentAt, m.IsRead, "
+                   + "COALESCE(st.FullName, sf.FullName) AS SenderName, "
+                   + "t.Title AS TaskTitle "
+                   + "FROM Message m "
+                   + "LEFT JOIN Student st ON st.StudentID = m.SenderID "
+                   + "LEFT JOIN Staff sf ON sf.StaffID = m.SenderID "
+                   + "LEFT JOIN Task t ON t.TaskID = m.TaskID "
+                   + "WHERE m.TaskID = ? "
+                   + "AND (m.Content LIKE 'QUESTION|%' OR m.Content LIKE 'ANSWER|%') "
+                   + "ORDER BY m.SentAt ASC";
+        try {
+            return executeQuery(sql, rs -> {
+                List<Message> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }, taskId);
+        } catch (SQLException e) {
+            throw new RuntimeException("DB error in findConversationByTask: " + e.getMessage(), e);
+        }
+    }
 
     private Message mapRow(ResultSet rs) throws SQLException {
         Message m = new Message();

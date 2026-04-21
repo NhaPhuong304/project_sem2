@@ -4,7 +4,10 @@ import com.aptech.projectmgmt.controller.TextPromptDialogController;
 import com.aptech.projectmgmt.model.*;
 import com.aptech.projectmgmt.repository.TaskRepository;
 import com.aptech.projectmgmt.service.GroupService;
+import com.aptech.projectmgmt.service.MailService;
 import com.aptech.projectmgmt.service.ProjectService;
+import com.aptech.projectmgmt.service.QuestionService;
+import com.aptech.projectmgmt.service.StaffService;
 import com.aptech.projectmgmt.service.TaskService;
 import com.aptech.projectmgmt.util.AlertUtil;
 import com.aptech.projectmgmt.util.SceneManager;
@@ -35,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import com.aptech.projectmgmt.service.MessageService;
 
 public class MyTaskListController {
 
@@ -69,7 +73,13 @@ public class MyTaskListController {
 	private boolean canCreateTask;
 	private int currentStudentId;
 	private ObservableList<TaskViewModel> taskList = FXCollections.observableArrayList();
+	private final QuestionService questionService = new QuestionService();
+	private int projectId;
 	private Timeline autoRefresh;
+	@FXML
+	private Button askTeacherBtn;
+	private final MailService mailService = new MailService();
+	private final StaffService staffService = new StaffService();
 
 	@FXML
 	public void initialize() {
@@ -77,13 +87,17 @@ public class MyTaskListController {
 		setupRowFactory();
 		taskTable.setItems(taskList);
 		actionColumn.setCellFactory(col -> createActionCell());
+
 		addTaskBtn.setVisible(false);
 		addTaskBtn.setManaged(false);
 		addTaskBtn.setOnAction(e -> handleAddTask());
 
+		askTeacherBtn.setOnAction(e -> handleAskTeacherGeneral());
+
 		autoRefresh = new Timeline(new KeyFrame(Duration.seconds(30), e -> loadTasks()));
 		autoRefresh.setCycleCount(Animation.INDEFINITE);
 		autoRefresh.play();
+
 		taskTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
 			if (newScene == null) {
 				onDestroy();
@@ -91,9 +105,102 @@ public class MyTaskListController {
 		});
 	}
 
+	@FXML
+	private void handleAskTeacherGeneral() {
+		TaskViewModel selectedTask = taskTable.getSelectionModel().getSelectedItem();
+
+		if (selectedTask == null) {
+			AlertUtil.showError("Vui long chon 1 task truoc khi hoi giao vien");
+			return;
+		}
+
+		Task<Staff> teacherTask = new Task<>() {
+			@Override
+			protected Staff call() {
+				Project project = projectService.getProjectById(projectId);
+				if (project == null || project.getSupervisorId() == null) {
+					throw new RuntimeException("Khong tim thay giao vien huong dan cua project");
+				}
+				return staffService.findById(project.getSupervisorId());
+			}
+		};
+
+		teacherTask.setOnSucceeded(e -> {
+			Staff teacher = teacherTask.getValue();
+			if (teacher == null) {
+				AlertUtil.showError("Khong tim thay thong tin giao vien");
+				return;
+			}
+
+			Optional<String> result = showTextPromptDialog("Hoi giao vien", "Nhap noi dung cau hoi gui giao vien",
+					"Noi dung cau hoi");
+
+			result.ifPresent(content -> {
+				String trimmed = content != null ? content.trim() : "";
+				if (trimmed.isEmpty()) {
+					AlertUtil.showError("Noi dung cau hoi khong duoc de trong");
+					return;
+				}
+
+				Task<Boolean> askTask = new Task<>() {
+					@Override
+					protected Boolean call() {
+						questionService.createQuestion(currentStudentId, teacher.getStaffId(), selectedTask.getTaskId(),
+								trimmed);
+
+						if (teacher == null) {
+							throw new RuntimeException("Khong tim thay giao vien");
+						}
+
+						if (teacher.getEmail() == null || teacher.getEmail().isBlank()) {
+							throw new RuntimeException("Giao vien chua co email");
+						}
+
+						System.out.println("=== ASK MAIL DEBUG ===");
+						System.out.println("Teacher ID = " + teacher.getStaffId());
+						System.out.println("Teacher email = " + teacher.getEmail());
+						System.out.println("Task ID = " + selectedTask.getTaskId());
+						System.out.println("Task title = " + selectedTask.getTitle());
+
+						String subject = "[Hoi bai] " + selectedTask.getTitle();
+						String body = "Sinh vien gui cau hoi cho giao vien.\n\n" + "Task: " + selectedTask.getTitle()
+								+ "\n" + "Sinh vien ID: " + currentStudentId + "\n\n" + "Noi dung cau hoi:\n" + trimmed;
+
+						mailService.sendEmail(teacher.getEmail(), subject, body);
+						return true;
+					}
+				};
+
+				askTask.setOnSucceeded(ev -> Platform.runLater(() -> {
+					Boolean mailSent = askTask.getValue();
+					if (Boolean.TRUE.equals(mailSent)) {
+						AlertUtil.showSuccess("Gui cau hoi thanh cong va da gui email cho giao vien");
+					} else {
+						AlertUtil.showSuccess("Gui cau hoi thanh cong, nhung chua gui duoc email");
+					}
+				}));
+
+				askTask.setOnFailed(ev -> Platform.runLater(() -> {
+					Throwable ex = askTask.getException();
+					AlertUtil.showError(ex != null ? ex.getMessage() : "Gui cau hoi that bai");
+				}));
+
+				new Thread(askTask).start();
+			});
+		});
+
+		teacherTask.setOnFailed(e -> Platform.runLater(() -> {
+			Throwable ex = teacherTask.getException();
+			AlertUtil.showError(ex != null ? ex.getMessage() : "Khong lay duoc giao vien huong dan");
+		}));
+
+		new Thread(teacherTask).start();
+	}
+
 	public void initData(int groupId, int projectId, MemberRole myRole) {
-		this.groupId = groupId;
+		this.projectId = projectId;
 		this.myRole = myRole;
+		this.groupId = groupId;
 		var student = SessionManager.getInstance().getCurrentStudent();
 		if (student != null)
 			currentStudentId = student.getStudentId();
@@ -225,7 +332,7 @@ public class MyTaskListController {
 			}
 		};
 
-		loadMembersTask.setOnSucceeded(e -> {
+		loadMembersTask.setOnSucceeded(e -> Platform.runLater(() -> {
 			try {
 				List<GroupMember> members = loadMembersTask.getValue();
 				if (members == null || members.isEmpty()) {
@@ -233,9 +340,9 @@ public class MyTaskListController {
 					return;
 				}
 
-				Dialog<ReassignTaskData> dialog = new Dialog<>();
-				dialog.setTitle("Phan cong lai task");
-				dialog.setHeaderText("Chon nguoi moi va sua lai thoi gian du kien");
+				Dialog<ButtonType> dialog = new Dialog<>();
+				dialog.setTitle("Phan cong task");
+				dialog.setHeaderText("Chon nguoi thuc hien va thoi gian du kien");
 
 				ButtonType saveButtonType = new ButtonType("Luu", ButtonBar.ButtonData.OK_DONE);
 				dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
@@ -287,22 +394,27 @@ public class MyTaskListController {
 
 				dialog.getDialogPane().setContent(grid);
 
-				dialog.setResultConverter(buttonType -> {
-					if (buttonType != saveButtonType) {
-						return null;
-					}
+				final ReassignTaskData[] selectedData = new ReassignTaskData[1];
 
+				Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
+				saveButton.addEventFilter(ActionEvent.ACTION, event -> {
 					GroupMember selected = memberCombo.getValue();
 					if (selected == null) {
-						throw new IllegalArgumentException("Phai chon nguoi thuc hien");
+						AlertUtil.showError("Phai chon nguoi thuc hien");
+						event.consume();
+						return;
 					}
 
 					if (taskVm.getReviewedById() != null && taskVm.getReviewedById() == selected.getStudentId()) {
-						throw new IllegalArgumentException("Nguoi thuc hien khong duoc trung voi nguoi kiem tra");
+						AlertUtil.showError("Nguoi thuc hien khong duoc trung voi nguoi kiem tra");
+						event.consume();
+						return;
 					}
 
 					if (startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
-						throw new IllegalArgumentException("Phai chon du ngay bat dau va ket thuc");
+						AlertUtil.showError("Phai chon du ngay bat dau va ket thuc");
+						event.consume();
+						return;
 					}
 
 					LocalDateTime start = LocalDateTime.of(startDatePicker.getValue(),
@@ -312,25 +424,20 @@ public class MyTaskListController {
 							java.time.LocalTime.of(endHour.getValue(), endMinute.getValue()));
 
 					if (!end.isAfter(start)) {
-						throw new IllegalArgumentException("Thoi gian ket thuc phai sau thoi gian bat dau");
+						AlertUtil.showError("Thoi gian ket thuc phai sau thoi gian bat dau");
+						event.consume();
+						return;
 					}
 
-					return new ReassignTaskData(selected.getStudentId(), start, end);
+					selectedData[0] = new ReassignTaskData(selected.getStudentId(), start, end);
 				});
 
-				Optional<ReassignTaskData> result;
-				try {
-					result = dialog.showAndWait();
-				} catch (Exception ex) {
-					AlertUtil.showError(ex.getMessage());
+				Optional<ButtonType> result = dialog.showAndWait();
+				if (result.isEmpty() || result.get() != saveButtonType || selectedData[0] == null) {
 					return;
 				}
 
-				if (result.isEmpty()) {
-					return;
-				}
-
-				ReassignTaskData data = result.get();
+				ReassignTaskData data = selectedData[0];
 
 				Task<Void> assignTask = new Task<>() {
 					@Override
@@ -341,27 +448,27 @@ public class MyTaskListController {
 					}
 				};
 
-				assignTask.setOnSucceeded(ev -> {
-					AlertUtil.showSuccess("Phan cong lai task thanh cong");
+				assignTask.setOnSucceeded(ev -> Platform.runLater(() -> {
+					AlertUtil.showSuccess("Phan cong task thanh cong");
 					loadTasks();
-				});
+				}));
 
-				assignTask.setOnFailed(ev -> {
+				assignTask.setOnFailed(ev -> Platform.runLater(() -> {
 					Throwable ex = assignTask.getException();
-					AlertUtil.showError(ex != null ? ex.getMessage() : "Loi phan cong lai task");
-				});
+					AlertUtil.showError(ex != null ? ex.getMessage() : "Loi phan cong task");
+				}));
 
 				new Thread(assignTask).start();
 
 			} catch (Exception ex) {
 				AlertUtil.showError("Khong the phan cong task: " + ex.getMessage());
 			}
-		});
+		}));
 
-		loadMembersTask.setOnFailed(e -> {
+		loadMembersTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = loadMembersTask.getException();
 			AlertUtil.showError("Khong tai duoc thanh vien nhom: " + (ex != null ? ex.getMessage() : ""));
-		});
+		}));
 
 		new Thread(loadMembersTask).start();
 	}
@@ -532,10 +639,16 @@ public class MyTaskListController {
 		if (member != null) {
 			myRole = member.getRole();
 		}
+
 		canCreateTask = currentMemberActive && myRole == MemberRole.LEADER;
+
 		addTaskBtn.setVisible(canCreateTask);
 		addTaskBtn.setManaged(canCreateTask);
 		addTaskBtn.setDisable(!canCreateTask);
+
+		askTeacherBtn.setVisible(currentMemberActive);
+		askTeacherBtn.setManaged(currentMemberActive);
+		askTeacherBtn.setDisable(!currentMemberActive);
 	}
 
 	private void showAddTaskDialog(List<GroupMember> members) {

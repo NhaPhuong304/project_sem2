@@ -4,25 +4,33 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+
 <AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.admin.AdminTeacherListController"
-            prefWidth="880" prefHeight="620">
+	xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.aptech.projectmgmt.controller.admin.AdminTeacherListController"
+	prefWidth="880" prefHeight="620">
 
-    <HBox layoutX="20" layoutY="20" spacing="10">
-        <Button fx:id="addTeacherBtn" text="+ Them giao vien" />
-    </HBox>
+	<HBox layoutX="20" layoutY="20" spacing="10">
+		<Button fx:id="addTeacherBtn" text="+ Them giao vien" />
+	</HBox>
 
-    <TableView fx:id="teacherTable"
-               layoutX="20" layoutY="65"
-               prefWidth="840" prefHeight="530">
-        <columns>
-            <TableColumn fx:id="avatarColumn" text="Avatar" prefWidth="80.0" />
-            <TableColumn fx:id="usernameColumn" text="Username" prefWidth="130.0" />
-            <TableColumn fx:id="fullNameColumn" text="Ho ten" prefWidth="200.0" />
-            <TableColumn fx:id="emailColumn" text="Email" prefWidth="220.0" />
-            <TableColumn fx:id="roleColumn" text="Chuc vu" prefWidth="110.0" />
-            <TableColumn fx:id="accountStatusColumn" text="Tai khoan" prefWidth="100.0" />
-        </columns>
-    </TableView>
+	<TableView fx:id="teacherTable" layoutX="20" layoutY="65"
+		prefWidth="840" prefHeight="530">
+		<columns>
+			<TableColumn fx:id="avatarColumn" text="Avatar"
+				prefWidth="65.0" />
+			<TableColumn fx:id="usernameColumn" text="Username"
+				prefWidth="110.0" />
+			<TableColumn fx:id="fullNameColumn" text="Ho ten"
+				prefWidth="160.0" />
+			<TableColumn fx:id="emailColumn" text="Email"
+				prefWidth="185.0" />
+			<TableColumn fx:id="roleColumn" text="Chuc vu"
+				prefWidth="85.0" />
+			<TableColumn fx:id="accountStatusColumn" text="Tai khoan"
+				prefWidth="95.0" />
+			<TableColumn fx:id="actionColumn" text="Action"
+				prefWidth="120.0" />
+		</columns>
+	</TableView>
 </AnchorPane>

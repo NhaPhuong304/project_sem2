@@ -51,7 +51,48 @@ public class ProjectCreateDialogController {
     public void setSupervisors(List<Staff> staffList) {
         supervisorCombo.setItems(FXCollections.observableArrayList(staffList));
     }
+    public void setData(Project project) {
+        if (project == null) {
+            return;
+        }
 
+        projectNameField.setText(project.getProjectName());
+        descriptionArea.setText(project.getDescription());
+        semesterField.setText(project.getSemester());
+        startDatePicker.setValue(project.getStartDate());
+        endDatePicker.setValue(project.getEndDate());
+        reportDatePicker.setValue(project.getReportDate());
+
+        if (supervisorCombo.getItems() != null) {
+            for (Staff staff : supervisorCombo.getItems()) {
+                if (staff.getStaffId() == project.getSupervisorId()) {
+                    supervisorCombo.getSelectionModel().select(staff);
+                    break;
+                }
+            }
+        }
+    }
+    public Project buildUpdatedProject(Project oldProject) {
+        if (oldProject == null) {
+            throw new IllegalArgumentException("Project khong hop le");
+        }
+
+        Staff selectedSupervisor = supervisorCombo.getValue();
+        if (selectedSupervisor == null) {
+            throw new IllegalArgumentException("Vui long chon giao vien huong dan");
+        }
+
+        oldProject.setProjectName(projectNameField.getText() != null ? projectNameField.getText().trim() : "");
+        oldProject.setDescription(descriptionArea.getText() != null ? descriptionArea.getText().trim() : "");
+        oldProject.setSemester(semesterField.getText() != null ? semesterField.getText().trim() : "");
+        oldProject.setStartDate(startDatePicker.getValue());
+        oldProject.setEndDate(endDatePicker.getValue());
+        oldProject.setReportDate(reportDatePicker.getValue());
+        oldProject.setSupervisorId(selectedSupervisor.getStaffId());
+        oldProject.setSupervisorName(selectedSupervisor.getFullName());
+
+        return oldProject;
+    }
     public Project buildProject(int classId) {
         Project project = new Project();
         project.setProjectName(projectNameField.getText() != null ? projectNameField.getText().trim() : "");

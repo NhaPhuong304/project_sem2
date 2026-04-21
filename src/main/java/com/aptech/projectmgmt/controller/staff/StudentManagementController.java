@@ -43,7 +43,7 @@ public class StudentManagementController {
 	@FXML
 	private TableColumn<Student, String> classNameColumn;
 	@FXML
-	private TableColumn<Student, String> accountStatusColumn;
+	private TableColumn<Student, String> createdByColumn;
 	@FXML
 	private TableColumn<Student, Void> actionColumn;
 
@@ -62,12 +62,18 @@ public class StudentManagementController {
 	private void setupTableColumns() {
 		actionColumn.setCellValueFactory(param -> new javafx.beans.property.SimpleObjectProperty<>(null));
 		actionColumn.setCellFactory(col -> new TableCell<>() {
+			private final Button editBtn = new Button("Sua");
 			private final Button transferBtn = new Button("Transfer");
 			private final Button lockBtn = new Button("Lock");
 			private final Button unlockBtn = new Button("Unlock");
 			private final javafx.scene.layout.HBox actionBox = new javafx.scene.layout.HBox(8);
 
 			{
+				editBtn.setOnAction(e -> {
+					Student student = getTableView().getItems().get(getIndex());
+					handleEditStudent(student);
+				});
+
 				transferBtn.setOnAction(e -> {
 					Student student = getTableView().getItems().get(getIndex());
 					handleTransferStudent(student);
@@ -95,6 +101,7 @@ public class StudentManagementController {
 				Student student = getTableView().getItems().get(getIndex());
 				actionBox.getChildren().clear();
 
+				actionBox.getChildren().add(editBtn);
 				actionBox.getChildren().add(transferBtn);
 
 				if (student.getAccountId() != null) {
@@ -108,6 +115,7 @@ public class StudentManagementController {
 				setGraphic(actionBox);
 			}
 		});
+
 		avatarColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPhotoUrl()));
 		avatarColumn.setCellFactory(col -> new TableCell<>() {
 			private final Parent avatarView;
@@ -135,13 +143,14 @@ public class StudentManagementController {
 				setGraphic(avatarView);
 			}
 		});
+
 		studentCodeColumn.setCellValueFactory(new PropertyValueFactory<>("studentCode"));
 		fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
 		emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 		classNameColumn.setCellValueFactory(
 				c -> new SimpleStringProperty(c.getValue().getClassName() != null ? c.getValue().getClassName() : ""));
-		accountStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(
-				c.getValue().getAccountId() != null ? "Co tai khoan" : "Chua co tai khoan"));
+		createdByColumn.setCellValueFactory(c -> new SimpleStringProperty(
+				c.getValue().getCreatedByStaffName() != null ? c.getValue().getCreatedByStaffName() : ""));
 	}
 
 	private void loadStudents() {
@@ -157,6 +166,54 @@ public class StudentManagementController {
 			AlertUtil.showError("Loi tai danh sach sinh vien: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
+	}
+
+	private void handleEditStudent(Student student) {
+		if (student == null) {
+			AlertUtil.showError("Khong tim thay sinh vien");
+			return;
+		}
+
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.STUDENT_CREATE_DIALOG));
+			Parent content = loader.load();
+			StudentCreateDialogController controller = loader.getController();
+
+			controller.setData(student);
+
+			Dialog<ButtonType> dialog = new Dialog<>();
+			dialog.setTitle("Sua sinh vien");
+			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+			dialog.getDialogPane().setContent(content);
+
+			Optional<ButtonType> result = dialog.showAndWait();
+			if (result.isEmpty() || result.get() != ButtonType.OK) {
+				return;
+			}
+
+			Task<Void> task = new Task<>() {
+				@Override
+				protected Void call() {
+					studentService.updateStudent(student.getStudentId(), controller.getFullName());
+					return null;
+				}
+			};
+
+			task.setOnSucceeded(e -> Platform.runLater(() -> {
+				AlertUtil.showSuccess("Cap nhat sinh vien thanh cong");
+				loadStudents();
+			}));
+
+			task.setOnFailed(e -> Platform.runLater(() -> {
+				Throwable ex = task.getException();
+				AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+			}));
+
+			new Thread(task).start();
+
+		} catch (Exception e) {
+			AlertUtil.showError("Khong the mo form sua sinh vien: " + e.getMessage());
+		}
 	}
 
 	private void handleTransferStudent(Student student) {

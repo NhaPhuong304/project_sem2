@@ -6,21 +6,34 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="620" prefWidth="880" styleClass="page-root" stylesheets="@../../css/staff.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.staff.StudentManagementController">
+<AnchorPane prefHeight="620" prefWidth="880"
+	styleClass="page-root" stylesheets="@../../css/staff.css"
+	xmlns="http://javafx.com/javafx/25"
+	xmlns:fx="http://www.w3.org/2001/XMLSchema-instance"
+	fx:controller="com.aptech.projectmgmt.controller.staff.StudentManagementController">
 
-    <HBox layoutX="24" layoutY="20" spacing="10">
-        <Button fx:id="addStudentBtn" styleClass="add-student-btn" text="+ Them sinh vien" />
-    </HBox>
+	<HBox layoutX="24" layoutY="20" spacing="10">
+		<Button fx:id="addStudentBtn" styleClass="add-student-btn"
+			text="+ Them sinh vien" />
+	</HBox>
 
-    <TableView fx:id="studentTable" layoutX="24" layoutY="64" prefHeight="532" prefWidth="832" styleClass="modern-table">
-        <columns>
-            <TableColumn fx:id="avatarColumn" prefWidth="72.0" text="Avatar" />
-            <TableColumn fx:id="studentCodeColumn" prefWidth="92.0" text="Ma SV" />
-            <TableColumn fx:id="fullNameColumn" prefWidth="155.0" text="Ho ten" />
-            <TableColumn fx:id="emailColumn" prefWidth="190.0" text="Email" />
-            <TableColumn fx:id="classNameColumn" prefWidth="95.0" text="Lop" />
-            <TableColumn fx:id="accountStatusColumn" prefWidth="105.0" text="Tai khoan" />
-            <TableColumn fx:id="actionColumn" prefWidth="123.0" text="Action" />
-        </columns>
-    </TableView>
+	<TableView fx:id="studentTable" layoutX="24" layoutY="64"
+		prefHeight="532" prefWidth="832" styleClass="modern-table">
+		<columns>
+			<TableColumn fx:id="avatarColumn" prefWidth="55.0"
+				text="Avatar" />
+			<TableColumn fx:id="studentCodeColumn" prefWidth="80.0"
+				text="Ma SV" />
+			<TableColumn fx:id="fullNameColumn" prefWidth="125.0"
+				text="Ho ten" />
+			<TableColumn fx:id="emailColumn" prefWidth="155.0"
+				text="Email" />
+			<TableColumn fx:id="classNameColumn" prefWidth="75.0"
+				text="Lop" />
+			<TableColumn fx:id="createdByColumn" prefWidth="95.0"
+				text="Nguoi tao" />
+			<TableColumn fx:id="actionColumn" prefWidth="190.0"
+				text="Action" />
+		</columns>
+	</TableView>
 </AnchorPane>

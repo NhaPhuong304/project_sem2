@@ -16,6 +16,9 @@ public class ClassService {
 	public List<SchoolClass> getClassesByManager(int managerId) {
 		return classRepository.findByManagerId(managerId);
 	}
+	public List<SchoolClass> getClassesByStaff(int staffId) {
+	    return classRepository.findByStaffId(staffId);
+	}
 
 	public List<SchoolClass> getClassesByAdvisor(int staffId) {
 		return classRepository.findByAdvisorId(staffId);

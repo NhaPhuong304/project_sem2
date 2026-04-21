@@ -26,7 +26,7 @@ public class AdminClassCreateDialogController {
             managerComboBox.setConverter(new StringConverter<Staff>() {
                 @Override
                 public String toString(Staff s) {
-                    if (s == null) return "Chưa phân công (Null)";
+                    if (s == null) return "Chưa phân công";
                     return s.getFullName() + " (" + s.getUsername() + ")";
                 }
 

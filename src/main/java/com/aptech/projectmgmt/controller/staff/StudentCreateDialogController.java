@@ -1,5 +1,6 @@
 package com.aptech.projectmgmt.controller.staff;
 
+import com.aptech.projectmgmt.model.Student;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -9,15 +10,24 @@ public class StudentCreateDialogController {
     @FXML private TextField fullNameField;
     @FXML private TextField emailField;
 
-    @FXML
-    public void initialize() {
-        studentCodeField.setEditable(false);
-        studentCodeField.setMouseTransparent(true);
-        studentCodeField.setFocusTraversable(false);
+    public void setStudentCode(String studentCode) {
+        studentCodeField.setText(studentCode);
     }
 
-    public void setStudentCode(String studentCode) {
-        studentCodeField.setText(studentCode != null ? studentCode : "");
+    public void setData(Student student) {
+        if (student == null) {
+            return;
+        }
+
+        studentCodeField.setText(student.getStudentCode());
+        fullNameField.setText(student.getFullName());
+        emailField.setText(student.getEmail());
+
+        studentCodeField.setEditable(false);
+        studentCodeField.setDisable(true);
+
+        emailField.setEditable(false);
+        emailField.setDisable(true);
     }
 
     public String getStudentCode() {

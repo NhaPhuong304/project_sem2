@@ -11,9 +11,16 @@ BEGIN
 END
 GO
 
--- ============================================================
--- PHẦN 2: TẠO DATABASE MỚI
--- ============================================================
+--  HỆ THỐNG QUẢN LÝ DỰ ÁN SINH VIÊN APTECH - SEMESTER 2
+--  Database: SQL Server 2019+
+--  Version: 3.2 (Updated by AntiGravity AI)
+--    + Account.Role:          Thêm Role = 4 (Staff / Giáo vụ)
+--    + Class.ManagerID:       Khóa ngoại tham chiếu đến Staff(StaffID) để xác định Giáo vụ quản lý lớp
+--    + Student.CreatedByStaffId: Khóa ngoại tham chiếu đến Staff(StaffID) để theo dõi ai tạo sinh viên
+--    + Account.PhotoUrl:      (avatar) URL/path
+--    + OtpVerification:       (xác thực OTP qua email)
+--    + sp_GenerateOtp:        (tạo mã OTP, trả về cho backend gửi mail)
+--    + sp_VerifyOtp:          (xác thực mã OTP, đổi mật khẩu)
 CREATE DATABASE ProjectManagementDB COLLATE Vietnamese_CI_AS;
 GO
 
@@ -35,7 +42,6 @@ CREATE TABLE Account (
 );
 GO
 
--- ============================================================
 -- PHẦN 4: TẠO BẢNG STAFF (Tham chiếu Account)
 -- ============================================================
 CREATE TABLE Staff (
@@ -60,14 +66,82 @@ GO
 
 -- ============================================================
 -- PHẦN 6: TẠO BẢNG STUDENT (Tham chiếu Account và Class)
+-- 2. OTP_VERIFICATION  [v3: bảng mới]
 -- ============================================================
+/*
+  Dùng cho 2 luồng:
+    Purpose 1 = ChangePassword  (student/staff muốn đổi mật khẩu)
+    Purpose 2 = FirstLogin      (sinh viên đăng nhập lần đầu bị ép đổi pass)
+
+  Luồng chuẩn:
+    1. Backend nhận yêu cầu từ client → gọi sp_GenerateOtp(@AccountID, @Purpose)
+    2. SP insert bản ghi OTP, trả về OtpCode (6 chữ số)
+    3. Backend gửi email chứa mã OTP đến địa chỉ của account
+    4. User nhập mã → client gọi sp_VerifyOtp(@AccountID, @Purpose, @InputCode, @NewPasswordHash)
+    5. SP kiểm tra mã → nếu đúng: đổi pass + đánh dấu IsUsed = 1
+
+  Bảo vệ brute-force:
+    AttemptCount tăng mỗi lần nhập sai.
+    Khi AttemptCount >= 5 → OTP bị khóa (IsUsed = 1) dù chưa dùng đúng.
+
+  Mỗi lần gọi sp_GenerateOtp sẽ vô hiệu hóa các OTP cũ cùng AccountID + Purpose
+  (set IsUsed = 1) trước khi tạo mới, tránh nhiều OTP active song song.
+
+  Không lưu trực tiếp OtpCode dạng plain — lưu hash nếu muốn bảo mật cao hơn.
+  Ở đây lưu plain để đơn giản cho dự án sinh viên (OTP 6 số, TTL 5 phút, max 5 lần thử).
+*/
+CREATE TABLE OtpVerification (
+    OtpID        INT           IDENTITY(1,1) PRIMARY KEY,
+    AccountID    INT           NOT NULL REFERENCES Account(AccountID),
+    Email        NVARCHAR(100) NOT NULL,               -- email nhận OTP (snapshot tại thời điểm tạo)
+    OtpCode      NVARCHAR(6)   NOT NULL,               -- 6 chữ số, VD: '483921'
+    Purpose      TINYINT       NOT NULL
+                               CHECK (Purpose IN (1, 2)),
+                                                       -- 1=ChangePassword, 2=FirstLogin
+    ExpiresAt    DATETIME      NOT NULL,               -- GETDATE() + 5 phút
+    IsUsed       BIT           NOT NULL DEFAULT 0,     -- 1 = đã dùng hoặc bị khóa
+    AttemptCount INT           NOT NULL DEFAULT 0,     -- số lần nhập sai
+    CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
+);
+GO
+
+-- Index để query nhanh OTP còn hiệu lực của một account
+CREATE INDEX IX_OtpVerification_AccountID_Purpose
+    ON OtpVerification(AccountID, Purpose)
+    INCLUDE (OtpCode, ExpiresAt, IsUsed, AttemptCount);
+GO
+
+-- ============================================================
+-- 3. STAFF
+-- ============================================================
+CREATE TABLE Staff (
+    StaffID   INT           IDENTITY(1,1) PRIMARY KEY,
+    FullName  NVARCHAR(100) NOT NULL,
+    Email     NVARCHAR(100) NOT NULL UNIQUE,
+    AccountID INT           NOT NULL UNIQUE REFERENCES Account(AccountID)
+);
+GO
+
+-- ============================================================
+-- 4. CLASS [v3.1: Thêm ManagerID để Giáo vụ quản lý lớp độc lập]
+-- ============================================================
+CREATE TABLE Class (
+    ClassID      INT           IDENTITY(1,1) PRIMARY KEY,
+    ClassName    NVARCHAR(100) NOT NULL,
+    AcademicYear NVARCHAR(10)  NOT NULL,
+    ManagerID    INT           NULL REFERENCES Staff(StaffID), -- Giáo vụ phụ trách lớp
+    CreatedAt    DATETIME      NOT NULL DEFAULT GETDATE()
+);
+GO
+
 CREATE TABLE Student (
-    StudentID   INT           IDENTITY(1,1) PRIMARY KEY,
-    StudentCode NVARCHAR(20)  NOT NULL UNIQUE,
-    FullName    NVARCHAR(100) NOT NULL,
-    Email       NVARCHAR(100) NOT NULL UNIQUE,
-    ClassID     INT           NOT NULL REFERENCES Class(ClassID),
-    AccountID   INT           NOT NULL UNIQUE REFERENCES Account(AccountID)
+    StudentID        INT           IDENTITY(1,1) PRIMARY KEY,
+    StudentCode      NVARCHAR(20)  NOT NULL UNIQUE,
+    FullName         NVARCHAR(100) NOT NULL,
+    Email            NVARCHAR(100) NOT NULL UNIQUE,
+    ClassID          INT           NOT NULL REFERENCES Class(ClassID),
+    AccountID        INT           NOT NULL UNIQUE REFERENCES Account(AccountID),
+    CreatedByStaffId INT           NULL REFERENCES Staff(StaffID)
 );
 GO
 
@@ -461,7 +535,63 @@ LEFT  JOIN (
 GO
 
 -- ============================================================
+<<<<<<< HEAD
 -- PHẦN 20: SEED DATA
+=======
+-- DATA ENUM REFERENCE
+-- ============================================================
+/*
+  Account.Role:         1=Admin, 2=Student, 3=Teacher, 4=Staff
+  Account.PhotoUrl:     NULL = dùng avatar mặc định (frontend tự xử lý)
+  GroupMember.Role:     1=Leader, 2=Member
+  GroupMember.Status:   1=Active, 2=Excluded
+  Project.Status:       1=Active, 2=Completed
+  Task.Status:          1=Pending → 2=InProgress → 3=Reviewing → 4=Revising / 5=Completed
+
+  OtpVerification.Purpose:
+    1 = ChangePassword   (user chủ động đổi pass)
+    2 = FirstLogin       (sinh viên login lần đầu bị ép đổi)
+
+  OTP flow (backend Spring Boot):
+    // Bước 1: Tạo OTP
+    String otpCode = otpRepo.callGenerateOtp(accountId, purpose);
+    mailService.sendOtp(email, otpCode);        // JavaMailSender
+
+    // Bước 2: User nhập mã → verify
+    int result = otpRepo.callVerifyOtp(accountId, purpose, inputCode, newHash);
+    // result: 0=OK, 1=WrongCode, 2=Locked, 3=Expired, 4=NotFound
+
+  Scheduler:
+    SQL Server Agent / @Scheduled Spring: EXEC sp_ResetOverdueTasks  (mỗi 1 phút)
+
+  Avatar:
+    Upload lên server (Multipart) → lưu file → UPDATE Account SET PhotoUrl = '/uploads/...'
+    Hoặc dùng cloud storage (S3, Cloudinary) → lưu URL đầy đủ
+*/
+
+-- ============================================================
+-- SEED DATA: TEST ACCOUNTS
+-- Chay cung file DDL nay tren may moi se co san tai khoan de test.
+--
+-- Password cho tat ca tai khoan: 123
+-- BCrypt hash: $2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm
+--
+-- Tai khoan tao san:
+--   Admin:
+--     admin / 123
+--   Staff:
+--     staff001 / 123
+--     staff002 / 123
+--   Teacher:
+--     gv001 / 123
+--     gv002 / 123
+--   Student:
+--     st001 / 123
+--     st002 / 123
+--     st003 / 123
+--     st004 / 123
+--     st005 / 123
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 -- ============================================================
 DECLARE @SeedPasswordHash NVARCHAR(255) = N'$2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm';
 DECLARE @SeedClassID1 INT, @SeedClassID2 INT, @SeedClassID3 INT;
@@ -505,49 +635,123 @@ INSERT INTO Class (ClassName, AcademicYear, ManagerID) VALUES (N'T2401M01', N'20
 SET @SeedClassID3 = SCOPE_IDENTITY();
 
 -- Teachers
+DECLARE @Teacher1ID INT, @Teacher2ID INT;
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'gv001', @SeedPasswordHash, 3, 0, N'no-image.jpg', 1);
 SET @Teacher1AccountID = SCOPE_IDENTITY();
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Tran Van K', N'gv001@aptech.local', @Teacher1AccountID);
+SET @Teacher1ID = SCOPE_IDENTITY();
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive)
 VALUES (N'gv002', @SeedPasswordHash, 3, 0, N'no-image.jpg', 1);
 SET @Teacher2AccountID = SCOPE_IDENTITY();
 INSERT INTO Staff (FullName, Email, AccountID)
 VALUES (N'Le Thi H', N'gv002@aptech.local', @Teacher2AccountID);
+SET @Teacher2ID = SCOPE_IDENTITY();
 
+<<<<<<< HEAD
 -- Students for Class 1
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
 VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+=======
+-- Students cho Lop 1 (Created by Staff 1 - Giáo vụ 1)
+DECLARE @St1ID INT, @St2ID INT, @St3ID INT, @St4ID INT, @St5ID INT;
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st001', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 SET @Student1AccountID = SCOPE_IDENTITY();
+<<<<<<< HEAD
 INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
 VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID);
+=======
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST001', N'Le Quang Huy', N'st001@aptech.local', @SeedClassID1, @Student1AccountID, @Staff1ID);
+SET @St1ID = SCOPE_IDENTITY();
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
 VALUES (N'st002', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student2AccountID = SCOPE_IDENTITY();
+<<<<<<< HEAD
 INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
 VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID);
+=======
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST002', N'Pham Ngoc Lan', N'st002@aptech.local', @SeedClassID1, @Student2AccountID, @Staff1ID);
+SET @St2ID = SCOPE_IDENTITY();
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
 VALUES (N'st003', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student3AccountID = SCOPE_IDENTITY();
+<<<<<<< HEAD
 INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
 VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID);
+=======
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST003', N'Vo Gia Bao', N'st003@aptech.local', @SeedClassID1, @Student3AccountID, @Staff1ID);
+SET @St3ID = SCOPE_IDENTITY();
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 
+<<<<<<< HEAD
 -- Students for Class 2
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
 VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+=======
+-- Thêm sinh viên chưa có nhóm
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'stUnassigned1', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+DECLARE @UnAcc1 INT = SCOPE_IDENTITY();
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'STU01', N'Van A', N'stu1@aptech.local', @SeedClassID1, @UnAcc1, @Staff1ID);
+
+-- Students cho Lop 2 (Created by Staff 2 - Giáo vụ 2)
+INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) VALUES (N'st004', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 SET @Student4AccountID = SCOPE_IDENTITY();
+<<<<<<< HEAD
 INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
 VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID);
+=======
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', @SeedClassID2, @Student4AccountID, @Staff2ID);
+SET @St4ID = SCOPE_IDENTITY();
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 
 INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive) 
 VALUES (N'st005', @SeedPasswordHash, 2, 0, N'no-image.jpg', 1);
 SET @Student5AccountID = SCOPE_IDENTITY();
+<<<<<<< HEAD
 INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID) 
 VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID);
+=======
+INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId) VALUES (N'ST005', N'Tran Thu Trang', N'st005@aptech.local', @SeedClassID2, @Student5AccountID, @Staff2ID);
+SET @St5ID = SCOPE_IDENTITY();
+
+-- Test Data: Project Groups, Projects, Group Members
+DECLARE @GroupID1 INT, @GroupID2 INT;
+
+-- Group 1
+INSERT INTO ProjectGroup (ClassID, GroupName) VALUES (@SeedClassID1, N'Nhom Alpha (Project Da Bat Dau)');
+SET @GroupID1 = SCOPE_IDENTITY();
+
+-- Group 2
+INSERT INTO ProjectGroup (ClassID, GroupName) VALUES (@SeedClassID2, N'Nhom Beta (Project Chua Bat Dau)');
+SET @GroupID2 = SCOPE_IDENTITY();
+
+---------- Projects ----------
+-- Project 1 (Thực tế, đã bắt đầu từ 2024, bạn không có quyền sửa thành viên)
+INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status)
+VALUES (@GroupID1, N'Website TMDT Ban Hang', N'Xay dung ung dung web TMDT', N'S2', '2024-01-01', '2027-12-31', '2027-12-29', @Teacher1ID, @Staff1ID, 1);
+
+-- Project 2 (Dự kiến, chưa bắt đầu, ở tương lai 2030, có thể Test Xóa/Thêm thành viên)
+INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status)
+VALUES (@GroupID2, N'Ung Dung Java Quan Ly', N'Viet app Java desktop', N'S2', '2030-01-01', '2030-06-30', '2030-06-28', @Teacher2ID, @Staff2ID, 1);
+
+---------- Members ----------
+-- Members for Group 1 
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID1, @St1ID, 1, 1); -- Leader
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID1, @St2ID, 2, 1); -- Member
+
+-- Members for Group 2
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID2, @St4ID, 1, 1); -- Leader
+INSERT INTO GroupMember (GroupID, StudentID, Role, Status) VALUES (@GroupID2, @St5ID, 2, 1); -- Member
+
+>>>>>>> branch 'master' of https://github.com/NhaPhuong304/project_sem2.git
 GO
 
 PRINT 'Database created successfully!';
