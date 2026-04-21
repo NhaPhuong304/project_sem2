@@ -4,6 +4,7 @@ import com.aptech.projectmgmt.controller.TextPromptDialogController;
 import com.aptech.projectmgmt.model.Question;
 import com.aptech.projectmgmt.model.Student;
 import com.aptech.projectmgmt.service.MailService;
+import com.aptech.projectmgmt.service.MessageService;
 import com.aptech.projectmgmt.service.QuestionService;
 import com.aptech.projectmgmt.service.StudentService;
 import com.aptech.projectmgmt.util.AlertUtil;
@@ -50,6 +51,7 @@ public class TeacherInboxController {
     private Button replyBtn;
 
     private final MailService mailService = new MailService();
+    private final MessageService messageService = new MessageService();
     private final StudentService studentService = new StudentService();
     private final QuestionService questionService = new QuestionService();
     private final ObservableList<Question> questionList = FXCollections.observableArrayList();
@@ -119,6 +121,12 @@ public class TeacherInboxController {
                 @Override
                 protected Boolean call() {
                     questionService.answerQuestion(selected.getQuestionId(), trimmed);
+                    messageService.createAnswerMessageForStudent(
+                    	    SessionManager.getInstance().getCurrentStaff().getStaffId(),
+                    	    selected.getStudentId(),
+                    	    selected.getTaskId(),
+                    	    trimmed
+                    	);
 
                     Student student = studentService.findById(selected.getStudentId());
 
