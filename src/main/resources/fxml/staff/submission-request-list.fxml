@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="620.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.staff.SubmissionRequestListController">
+    <top>
+        <VBox spacing="4.0">
+            <padding>
+                <Insets bottom="8.0" left="20.0" right="20.0" top="18.0" />
+            </padding>
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Yêu cầu nộp đồ án" />
+            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Tạo yêu cầu, theo dõi bài nộp của từng nhóm và tải file đã nộp về máy." />
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Tạo yêu cầu">
+                    <content>
+                        <HBox spacing="18.0">
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="12.0" />
+                            </padding>
+
+                            <VBox prefWidth="410.0" spacing="10.0">
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Thông tin yêu cầu" />
+
+                                <TextField fx:id="titleField" promptText="Tiêu đề yêu cầu" />
+                                <TextArea fx:id="descriptionArea" prefHeight="88.0" promptText="Nội dung thông báo gửi cho leader" wrapText="true" />
+
+                                <HBox spacing="8.0">
+                                    <DatePicker fx:id="deadlineDatePicker" prefWidth="245.0" promptText="Ngày hết hạn" />
+                                    <ComboBox fx:id="deadlineTimeCombo" prefWidth="145.0" promptText="Giờ" />
+                                </HBox>
+
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Nội dung cần nộp" />
+                                <ScrollPane fitToWidth="true" prefHeight="155.0">
+                                    <content>
+                                        <VBox fx:id="requirementBox" spacing="7.0">
+                                            <padding>
+                                                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                            </padding>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Người nhận" />
+                                <ScrollPane fitToWidth="true" prefHeight="185.0">
+                                    <content>
+                                        <VBox fx:id="recipientBox" spacing="7.0">
+                                            <padding>
+                                                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                            </padding>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <Button fx:id="sendRequestBtn" styleClass="add-btn" text="Gửi yêu cầu" />
+                                    <Label fx:id="statusLabel" style="-fx-text-fill: #475569;" />
+                                </HBox>
+                            </VBox>
+
+                            <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Yêu cầu đã tạo" />
+                                <TableView fx:id="requestTable" prefHeight="520.0" styleClass="student-table" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="titleColumn" prefWidth="250.0" text="Tiêu đề" />
+                                        <TableColumn fx:id="deadlineColumn" prefWidth="140.0" text="Hạn nộp" />
+                                        <TableColumn fx:id="statusColumn" prefWidth="90.0" text="Trạng thái" />
+                                        <TableColumn fx:id="createdAtColumn" prefWidth="135.0" text="Ngày tạo" />
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </HBox>
+                    </content>
+                </Tab>
+
+                <Tab text="Theo dõi bài nộp">
+                    <content>
+                        <HBox spacing="16.0">
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="12.0" />
+                            </padding>
+
+                            <VBox prefWidth="285.0" spacing="10.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Yêu cầu" />
+                                    <Button fx:id="refreshMonitorBtn" text="Tải lại" />
+                                </HBox>
+                                <TableView fx:id="monitorRequestTable" prefHeight="505.0" styleClass="student-table" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="monitorTitleColumn" prefWidth="145.0" text="Tiêu đề" />
+                                        <TableColumn fx:id="monitorDeadlineColumn" prefWidth="105.0" text="Hạn nộp" />
+                                        <TableColumn fx:id="monitorStatusColumn" prefWidth="80.0" text="Trạng thái" />
+                                    </columns>
+                                </TableView>
+                            </VBox>
+
+                            <VBox prefWidth="285.0" spacing="10.0">
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Nhóm nhận" />
+                                <TableView fx:id="targetTable" prefHeight="505.0" styleClass="student-table" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="groupColumn" prefWidth="120.0" text="Nhóm" />
+                                        <TableColumn fx:id="leaderColumn" prefWidth="105.0" text="Leader" />
+                                        <TableColumn fx:id="targetStatusColumn" prefWidth="95.0" text="Trạng thái" />
+                                        <TableColumn fx:id="submittedAtColumn" prefWidth="115.0" text="Nộp lúc" />
+                                    </columns>
+                                </TableView>
+                            </VBox>
+
+                            <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="File đã nộp" />
+                                <TableView fx:id="submittedFileTable" prefHeight="450.0" styleClass="student-table" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="requirementColumn" prefWidth="170.0" text="Nội dung" />
+                                        <TableColumn fx:id="submittedFileNameColumn" prefWidth="170.0" text="Tên file" />
+                                        <TableColumn fx:id="submittedFileSizeColumn" prefWidth="80.0" text="Dung lượng" />
+                                        <TableColumn fx:id="uploadedAtColumn" prefWidth="125.0" text="Nộp lúc" />
+                                    </columns>
+                                </TableView>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <Button fx:id="downloadFilesBtn" disable="true" styleClass="add-btn" text="Tải file nhóm" />
+                                    <Label fx:id="monitorStatusLabel" style="-fx-text-fill: #475569;" />
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

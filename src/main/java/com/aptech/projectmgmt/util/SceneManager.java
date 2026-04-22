@@ -34,6 +34,7 @@ public class SceneManager {
     public static final String TEACHER_LIST     = "/fxml/staff/teacher-list.fxml";
     public static final String TEACHER_CREATE_DIALOG = "/fxml/staff/teacher-create-dialog.fxml";
     public static final String PROJECT_LIST     = "/fxml/staff/project-list.fxml";
+    public static final String SUBMISSION_REQUEST_LIST = "/fxml/staff/submission-request-list.fxml";
     public static final String PROJECT_CREATE_DIALOG = "/fxml/staff/project-create-dialog.fxml";
     public static final String PROJECT_DETAIL   = "/fxml/staff/project-detail.fxml";
     public static final String GROUP_CREATE_DIALOG = "/fxml/staff/group-create-dialog.fxml";
@@ -44,6 +45,7 @@ public class SceneManager {
     public static final String TASK_DETAIL      = "/fxml/staff/task-detail.fxml";
     public static final String STUDENT_DASHBOARD = "/fxml/student/student-dashboard.fxml";
     public static final String MY_PROJECT_LIST   = "/fxml/student/my-project-list.fxml";
+    public static final String STUDENT_SUBMISSION = "/fxml/student/student-submission.fxml";
     public static final String MY_TASK_LIST      = "/fxml/student/my-task-list.fxml";
     public static final String MY_TASK_ACTION_CELL = "/fxml/student/my-task-action-cell.fxml";
     public static final String TASK_CREATE_DIALOG = "/fxml/student/task-create-dialog.fxml";

@@ -33,6 +33,8 @@ public class StaffDashboardController {
 	@FXML
 	private Button projectListBtn;
 	@FXML
+	private Button submissionRequestBtn;
+	@FXML
 	private Button studentManagementBtn;
 	@FXML
 	private Button teacherListBtn;
@@ -184,6 +186,12 @@ public class StaffDashboardController {
 	}
 
 	@FXML
+	public void onSubmissionRequestClick() {
+		setActiveMenu(submissionRequestBtn);
+		loadContent(SceneManager.SUBMISSION_REQUEST_LIST);
+	}
+
+	@FXML
 	public void onStudentManagementClick() {
 		setActiveMenu(studentManagementBtn);
 		loadContent(SceneManager.STUDENT_MANAGEMENT);
@@ -201,6 +209,9 @@ public class StaffDashboardController {
 		}
 		if (projectListBtn != null) {
 			projectListBtn.getStyleClass().remove("sidebar-btn-active");
+		}
+		if (submissionRequestBtn != null) {
+			submissionRequestBtn.getStyleClass().remove("sidebar-btn-active");
 		}
 		if (studentManagementBtn != null) {
 			studentManagementBtn.getStyleClass().remove("sidebar-btn-active");

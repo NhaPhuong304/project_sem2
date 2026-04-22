@@ -26,6 +26,8 @@
 
 				<Button fx:id="projectListBtn" onAction="#onProjectListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Quan ly Project" />
 
+				<Button fx:id="submissionRequestBtn" onAction="#onSubmissionRequestClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Yêu cầu nộp đồ án" />
+
 				<Button fx:id="studentManagementBtn" onAction="#onStudentManagementClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Quan ly Sinh vien" />
 
 				<Button fx:id="teacherListBtn" onAction="#onTeacherListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Quan ly Giao vien" />

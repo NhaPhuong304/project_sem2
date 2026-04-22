@@ -41,6 +41,8 @@ public class StudentDashboardController {
 	@FXML
 	private Button myProjectsBtn;
 	@FXML
+	private Button submissionBtn;
+	@FXML
 	private Button inboxBtn;
 	@FXML
 	private StackPane contentArea;
@@ -181,6 +183,12 @@ public class StudentDashboardController {
 	}
 
 	@FXML
+	public void onSubmissionClick() {
+		setActiveMenu(submissionBtn);
+		loadContent(SceneManager.STUDENT_SUBMISSION);
+	}
+
+	@FXML
 	public void onInboxClick() {
 		setActiveMenu(inboxBtn);
 		loadContent(SceneManager.MESSAGE_INBOX);
@@ -200,6 +208,9 @@ public class StudentDashboardController {
 	private void setActiveMenu(Button activeButton) {
 		if (myProjectsBtn != null) {
 			myProjectsBtn.getStyleClass().remove("sidebar-btn-active");
+		}
+		if (submissionBtn != null) {
+			submissionBtn.getStyleClass().remove("sidebar-btn-active");
 		}
 		if (inboxBtn != null) {
 			inboxBtn.getStyleClass().remove("sidebar-btn-active");

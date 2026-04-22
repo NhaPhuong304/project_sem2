@@ -29,6 +29,13 @@
                         onAction="#onMyProjectsClick"
                         styleClass="sidebar-btn" />
 
+                <Button fx:id="submissionBtn"
+                        text="Nộp đồ án"
+                        prefWidth="204.0"
+                        prefHeight="44.0"
+                        onAction="#onSubmissionClick"
+                        styleClass="sidebar-btn" />
+
                 <Button fx:id="inboxBtn"
                         text="Hop thu den"
                         prefWidth="204.0"
