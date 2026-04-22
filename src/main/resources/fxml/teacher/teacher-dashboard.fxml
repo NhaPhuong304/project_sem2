@@ -12,13 +12,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 
-<StackPane stylesheets="@../../css/staff.css"
-           xmlns="http://javafx.com/javafx/21"
-           xmlns:fx="http://javafx.com/fxml/1"
+<StackPane stylesheets="@../../css/staff.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.aptech.projectmgmt.controller.teacher.TeacherDashboardController">
 
     <BorderPane prefWidth="1180.0" prefHeight="720.0" styleClass="dashboard-root">
-
         <left>
             <VBox prefWidth="240.0" spacing="14.0" styleClass="sidebar">
                 <padding>
@@ -26,42 +23,19 @@
                 </padding>
 
                 <VBox spacing="10.0" style="-fx-padding: 18 0 0 0;">
-                    <Button fx:id="myClassesBtn"
-                            text="Lop cua toi"
-                            prefWidth="204.0"
-                            prefHeight="44.0"
-                            onAction="#onMyClassesClick"
-                            styleClass="sidebar-btn" />
-
-                    <Button fx:id="myProjectsBtn"
-                            text="Project huong dan"
-                            prefWidth="204.0"
-                            prefHeight="44.0"
-                            onAction="#onMyProjectsClick"
-                            styleClass="sidebar-btn" />
-
-                    <Button fx:id="inboxBtn"
-                            text="Hop thu den"
-                            prefWidth="204.0"
-                            prefHeight="44.0"
-                            onAction="#onInboxClick"
-                            styleClass="sidebar-btn" />
+                    <Button fx:id="overviewBtn" text="Dashboard" prefWidth="204.0" prefHeight="44.0" onAction="#onOverviewClick" styleClass="sidebar-btn" />
+                    <Button fx:id="myClassesBtn" text="My classes" prefWidth="204.0" prefHeight="44.0" onAction="#onMyClassesClick" styleClass="sidebar-btn" />
+                    <Button fx:id="myProjectsBtn" text="Supervised projects" prefWidth="204.0" prefHeight="44.0" onAction="#onMyProjectsClick" styleClass="sidebar-btn" />
+                    <Button fx:id="inboxBtn" text="Inbox" prefWidth="204.0" prefHeight="44.0" onAction="#onInboxClick" styleClass="sidebar-btn" />
                 </VBox>
             </VBox>
         </left>
 
         <top>
             <AnchorPane prefHeight="78.0" styleClass="topbar">
-                <HBox alignment="CENTER_LEFT"
-                      spacing="12.0"
-                      AnchorPane.leftAnchor="28.0"
-                      AnchorPane.topAnchor="12.0">
-
+                <HBox alignment="CENTER_LEFT" spacing="12.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="12.0">
                     <StackPane styleClass="top-logo-wrap">
-                        <ImageView fitWidth="34.0"
-                                   fitHeight="34.0"
-                                   preserveRatio="true"
-                                   smooth="true">
+                        <ImageView fitWidth="34.0" fitHeight="34.0" preserveRatio="true" smooth="true">
                             <image>
                                 <Image url="@/images/aptech.png" />
                             </image>
@@ -70,38 +44,19 @@
 
                     <VBox spacing="2.0">
                         <Label text="Teacher Project" styleClass="topbar-title" />
-                        <Label text="Management System" styleClass="topbar-subtitle" />
+                        <Label text="Guidance Dashboard" styleClass="topbar-subtitle" />
                     </VBox>
                 </HBox>
 
-                <HBox alignment="CENTER_RIGHT"
-                      spacing="12.0"
-                      AnchorPane.rightAnchor="24.0"
-                      AnchorPane.topAnchor="15.0">
-
-                    <Label fx:id="teacherNameLabel"
-                           text="Giao vien"
-                           styleClass="staff-name-label" />
-
-                    <Label fx:id="msgBadge"
-                           text="0"
-                           visible="false"
-                           styleClass="badge" />
-
-                    <ImageView fx:id="avatarImageView"
-                               fitWidth="42.0"
-                               fitHeight="42.0"
-                               preserveRatio="false"
-                               smooth="true"
-                               styleClass="clickable-avatar">
+                <HBox alignment="CENTER_RIGHT" spacing="12.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="15.0">
+                    <Label fx:id="teacherNameLabel" text="Teacher" styleClass="staff-name-label" />
+                    <Label fx:id="msgBadge" text="0" visible="false" styleClass="badge" />
+                    <ImageView fx:id="avatarImageView" fitWidth="42.0" fitHeight="42.0" preserveRatio="false" smooth="true" styleClass="clickable-avatar">
                         <clip>
                             <Circle centerX="21.0" centerY="21.0" radius="21.0" />
                         </clip>
                     </ImageView>
-
-                    <Button fx:id="logoutBtn"
-                            text="Dang xuat"
-                            styleClass="logout-btn" />
+                    <Button fx:id="logoutBtn" text="Log out" styleClass="logout-btn" />
                 </HBox>
             </AnchorPane>
         </top>
@@ -111,7 +66,6 @@
                 <StackPane fx:id="contentArea" styleClass="content-card" />
             </StackPane>
         </center>
-
     </BorderPane>
 
     <fx:include source="../ai-chatbot.fxml" />

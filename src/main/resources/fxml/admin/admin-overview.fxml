@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="overview-scroll"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.admin.AdminOverviewController">
+    <content>
+        <VBox spacing="20.0" styleClass="overview-root">
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+
+            <VBox spacing="4.0">
+                <Label text="System dashboard" styleClass="overview-title" />
+                <Label text="A clean summary of users, classes, and project distribution." styleClass="overview-subtitle" />
+            </VBox>
+
+            <HBox fx:id="metricContainer" spacing="16.0" />
+
+            <GridPane hgap="16.0" vgap="16.0">
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Accounts by role" styleClass="overview-chart-title" />
+                    <PieChart fx:id="accountRoleChart" labelsVisible="true" prefHeight="300.0" />
+                </VBox>
+
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Classes by manager" styleClass="overview-chart-title" />
+                    <Label text="X: Manager   Y: Number of classes" styleClass="overview-chart-meta" />
+                    <BarChart fx:id="classesByManagerChart" categoryGap="18.0" prefHeight="300.0">
+                        <xAxis>
+                            <CategoryAxis tickLabelRotation="0.0" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Projects by teacher" styleClass="overview-chart-title" />
+                    <Label text="X: Teacher   Y: Number of projects" styleClass="overview-chart-meta" />
+                    <BarChart fx:id="projectsByAdvisorChart" categoryGap="18.0" prefHeight="300.0">
+                        <xAxis>
+                            <CategoryAxis tickLabelRotation="0.0" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Recent account growth" styleClass="overview-chart-title" />
+                    <Label text="X: Month   Y: New accounts" styleClass="overview-chart-meta" />
+                    <AreaChart fx:id="accountGrowthChart" prefHeight="300.0">
+                        <xAxis>
+                            <CategoryAxis />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </AreaChart>
+                </VBox>
+
+                <columnConstraints>
+                    <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                    <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                </columnConstraints>
+            </GridPane>
+        </VBox>
+    </content>
+</ScrollPane>

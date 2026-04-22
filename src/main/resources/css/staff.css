@@ -110,6 +110,186 @@
     -fx-border-radius: 22;
     -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 18, 0.15, 0, 4);
 }
+
+.sidebar-btn-active {
+    -fx-background-color: #2563eb;
+}
+
+.overview-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.overview-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.overview-root {
+    -fx-background-color: transparent;
+}
+
+.overview-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.overview-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.overview-metric-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f8fbff);
+    -fx-background-radius: 18;
+    -fx-border-color: #dbeafe;
+    -fx-border-radius: 18;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.08), 16, 0.12, 0, 4);
+}
+
+.overview-metric-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b;
+}
+
+.overview-metric-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.overview-metric-caption {
+    -fx-font-size: 12px;
+    -fx-text-fill: #475569;
+}
+
+.overview-chart-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 20;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 12, 0.1, 0, 3);
+}
+
+.overview-chart-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.overview-chart-meta {
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #64748b;
+}
+
+.chart-title {
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.axis-label {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8 4 8 4;
+}
+
+.axis {
+    -fx-tick-label-fill: #334155;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+.axis .tick-label {
+    -fx-fill: #334155;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.chart-plot-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 14;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: #dbeafe;
+    -fx-stroke-dash-array: 2 6;
+}
+
+.chart-series-line {
+    -fx-stroke-width: 3px;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #2563eb;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #2563eb, white;
+}
+
+.default-color0.chart-area-symbol {
+    -fx-background-color: #ef4444, white;
+}
+
+.default-color0.chart-bar {
+    -fx-bar-fill: #3b82f6;
+}
+
+.default-color0.chart-series-area-line {
+    -fx-stroke: #ef4444;
+    -fx-stroke-width: 3px;
+}
+
+.default-color0.chart-series-area-fill {
+    -fx-fill: rgba(239, 68, 68, 0.18);
+}
+
+.default-color0.chart-pie {
+    -fx-pie-color: #2563eb;
+}
+
+.default-color1.chart-pie {
+    -fx-pie-color: #14b8a6;
+}
+
+.default-color2.chart-pie {
+    -fx-pie-color: #f59e0b;
+}
+
+.default-color3.chart-pie {
+    -fx-pie-color: #ef4444;
+}
+
+.default-color4.chart-pie {
+    -fx-pie-color: #8b5cf6;
+}
+
+.chart-value-label {
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-background-radius: 10;
+    -fx-padding: 2 6 2 6;
+    -fx-border-color: #dbeafe;
+    -fx-border-radius: 10;
+}
 /*dashboard*/
 
 .root {

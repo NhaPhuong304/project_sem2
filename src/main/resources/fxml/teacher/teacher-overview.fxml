@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="overview-scroll"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.teacher.TeacherOverviewController">
+    <content>
+        <VBox spacing="20.0" styleClass="overview-root">
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+
+            <VBox spacing="4.0">
+                <Label text="Teaching dashboard" styleClass="overview-title" />
+                <Label text="Keep an eye on supervised projects without overwhelming the screen." styleClass="overview-subtitle" />
+            </VBox>
+
+            <HBox fx:id="metricContainer" spacing="16.0" />
+
+            <GridPane hgap="16.0" vgap="16.0">
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Projects by class" styleClass="overview-chart-title" />
+                    <Label text="X: Class   Y: Number of projects" styleClass="overview-chart-meta" />
+                    <BarChart fx:id="projectsByClassChart" categoryGap="18.0" prefHeight="300.0">
+                        <xAxis>
+                            <CategoryAxis />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Task status mix" styleClass="overview-chart-title" />
+                    <PieChart fx:id="taskStatusChart" labelsVisible="true" prefHeight="300.0" />
+                </VBox>
+
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Completed tasks over time" styleClass="overview-chart-title" />
+                    <Label text="X: Month   Y: Completed tasks" styleClass="overview-chart-meta" />
+                    <LineChart fx:id="completedTasksChart" createSymbols="true" prefHeight="300.0">
+                        <xAxis>
+                            <CategoryAxis />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+
+                <columnConstraints>
+                    <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                    <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                </columnConstraints>
+            </GridPane>
+        </VBox>
+    </content>
+</ScrollPane>

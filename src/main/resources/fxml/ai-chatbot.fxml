@@ -19,7 +19,7 @@
    <!-- Cố định kích thước bằng maxHeight/maxWidth để không bị giãn theo màn hình -->
    <VBox fx:id="chatWindow" visible="false" spacing="0" 
          maxHeight="450.0" maxWidth="350.0" 
-         StackPane.alignment="CENTER_LEFT"
+         StackPane.alignment="BOTTOM_LEFT"
          style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #DDDDDD; -fx-border-width: 1;">
        
        <!-- Viền đổ bóng cho khung chat -->
@@ -29,7 +29,7 @@
 
        <!-- Đẩy khung chat nhích ra từ lề trái, kế bên vị trí con Robot -->
        <StackPane.margin>
-           <Insets left="110.0" />
+           <Insets bottom="40.0" left="110.0" />
        </StackPane.margin>
 
        <!-- Header -->
@@ -51,11 +51,11 @@
    <!-- NÚT ROBOT VẪY TAY -->
    <!-- Đẩy sang giữa lề trái màn hình -->
    <Button fx:id="chatbotBtn" onAction="#toggleChat" 
-           StackPane.alignment="CENTER_LEFT"
+           StackPane.alignment="BOTTOM_LEFT"
            style="-fx-background-color: transparent; -fx-cursor: hand;">
        
        <StackPane.margin>
-           <Insets left="20.0" />
+           <Insets bottom="45.0" left="20.0" />
        </StackPane.margin>
 
        <graphic>

@@ -420,8 +420,20 @@ public class TaskRepository extends BaseRepository {
                      "JOIN Project p ON p.GroupID = pg.GroupID " +
                      "WHERE t.Status = 1 AND t.AssignedTo IS NOT NULL " +
                      "AND DATEADD(minute, 30, t.EstimatedStartDate) <= ? " +
-                     "AND NOT EXISTS (SELECT 1 FROM Message WHERE TaskID = t.TaskID AND Content LIKE 'SYSTEM_REMINDER|[ASSIGNED]%')";
-        return executeReminderQuery(sql, now);
+                     "AND NOT EXISTS (SELECT 1 FROM Message " +
+                     "                WHERE TaskID = t.TaskID " +
+                     "                  AND ReceiverID = t.AssignedTo " +
+                     "                  AND SentAt >= DATEADD(hour, -1, ?) " +
+                     "                  AND Content LIKE 'SYSTEM_REMINDER|[ASSIGNED]%')";
+        try {
+            return executeQuery(sql, rs -> {
+                List<TaskReminderInfo> list = new ArrayList<>();
+                while (rs.next()) list.add(mapReminderRow(rs));
+                return list;
+            }, Timestamp.valueOf(now), Timestamp.valueOf(now));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void markAssignedReminderSent(List<Integer> taskIds) {
@@ -434,8 +446,20 @@ public class TaskRepository extends BaseRepository {
                      "JOIN Project p ON p.GroupID = pg.GroupID " +
                      "WHERE t.Status IN (2, 3, 4) AND t.AssignedTo IS NOT NULL " +
                      "AND DATEADD(minute, -30, t.EstimatedEndDate) <= ? " +
-                     "AND NOT EXISTS (SELECT 1 FROM Message WHERE TaskID = t.TaskID AND Content LIKE 'SYSTEM_REMINDER|[DUE]%')";
-        return executeReminderQuery(sql, now);
+                     "AND NOT EXISTS (SELECT 1 FROM Message " +
+                     "                WHERE TaskID = t.TaskID " +
+                     "                  AND ReceiverID = t.AssignedTo " +
+                     "                  AND SentAt >= DATEADD(hour, -1, ?) " +
+                     "                  AND Content LIKE 'SYSTEM_REMINDER|[DUE]%')";
+        try {
+            return executeQuery(sql, rs -> {
+                List<TaskReminderInfo> list = new ArrayList<>();
+                while (rs.next()) list.add(mapReminderRow(rs));
+                return list;
+            }, Timestamp.valueOf(now), Timestamp.valueOf(now));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void markDueReminderSent(List<Integer> taskIds) {
@@ -448,7 +472,11 @@ public class TaskRepository extends BaseRepository {
                      "JOIN Project p ON p.GroupID = pg.GroupID " +
                      "WHERE t.Status IN (1, 2, 3, 4) AND t.AssignedTo IS NOT NULL " +
                      "AND DATEADD(day, -3, t.EstimatedEndDate) <= ? " +
-                     "AND NOT EXISTS (SELECT 1 FROM Message WHERE TaskID = t.TaskID AND CAST(SentAt AS DATE) = CAST(? AS DATE) AND Content LIKE 'SYSTEM_REMINDER|[DAILY]%')";
+                     "AND NOT EXISTS (SELECT 1 FROM Message " +
+                     "                WHERE TaskID = t.TaskID " +
+                     "                  AND ReceiverID = t.AssignedTo " +
+                     "                  AND SentAt >= DATEADD(hour, -1, ?) " +
+                     "                  AND Content LIKE 'SYSTEM_REMINDER|[DAILY]%')";
         try {
             return executeQuery(sql, rs -> {
                 List<TaskReminderInfo> list = new ArrayList<>();

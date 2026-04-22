@@ -1,4 +1,5 @@
 package com.aptech.projectmgmt.controller.admin;
+
 import com.aptech.projectmgmt.controller.staff.StudentListController;
 import com.aptech.projectmgmt.model.Staff;
 import com.aptech.projectmgmt.service.AccountService;
@@ -25,6 +26,7 @@ public class AdminDashboardController {
     @FXML private Label staffNameLabel;
     @FXML private ImageView avatarImageView;
     @FXML private Button logoutBtn;
+    @FXML private Button overviewBtn;
     @FXML private Button classListBtn;
     @FXML private Button teacherListBtn;
     @FXML private Button staffListBtn;
@@ -41,10 +43,12 @@ public class AdminDashboardController {
         loadAvatar();
         avatarImageView.setOnMouseClicked(e -> handleChangeAvatar());
         logoutBtn.setOnAction(e -> handleLogout());
-        teacherListBtn.setVisible(true); teacherListBtn.setManaged(true);
-        staffListBtn.setVisible(true); staffListBtn.setManaged(true);
-        setActiveMenu(staffListBtn);
-        loadContent(SceneManager.ADMIN_STAFF_LIST);
+        teacherListBtn.setVisible(true);
+        teacherListBtn.setManaged(true);
+        staffListBtn.setVisible(true);
+        staffListBtn.setManaged(true);
+        setActiveMenu(overviewBtn);
+        loadContent(SceneManager.ADMIN_OVERVIEW);
     }
 
     public void loadContent(String fxmlPath) {
@@ -53,7 +57,7 @@ public class AdminDashboardController {
             Node content = loader.load();
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
-            AlertUtil.showError("Loi tai noi dung: " + e.getMessage());
+            AlertUtil.showError("Unable to load content: " + e.getMessage());
         }
     }
 
@@ -66,7 +70,7 @@ public class AdminDashboardController {
             controller.initData(classId);
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
-            AlertUtil.showError("Loi tai danh sach sinh vien: " + e.getMessage());
+            AlertUtil.showError("Unable to load students: " + e.getMessage());
         }
     }
 
@@ -90,18 +94,18 @@ public class AdminDashboardController {
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             loadAvatar();
-            AlertUtil.showSuccess("Cap nhat avatar thanh cong");
+            AlertUtil.showSuccess("Avatar updated successfully");
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi cap nhat avatar: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Unable to update avatar: " + (ex != null ? ex.getMessage() : ""));
         }));
         new Thread(task).start();
     }
 
     private File chooseAvatarFile() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chon avatar");
+        fileChooser.setTitle("Choose avatar");
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
         );
@@ -115,11 +119,16 @@ public class AdminDashboardController {
             Stage stage = (Stage) logoutBtn.getScene().getWindow();
             SceneManager.switchScene(stage, SceneManager.LOGIN);
         } catch (Exception e) {
-            AlertUtil.showError("Loi dang xuat: " + e.getMessage());
+            AlertUtil.showError("Unable to log out: " + e.getMessage());
         }
     }
 
-    // Called by sidebar menu buttons (wired via onAction in FXML or set programmatically)
+    @FXML
+    public void onOverviewClick() {
+        setActiveMenu(overviewBtn);
+        loadContent(SceneManager.ADMIN_OVERVIEW);
+    }
+
     @FXML
     public void onClassListClick() {
         setActiveMenu(classListBtn);
@@ -139,6 +148,9 @@ public class AdminDashboardController {
     }
 
     private void setActiveMenu(Button activeButton) {
+        if (overviewBtn != null) {
+            overviewBtn.getStyleClass().remove("sidebar-btn-active");
+        }
         if (classListBtn != null) {
             classListBtn.getStyleClass().remove("sidebar-btn-active");
         }

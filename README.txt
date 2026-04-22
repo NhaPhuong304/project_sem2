@@ -80,7 +80,7 @@ Thu muc quan trong:
 - src/main/java/com/aptech/projectmgmt
 - src/main/resources/fxml
 - src/main/resources/css/style.css
-- src/main/resources/db/ProjectManagement_DDL_v3.sql
+- src/main/resources/db/database.sql
 - src/main/resources/database.properties
 - src/main/resources/application.properties
 - uploads/avatars
@@ -130,7 +130,7 @@ Luu y:
 =========================================================
 
 File SQL chinh:
-- src/main/resources/db/ProjectManagement_DDL_v3.sql
+- src/main/resources/db/database.sql
 
 File nay se:
 - Tao database `ProjectManagementDB`
@@ -141,7 +141,7 @@ File nay se:
 1. Mo DBeaver hoac SQL Server Management Studio
 2. Ket noi toi SQL Server local
 3. Mo file:
-   `src/main/resources/db/ProjectManagement_DDL_v3.sql`
+   `src/main/resources/db/database.sql`
 4. Chay toan bo file
 
 6.2. Luu y quan trong
@@ -446,7 +446,7 @@ Copy toan bo thu muc project, bao gom:
 17.3. Chay database
 1. Mo SQL tool
 2. Chay file:
-   src/main/resources/db/ProjectManagement_DDL_v3.sql
+   src/main/resources/db/database.sql
 3. File nay tao DB va seed luon account test
 
 17.4. Sua cau hinh
@@ -513,7 +513,7 @@ Neu ban chi muon chay nhanh tren may moi:
 2. Cai Maven
 3. Cai SQL Server
 4. Chay file:
-   `src/main/resources/db/ProjectManagement_DDL_v3.sql`
+   `src/main/resources/db/database.sql`
 5. Sua:
    `src/main/resources/database.properties`
 6. Neu can OTP/mail thi sua:

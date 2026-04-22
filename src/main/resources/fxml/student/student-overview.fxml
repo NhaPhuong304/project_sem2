@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="overview-scroll"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aptech.projectmgmt.controller.student.StudentOverviewController">
+    <content>
+        <VBox spacing="20.0" styleClass="overview-root">
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+
+            <VBox spacing="4.0">
+                <Label text="My dashboard" styleClass="overview-title" />
+                <Label text="A simple snapshot of workload, deadlines, and submissions." styleClass="overview-subtitle" />
+            </VBox>
+
+            <HBox fx:id="metricContainer" spacing="16.0" />
+
+            <HBox spacing="16.0">
+                <VBox HBox.hgrow="ALWAYS" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="My task status" styleClass="overview-chart-title" />
+                    <PieChart fx:id="taskStatusChart" labelsVisible="true" prefHeight="320.0" />
+                </VBox>
+
+                <VBox HBox.hgrow="ALWAYS" spacing="12.0" styleClass="overview-chart-card">
+                    <Label text="Upcoming task schedule" styleClass="overview-chart-title" />
+                    <Label text="X: Month   Y: Task count" styleClass="overview-chart-meta" />
+                    <LineChart fx:id="scheduleChart" createSymbols="true" prefHeight="320.0">
+                        <xAxis>
+                            <CategoryAxis />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+            </HBox>
+        </VBox>
+    </content>
+</ScrollPane>

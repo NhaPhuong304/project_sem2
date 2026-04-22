@@ -19,12 +19,15 @@ public class SceneManager {
     public static final String SINGLE_ACTION_CELL = "/fxml/single-action-cell.fxml";
     public static final String TEXT_PROMPT_DIALOG = "/fxml/text-prompt-dialog.fxml";
     public static final String ADMIN_DASHBOARD  = "/fxml/admin/admin-dashboard.fxml";
+    public static final String ADMIN_OVERVIEW = "/fxml/admin/admin-overview.fxml";
     public static final String ADMIN_TEACHER_LIST = "/fxml/admin/admin-teacher-list.fxml";
     public static final String ADMIN_STAFF_LIST   = "/fxml/admin/admin-staff-list.fxml";
     public static final String ADMIN_TEACHER_CREATE_DIALOG = "/fxml/admin/admin-teacher-create-dialog.fxml";
     public static final String ADMIN_STAFF_CREATE_DIALOG   = "/fxml/admin/admin-staff-create-dialog.fxml";
     public static final String STAFF_DASHBOARD  = "/fxml/staff/staff-dashboard.fxml";
+    public static final String STAFF_OVERVIEW  = "/fxml/staff/staff-overview.fxml";
     public static final String TEACHER_DASHBOARD = "/fxml/teacher/teacher-dashboard.fxml";
+    public static final String TEACHER_OVERVIEW = "/fxml/teacher/teacher-overview.fxml";
     public static final String CLASS_LIST       = "/fxml/staff/class-list.fxml";
     public static final String ADMIN_CLASS_CREATE_DIALOG = "/fxml/admin/admin-class-create-dialog.fxml";
     public static final String STUDENT_LIST     = "/fxml/staff/student-list.fxml";
@@ -44,6 +47,7 @@ public class SceneManager {
     public static final String STAFF_TASK_ACTION_CELL = "/fxml/staff/task-action-cell.fxml";
     public static final String TASK_DETAIL      = "/fxml/staff/task-detail.fxml";
     public static final String STUDENT_DASHBOARD = "/fxml/student/student-dashboard.fxml";
+    public static final String STUDENT_OVERVIEW = "/fxml/student/student-overview.fxml";
     public static final String MY_PROJECT_LIST   = "/fxml/student/my-project-list.fxml";
     public static final String STUDENT_SUBMISSION = "/fxml/student/student-submission.fxml";
     public static final String MY_TASK_LIST      = "/fxml/student/my-task-list.fxml";

@@ -12,63 +12,60 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 
-<StackPane stylesheets="@../../css/staff.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.admin.AdminDashboardController">
-<BorderPane prefHeight="720.0" prefWidth="1180.0" styleClass="dashboard-root">
+<StackPane stylesheets="@../../css/staff.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.aptech.projectmgmt.controller.admin.AdminDashboardController">
+    <BorderPane prefHeight="720.0" prefWidth="1180.0" styleClass="dashboard-root">
 
-	<left>
-		<VBox prefWidth="240.0" spacing="14.0" styleClass="sidebar">
-			<padding>
-				<Insets bottom="24.0" left="18.0" right="18.0" top="24.0" />
-			</padding>
+        <left>
+            <VBox prefWidth="240.0" spacing="14.0" styleClass="sidebar">
+                <padding>
+                    <Insets bottom="24.0" left="18.0" right="18.0" top="24.0" />
+                </padding>
 
-			<VBox spacing="10.0" style="-fx-padding: 18 0 0 0;">
-				<Button fx:id="classListBtn" onAction="#onClassListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Quan ly Lop" />
+                <VBox spacing="10.0" style="-fx-padding: 18 0 0 0;">
+                    <Button fx:id="overviewBtn" onAction="#onOverviewClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Dashboard" />
+                    <Button fx:id="classListBtn" onAction="#onClassListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Classes" />
+                    <Button fx:id="staffListBtn" onAction="#onStaffListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Staff" />
+                    <Button fx:id="teacherListBtn" onAction="#onTeacherListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Teachers" />
+                </VBox>
+            </VBox>
+        </left>
 
-				<Button fx:id="staffListBtn" onAction="#onStaffListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Quan ly Giao vu" />
+        <top>
+            <AnchorPane prefHeight="78.0" styleClass="topbar">
+                <HBox alignment="CENTER_LEFT" spacing="12.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="12.0">
+                    <StackPane styleClass="top-logo-wrap">
+                        <ImageView fitHeight="34.0" fitWidth="34.0" preserveRatio="true" smooth="true">
+                            <image>
+                                <Image url="@/images/aptech.png" />
+                            </image>
+                        </ImageView>
+                    </StackPane>
 
-				<Button fx:id="teacherListBtn" onAction="#onTeacherListClick" prefHeight="44.0" prefWidth="204.0" styleClass="sidebar-btn" text="Quan ly Giao vien" />
-			</VBox>
-		</VBox>
-	</left>
+                    <VBox spacing="2.0">
+                        <Label styleClass="topbar-title" text="Student Project" />
+                        <Label styleClass="topbar-subtitle" text="System Administration" />
+                    </VBox>
+                </HBox>
 
-	<top>
-		<AnchorPane prefHeight="78.0" styleClass="topbar">
-			<HBox alignment="CENTER_LEFT" spacing="12.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="12.0">
+                <HBox alignment="CENTER_RIGHT" spacing="12.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="15.0">
+                    <Label fx:id="staffNameLabel" styleClass="staff-name-label" text="Admin" />
+                    <ImageView fx:id="avatarImageView" fitHeight="42.0" fitWidth="42.0" preserveRatio="false" smooth="true" styleClass="clickable-avatar">
+                        <clip>
+                            <Circle centerX="21.0" centerY="21.0" radius="21.0" />
+                        </clip>
+                    </ImageView>
+                    <Button fx:id="logoutBtn" styleClass="logout-btn" text="Log out" />
+                </HBox>
+            </AnchorPane>
+        </top>
 
-				<StackPane styleClass="top-logo-wrap">
-					<ImageView fitHeight="34.0" fitWidth="34.0" preserveRatio="true" smooth="true">
-						<image>
-							<Image url="@/images/aptech.png" />
-						</image>
-					</ImageView>
-				</StackPane>
+        <center>
+            <StackPane styleClass="center-wrapper">
+                <StackPane fx:id="contentArea" styleClass="content-card" />
+            </StackPane>
+        </center>
+    </BorderPane>
 
-				<VBox spacing="2.0">
-					<Label styleClass="topbar-title" text="Student Project" />
-					<Label styleClass="topbar-subtitle" text="Management System" />
-				</VBox>
-			</HBox>
-
-			<HBox alignment="CENTER_RIGHT" spacing="12.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="15.0">
-
-				<Label fx:id="staffNameLabel" styleClass="staff-name-label" text="Giao vu" />
-
-				<ImageView fx:id="avatarImageView" fitHeight="42.0" fitWidth="42.0" preserveRatio="false" smooth="true" styleClass="clickable-avatar">
-					<clip>
-						<Circle centerX="21.0" centerY="21.0" radius="21.0" />
-					</clip>
-				</ImageView>
-
-				<Button fx:id="logoutBtn" styleClass="logout-btn" text="Dang xuat" />
-			</HBox>
-		</AnchorPane>
-	</top>
-
-	<center>
-		<StackPane styleClass="center-wrapper">
-			<StackPane fx:id="contentArea" styleClass="content-card" />
-		</StackPane>
-	</center>
-</BorderPane>
     <fx:include source="../ai-chatbot.fxml" />
 </StackPane>

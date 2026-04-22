@@ -2,10 +2,30 @@ USE [master]
 GO
 
 /*
-    Reset script for DBeaver / SQL Server.
-    Running this file will DROP ProjectManagementDB if it already exists,
-    then recreate it and import the schema + sample data below.
-*/
+    =========================================================
+    PROJECT MANAGEMENT SYSTEM - MASTER DATABASE SCRIPT
+    =========================================================
+
+    Purpose:
+    - This is the only SQL file you need to run for a fresh setup.
+    - It resets ProjectManagementDB and recreates everything from scratch.
+
+    What this script includes:
+    1. Database reset and creation
+    2. Core schema: tables, constraints, indexes, views, triggers, procedures
+    3. Built-in sample data for login, projects, tasks, and messages
+    4. Submission feature tables and sample submission records
+    5. Dashboard seed data for charts and overview screens
+
+    Safe usage:
+    - Use this script only when you want a clean rebuild of the database.
+    - Existing ProjectManagementDB data will be deleted.
+
+    Recommended tools:
+    - SQL Server Management Studio
+    - Azure Data Studio
+    - DBeaver
+ */
 IF DB_ID(N'ProjectManagementDB') IS NOT NULL
 BEGIN
     ALTER DATABASE [ProjectManagementDB] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
@@ -1554,4 +1574,790 @@ GO
 USE [master]
 GO
 ALTER DATABASE [ProjectManagementDB] SET  READ_WRITE 
+GO
+
+USE [ProjectManagementDB]
+GO
+
+-- ============================================================
+-- Submission feature migration
+-- ============================================================
+
+IF OBJECT_ID(N'dbo.SubmissionRequest', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SubmissionRequest (
+        RequestID        INT IDENTITY(1,1) PRIMARY KEY,
+        Title            NVARCHAR(200) NOT NULL,
+        Description      NVARCHAR(MAX) NULL,
+        Deadline         DATETIME NOT NULL,
+        CreatedByStaffID INT NOT NULL,
+        Status           TINYINT NOT NULL DEFAULT 1,
+        CreatedAt        DATETIME NOT NULL DEFAULT GETDATE(),
+        CONSTRAINT CK_SubmissionRequest_Status
+            CHECK (Status IN (1, 2))
+    )
+END
+GO
+
+IF OBJECT_ID(N'dbo.SubmissionRequirementTemplate', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SubmissionRequirementTemplate (
+        TemplateID         INT IDENTITY(1,1) PRIMARY KEY,
+        RequirementName    NVARCHAR(100) NOT NULL UNIQUE,
+        RequiredExtension  NVARCHAR(20) NOT NULL,
+        SortOrder          INT NOT NULL,
+        IsActive           BIT NOT NULL DEFAULT 1
+    )
+END
+GO
+
+IF OBJECT_ID(N'dbo.SubmissionRequirement', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SubmissionRequirement (
+        RequirementID      INT IDENTITY(1,1) PRIMARY KEY,
+        RequestID          INT NOT NULL,
+        RequirementName    NVARCHAR(100) NOT NULL,
+        RequiredExtension  NVARCHAR(20) NOT NULL,
+        SortOrder          INT NOT NULL,
+        IsRequired         BIT NOT NULL DEFAULT 1,
+        CONSTRAINT FK_SubmissionRequirement_Request
+            FOREIGN KEY (RequestID) REFERENCES dbo.SubmissionRequest(RequestID),
+        CONSTRAINT UQ_SubmissionRequirement_Request_Name
+            UNIQUE (RequestID, RequirementName)
+    )
+END
+GO
+
+IF OBJECT_ID(N'dbo.SubmissionTarget', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SubmissionTarget (
+        TargetID        INT IDENTITY(1,1) PRIMARY KEY,
+        RequestID       INT NOT NULL,
+        GroupID         INT NOT NULL,
+        LeaderStudentID INT NOT NULL,
+        Status          TINYINT NOT NULL DEFAULT 1,
+        NotifiedAt      DATETIME NULL,
+        SubmittedAt     DATETIME NULL,
+        CreatedAt       DATETIME NOT NULL DEFAULT GETDATE(),
+        CONSTRAINT FK_SubmissionTarget_Request
+            FOREIGN KEY (RequestID) REFERENCES dbo.SubmissionRequest(RequestID),
+        CONSTRAINT UQ_SubmissionTarget_Request_Group
+            UNIQUE (RequestID, GroupID),
+        CONSTRAINT CK_SubmissionTarget_Status
+            CHECK (Status IN (1, 2, 3))
+    )
+END
+GO
+
+IF OBJECT_ID(N'dbo.SubmissionFile', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SubmissionFile (
+        FileID              INT IDENTITY(1,1) PRIMARY KEY,
+        TargetID            INT NOT NULL,
+        RequirementID       INT NOT NULL,
+        OriginalFileName    NVARCHAR(255) NOT NULL,
+        StoredFileName      NVARCHAR(255) NOT NULL,
+        FilePath            NVARCHAR(1000) NOT NULL,
+        FileSize            BIGINT NOT NULL,
+        UploadedByStudentID INT NOT NULL,
+        UploadedAt          DATETIME NOT NULL DEFAULT GETDATE(),
+        CONSTRAINT FK_SubmissionFile_Target
+            FOREIGN KEY (TargetID) REFERENCES dbo.SubmissionTarget(TargetID),
+        CONSTRAINT FK_SubmissionFile_Requirement
+            FOREIGN KEY (RequirementID) REFERENCES dbo.SubmissionRequirement(RequirementID),
+        CONSTRAINT UQ_SubmissionFile_Target_Requirement
+            UNIQUE (TargetID, RequirementID)
+    )
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'Database')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'Database', N'.zip', 1)
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'eProjects Status report')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'eProjects Status report', N'.xlsx', 2)
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'eProjects Feedback Form')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'eProjects Feedback Form', N'.xlsx', 3)
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'Project report')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'Project report', N'.docx', 4)
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'Source Code')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'Source Code', N'.zip', 5)
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'Slide PowerPoint')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'Slide PowerPoint', N'.pptx', 6)
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'Video')
+BEGIN
+    INSERT INTO dbo.SubmissionRequirementTemplate (RequirementName, RequiredExtension, SortOrder)
+    VALUES (N'Video', N'.zip', 7)
+END
+GO
+
+-- ============================================================
+-- Dashboard-friendly seed data
+-- ============================================================
+
+DECLARE @DashSeedPasswordHash NVARCHAR(255) = N'$2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm';
+DECLARE @DashNow DATETIME = GETDATE();
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE Username = N'staff003')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'staff003', @DashSeedPasswordHash, 4, 0, N'no-image.jpg', 1, DATEADD(MONTH, -3, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE Username = N'gv003')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'gv003', @DashSeedPasswordHash, 3, 0, N'no-image.jpg', 1, DATEADD(MONTH, -2, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST006')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST006', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -3, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST007')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST007', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -3, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST008')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST008', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -3, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST009')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST009', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -2, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST010')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST010', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -2, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST011')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST011', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -1, @DashNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST012')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST012', @DashSeedPasswordHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -1, @DashNow));
+GO
+
+DECLARE @DashStaff3AccountID INT = (SELECT TOP 1 AccountID FROM Account WHERE Username = N'staff003');
+DECLARE @DashTeacher3AccountID INT = (SELECT TOP 1 AccountID FROM Account WHERE Username = N'gv003');
+
+IF @DashTeacher3AccountID IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM Staff WHERE AccountID = @DashTeacher3AccountID)
+BEGIN
+    INSERT INTO Staff (FullName, Email, AccountID)
+    VALUES (N'Mr. Ethan Vu', N'gv003@aptech.local', @DashTeacher3AccountID);
+END
+GO
+
+DECLARE @DashNow DATETIME = GETDATE();
+DECLARE @DashStaff3ID INT = (
+    SELECT TOP 1 s.StaffID
+    FROM Staff s
+    INNER JOIN Account a ON a.AccountID = s.AccountID
+    WHERE a.Username = N'staff003'
+);
+
+IF @DashStaff3ID IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM Class WHERE ClassName = N'T2401M02')
+BEGIN
+    INSERT INTO Class (ClassName, AcademicYear, ManagerID, CreatedAt)
+    VALUES (N'T2401M02', N'2025-2026', @DashStaff3ID, DATEADD(MONTH, -2, @DashNow));
+END
+GO
+
+DECLARE @DashStaff1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff001');
+DECLARE @DashStaff2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @DashStaff3ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff003');
+DECLARE @DashClassB INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2305M02');
+DECLARE @DashClassC INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2401M01');
+DECLARE @DashClassD INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2401M02');
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST006')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST006', N'Charlotte Bui', N'st006@aptech.local', @DashClassB, AccountID, @DashStaff1ID
+    FROM Account WHERE UPPER(Username) = N'ST006';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST007')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST007', N'Benjamin Vu', N'st007@aptech.local', @DashClassC, AccountID, @DashStaff2ID
+    FROM Account WHERE UPPER(Username) = N'ST007';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST008')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST008', N'Amelia Dang', N'st008@aptech.local', @DashClassC, AccountID, @DashStaff2ID
+    FROM Account WHERE UPPER(Username) = N'ST008';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST009')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST009', N'Elijah Do', N'st009@aptech.local', @DashClassC, AccountID, @DashStaff2ID
+    FROM Account WHERE UPPER(Username) = N'ST009';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST010')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST010', N'Harper Vo', N'st010@aptech.local', @DashClassD, AccountID, @DashStaff3ID
+    FROM Account WHERE UPPER(Username) = N'ST010';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST011')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST011', N'James Phan', N'st011@aptech.local', @DashClassD, AccountID, @DashStaff3ID
+    FROM Account WHERE UPPER(Username) = N'ST011';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST012')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST012', N'Evelyn Truong', N'st012@aptech.local', @DashClassD, AccountID, @DashStaff3ID
+    FROM Account WHERE UPPER(Username) = N'ST012';
+GO
+
+DECLARE @DashNow DATETIME = GETDATE();
+DECLARE @DashClassA INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2305M01');
+DECLARE @DashClassB INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2305M02');
+DECLARE @DashClassC INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2401M01');
+DECLARE @DashClassD INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2401M02');
+
+IF NOT EXISTS (SELECT 1 FROM ProjectGroup WHERE GroupName = N'Alpha Team')
+BEGIN
+    INSERT INTO ProjectGroup (ClassID, GroupName, CreatedAt)
+    VALUES
+        (@DashClassA, N'Alpha Team', DATEADD(MONTH, -4, @DashNow)),
+        (@DashClassB, N'Beta Builders', DATEADD(MONTH, -3, @DashNow)),
+        (@DashClassC, N'Gamma Studio', DATEADD(MONTH, -2, @DashNow)),
+        (@DashClassD, N'Delta Works', DATEADD(MONTH, -1, @DashNow));
+END
+GO
+
+DECLARE @DashNow DATETIME = GETDATE();
+DECLARE @DashTeacher1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv001');
+DECLARE @DashTeacher2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv002');
+DECLARE @DashTeacher3ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv003');
+DECLARE @DashStaff1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff001');
+DECLARE @DashStaff2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @DashStaff3ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff003');
+DECLARE @DashGroupAlpha INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Alpha Team');
+DECLARE @DashGroupBeta INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Beta Builders');
+DECLARE @DashGroupGamma INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Gamma Studio');
+DECLARE @DashGroupDelta INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Delta Works');
+
+IF NOT EXISTS (SELECT 1 FROM Project WHERE Title = N'Campus Marketplace')
+BEGIN
+    INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status, CreatedAt)
+    VALUES
+        (@DashGroupAlpha, N'Campus Marketplace', N'Java web marketplace for student trading.', N'S2',
+            CAST(DATEADD(MONTH, -4, @DashNow) AS DATE), CAST(DATEADD(MONTH, 1, @DashNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, 1, @DashNow)) AS DATE),
+            @DashTeacher1ID, @DashStaff1ID, 1, DATEADD(MONTH, -4, @DashNow)),
+        (@DashGroupBeta, N'Fitness Booking App', N'Desktop and mobile workflow for coach booking.', N'S2',
+            CAST(DATEADD(MONTH, -3, @DashNow) AS DATE), CAST(DATEADD(MONTH, 2, @DashNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, 2, @DashNow)) AS DATE),
+            @DashTeacher2ID, @DashStaff1ID, 1, DATEADD(MONTH, -3, @DashNow)),
+        (@DashGroupGamma, N'Smart Attendance', N'Attendance analytics and QR scanning platform.', N'S2',
+            CAST(DATEADD(MONTH, -2, @DashNow) AS DATE), CAST(DATEADD(MONTH, 3, @DashNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, 3, @DashNow)) AS DATE),
+            @DashTeacher2ID, @DashStaff2ID, 1, DATEADD(MONTH, -2, @DashNow)),
+        (@DashGroupDelta, N'Library Insights', N'Data-driven library management and reporting.', N'S2',
+            CAST(DATEADD(MONTH, -6, @DashNow) AS DATE), CAST(DATEADD(MONTH, -1, @DashNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, -1, @DashNow)) AS DATE),
+            @DashTeacher3ID, @DashStaff3ID, 2, DATEADD(MONTH, -6, @DashNow));
+END
+GO
+
+DECLARE @DashNow DATETIME = GETDATE();
+DECLARE @DashGroupAlpha INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Alpha Team');
+DECLARE @DashGroupBeta INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Beta Builders');
+DECLARE @DashGroupGamma INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Gamma Studio');
+DECLARE @DashGroupDelta INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Delta Works');
+DECLARE @DashSt1 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST001');
+DECLARE @DashSt2 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST002');
+DECLARE @DashSt3 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST003');
+DECLARE @DashSt4 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST004');
+DECLARE @DashSt5 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST005');
+DECLARE @DashSt6 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST006');
+DECLARE @DashSt7 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST007');
+DECLARE @DashSt8 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST008');
+DECLARE @DashSt9 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST009');
+DECLARE @DashSt10 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST010');
+DECLARE @DashSt11 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST011');
+DECLARE @DashSt12 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST012');
+
+IF NOT EXISTS (SELECT 1 FROM GroupMember WHERE GroupID = @DashGroupAlpha AND StudentID = @DashSt1)
+BEGIN
+    INSERT INTO GroupMember (GroupID, StudentID, Role, Status, JoinedAt)
+    VALUES
+        (@DashGroupAlpha, @DashSt1, 1, 1, DATEADD(MONTH, -4, @DashNow)),
+        (@DashGroupAlpha, @DashSt2, 2, 1, DATEADD(MONTH, -4, @DashNow)),
+        (@DashGroupAlpha, @DashSt3, 2, 1, DATEADD(MONTH, -4, @DashNow)),
+        (@DashGroupBeta, @DashSt4, 1, 1, DATEADD(MONTH, -3, @DashNow)),
+        (@DashGroupBeta, @DashSt5, 2, 1, DATEADD(MONTH, -3, @DashNow)),
+        (@DashGroupBeta, @DashSt6, 2, 1, DATEADD(MONTH, -3, @DashNow)),
+        (@DashGroupGamma, @DashSt7, 1, 1, DATEADD(MONTH, -2, @DashNow)),
+        (@DashGroupGamma, @DashSt8, 2, 1, DATEADD(MONTH, -2, @DashNow)),
+        (@DashGroupGamma, @DashSt9, 2, 1, DATEADD(MONTH, -2, @DashNow)),
+        (@DashGroupDelta, @DashSt10, 1, 1, DATEADD(MONTH, -6, @DashNow)),
+        (@DashGroupDelta, @DashSt11, 2, 1, DATEADD(MONTH, -6, @DashNow)),
+        (@DashGroupDelta, @DashSt12, 2, 1, DATEADD(MONTH, -6, @DashNow));
+END
+GO
+
+DECLARE @DashNow DATETIME = GETDATE();
+DECLARE @DashGroupAlpha INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Alpha Team');
+DECLARE @DashGroupBeta INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Beta Builders');
+DECLARE @DashGroupGamma INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Gamma Studio');
+DECLARE @DashGroupDelta INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Delta Works');
+DECLARE @DashSt1 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST001');
+DECLARE @DashSt2 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST002');
+DECLARE @DashSt3 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST003');
+DECLARE @DashSt4 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST004');
+DECLARE @DashSt5 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST005');
+DECLARE @DashSt6 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST006');
+DECLARE @DashSt7 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST007');
+DECLARE @DashSt8 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST008');
+DECLARE @DashSt9 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST009');
+DECLARE @DashSt10 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST010');
+DECLARE @DashSt11 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST011');
+DECLARE @DashSt12 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST012');
+
+IF NOT EXISTS (SELECT 1 FROM Task WHERE Title = N'Gather marketplace requirements')
+BEGIN
+    INSERT INTO Task (GroupID, Title, Description, EstimatedStartDate, EstimatedEndDate, ActualStartDate, ActualEndDate, Status, AssignedTo, ReviewedBy, CreatedBy, IsLate, CreatedAt)
+    VALUES
+        (@DashGroupAlpha, N'Gather marketplace requirements', N'Interview users and validate scope.', DATEADD(MONTH, -4, @DashNow), DATEADD(MONTH, -3, @DashNow), DATEADD(MONTH, -4, @DashNow), DATEADD(DAY, -75, @DashNow), 5, @DashSt2, @DashSt1, @DashSt1, 0, DATEADD(MONTH, -4, @DashNow)),
+        (@DashGroupAlpha, N'Build seller onboarding', N'Create onboarding flow and approval form.', DATEADD(MONTH, -2, @DashNow), DATEADD(DAY, -10, @DashNow), DATEADD(MONTH, -2, @DashNow), NULL, 3, @DashSt3, @DashSt1, @DashSt1, 0, DATEADD(MONTH, -2, @DashNow)),
+        (@DashGroupBeta, N'Design booking dashboard', N'Staff and trainer dashboard wireframes.', DATEADD(MONTH, -3, @DashNow), DATEADD(MONTH, -2, @DashNow), DATEADD(MONTH, -3, @DashNow), DATEADD(MONTH, -2, @DashNow), 5, @DashSt5, @DashSt4, @DashSt4, 0, DATEADD(MONTH, -3, @DashNow)),
+        (@DashGroupBeta, N'Implement booking calendar', N'Interactive booking calendar and rules.', DATEADD(DAY, -45, @DashNow), DATEADD(DAY, -5, @DashNow), DATEADD(DAY, -40, @DashNow), NULL, 2, @DashSt6, @DashSt4, @DashSt4, 0, DATEADD(DAY, -45, @DashNow)),
+        (@DashGroupGamma, N'Prepare QR attendance module', N'QR generation and attendance scanner.', DATEADD(DAY, -30, @DashNow), DATEADD(DAY, 5, @DashNow), DATEADD(DAY, -28, @DashNow), NULL, 2, @DashSt8, @DashSt7, @DashSt7, 0, DATEADD(DAY, -30, @DashNow)),
+        (@DashGroupGamma, N'Build attendance analytics', N'Charts for attendance heatmaps.', DATEADD(DAY, -20, @DashNow), DATEADD(DAY, -2, @DashNow), DATEADD(DAY, -18, @DashNow), NULL, 4, @DashSt9, @DashSt7, @DashSt7, 1, DATEADD(DAY, -20, @DashNow)),
+        (@DashGroupDelta, N'Data model for library stock', N'Finalize ERD and migration scripts.', DATEADD(MONTH, -6, @DashNow), DATEADD(MONTH, -5, @DashNow), DATEADD(MONTH, -6, @DashNow), DATEADD(MONTH, -5, @DashNow), 5, @DashSt11, @DashSt10, @DashSt10, 0, DATEADD(MONTH, -6, @DashNow)),
+        (@DashGroupDelta, N'Usage reporting module', N'Usage charts and report exports.', DATEADD(MONTH, -5, @DashNow), DATEADD(MONTH, -2, @DashNow), DATEADD(MONTH, -5, @DashNow), DATEADD(MONTH, -1, @DashNow), 5, @DashSt12, @DashSt10, @DashSt10, 1, DATEADD(MONTH, -5, @DashNow));
+END
+GO
+
+DECLARE @DashNow DATETIME = GETDATE();
+DECLARE @DashTask2 INT = (SELECT TOP 1 TaskID FROM Task WHERE Title = N'Build seller onboarding');
+DECLARE @DashTask4 INT = (SELECT TOP 1 TaskID FROM Task WHERE Title = N'Implement booking calendar');
+DECLARE @DashTask5 INT = (SELECT TOP 1 TaskID FROM Task WHERE Title = N'Prepare QR attendance module');
+DECLARE @DashTask6 INT = (SELECT TOP 1 TaskID FROM Task WHERE Title = N'Build attendance analytics');
+DECLARE @DashTask8 INT = (SELECT TOP 1 TaskID FROM Task WHERE Title = N'Usage reporting module');
+DECLARE @DashSt1 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST001');
+DECLARE @DashSt3 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST003');
+DECLARE @DashSt4 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST004');
+DECLARE @DashSt7 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST007');
+DECLARE @DashSt9 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST009');
+DECLARE @DashSt10 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST010');
+DECLARE @DashSt12 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST012');
+DECLARE @DashTeacher1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv001');
+DECLARE @DashTeacher2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv002');
+DECLARE @DashStaff2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @DashStaff3ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff003');
+
+IF NOT EXISTS (SELECT 1 FROM TaskRevision WHERE TaskID = @DashTask2)
+BEGIN
+    INSERT INTO TaskRevision (TaskID, ReviewedBy, Note, CreatedAt)
+    VALUES
+        (@DashTask2, @DashSt1, N'Please shorten the onboarding steps and add validation messages.', DATEADD(DAY, -8, @DashNow)),
+        (@DashTask6, @DashSt7, N'Analytics needs clearer legends and daily breakdown.', DATEADD(DAY, -3, @DashNow));
+END
+
+IF NOT EXISTS (SELECT 1 FROM TaskStatusHistory WHERE TaskID = @DashTask2)
+BEGIN
+    INSERT INTO TaskStatusHistory (TaskID, FromStatus, ToStatus, ChangedBy, ChangedAt, Note)
+    VALUES
+        (@DashTask2, 1, 2, (SELECT TOP 1 AccountID FROM Student WHERE StudentID = @DashSt3), DATEADD(MONTH, -2, @DashNow), N'Work started'),
+        (@DashTask2, 2, 3, (SELECT TOP 1 AccountID FROM Student WHERE StudentID = @DashSt3), DATEADD(DAY, -9, @DashNow), N'Ready for review'),
+        (@DashTask6, 2, 4, (SELECT TOP 1 AccountID FROM Student WHERE StudentID = @DashSt9), DATEADD(DAY, -3, @DashNow), N'Needs revision after review'),
+        (@DashTask8, 2, 5, (SELECT TOP 1 AccountID FROM Student WHERE StudentID = @DashSt12), DATEADD(MONTH, -1, @DashNow), N'Completed after fixes');
+END
+
+IF NOT EXISTS (SELECT 1 FROM TaskAbandonLog WHERE TaskID = @DashTask6 AND StudentID = @DashSt9)
+BEGIN
+    INSERT INTO TaskAbandonLog (TaskID, StudentID, AbandonedAt, Note)
+    VALUES (@DashTask6, @DashSt9, DATEADD(DAY, -6, @DashNow), N'Missed hand-off and failed to confirm progress');
+END
+
+IF NOT EXISTS (SELECT 1 FROM [Message] WHERE Content LIKE N'%progress summary%')
+BEGIN
+    INSERT INTO [Message] (SenderID, ReceiverID, TaskID, Content, SentAt, IsRead)
+    VALUES
+        (@DashTeacher1ID, @DashSt1, @DashTask2, N'Please prepare a concise progress summary for tomorrow.', DATEADD(DAY, -4, @DashNow), 1),
+        (@DashTeacher2ID, @DashSt4, @DashTask4, N'Update the booking calendar demo before Friday.', DATEADD(DAY, -2, @DashNow), 0),
+        (@DashStaff2ID, @DashSt7, @DashTask5, N'Remember the upcoming interim checkpoint next week.', DATEADD(DAY, -1, @DashNow), 0),
+        (@DashStaff3ID, @DashSt10, @DashTask8, N'Upload the final reporting screenshots for archive.', DATEADD(DAY, -20, @DashNow), 1);
+END
+GO
+
+-- ============================================================
+-- Submission sample data
+-- Depends on dashboard seed data above
+-- ============================================================
+
+DECLARE @SubmissionNow DATETIME = GETDATE();
+DECLARE @SubmissionStaff1ID INT = (SELECT TOP 1 StaffID FROM dbo.Staff s INNER JOIN dbo.Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff001');
+DECLARE @SubmissionStaff2ID INT = (SELECT TOP 1 StaffID FROM dbo.Staff s INNER JOIN dbo.Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @SubmissionGroupAlpha INT = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Alpha Team');
+DECLARE @SubmissionGroupBeta INT = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Beta Builders');
+DECLARE @SubmissionGroupGamma INT = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Gamma Studio');
+DECLARE @SubmissionLeaderAlpha INT = (SELECT TOP 1 StudentID FROM dbo.GroupMember WHERE GroupID = @SubmissionGroupAlpha AND [Role] = 1 AND [Status] = 1);
+DECLARE @SubmissionLeaderBeta INT = (SELECT TOP 1 StudentID FROM dbo.GroupMember WHERE GroupID = @SubmissionGroupBeta AND [Role] = 1 AND [Status] = 1);
+DECLARE @SubmissionLeaderGamma INT = (SELECT TOP 1 StudentID FROM dbo.GroupMember WHERE GroupID = @SubmissionGroupGamma AND [Role] = 1 AND [Status] = 1);
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequest WHERE Title = N'Checkpoint 1 submission pack')
+   AND @SubmissionGroupAlpha IS NOT NULL
+   AND @SubmissionGroupBeta IS NOT NULL
+BEGIN
+    DECLARE @RequestAlpha INT;
+    INSERT INTO dbo.SubmissionRequest (Title, Description, Deadline, CreatedByStaffID, Status, CreatedAt)
+    VALUES (N'Checkpoint 1 submission pack', N'Upload the first review package for the current sprint.', DATEADD(DAY, 5, @SubmissionNow), @SubmissionStaff1ID, 1, DATEADD(DAY, -7, @SubmissionNow));
+    SET @RequestAlpha = SCOPE_IDENTITY();
+
+    INSERT INTO dbo.SubmissionRequirement (RequestID, RequirementName, RequiredExtension, SortOrder, IsRequired)
+    SELECT @RequestAlpha, RequirementName, RequiredExtension, SortOrder, 1
+    FROM dbo.SubmissionRequirementTemplate
+    WHERE RequirementName IN (N'Database', N'Project report', N'Source Code', N'Slide PowerPoint');
+
+    INSERT INTO dbo.SubmissionTarget (RequestID, GroupID, LeaderStudentID, Status, NotifiedAt, CreatedAt)
+    VALUES
+        (@RequestAlpha, @SubmissionGroupAlpha, @SubmissionLeaderAlpha, 2, DATEADD(DAY, -6, @SubmissionNow), DATEADD(DAY, -7, @SubmissionNow)),
+        (@RequestAlpha, @SubmissionGroupBeta, @SubmissionLeaderBeta, 1, DATEADD(DAY, -6, @SubmissionNow), DATEADD(DAY, -7, @SubmissionNow));
+END
+GO
+
+DECLARE @SubmissionNow DATETIME = GETDATE();
+DECLARE @SubmissionStaff2ID INT = (SELECT TOP 1 StaffID FROM dbo.Staff s INNER JOIN dbo.Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @SubmissionGroupGamma INT = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Gamma Studio');
+DECLARE @SubmissionLeaderGamma INT = (SELECT TOP 1 StudentID FROM dbo.GroupMember WHERE GroupID = @SubmissionGroupGamma AND [Role] = 1 AND [Status] = 1);
+
+IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequest WHERE Title = N'Final demo package')
+   AND @SubmissionGroupGamma IS NOT NULL
+BEGIN
+    DECLARE @RequestBeta INT;
+    INSERT INTO dbo.SubmissionRequest (Title, Description, Deadline, CreatedByStaffID, Status, CreatedAt)
+    VALUES (N'Final demo package', N'Final report, slides, and supporting demo files.', DATEADD(DAY, 14, @SubmissionNow), @SubmissionStaff2ID, 1, DATEADD(DAY, -2, @SubmissionNow));
+    SET @RequestBeta = SCOPE_IDENTITY();
+
+    INSERT INTO dbo.SubmissionRequirement (RequestID, RequirementName, RequiredExtension, SortOrder, IsRequired)
+    SELECT @RequestBeta, RequirementName, RequiredExtension, SortOrder, 1
+    FROM dbo.SubmissionRequirementTemplate
+    WHERE RequirementName IN (N'eProjects Status report', N'eProjects Feedback Form', N'Project report', N'Video');
+
+    INSERT INTO dbo.SubmissionTarget (RequestID, GroupID, LeaderStudentID, Status, NotifiedAt, CreatedAt)
+    VALUES (@RequestBeta, @SubmissionGroupGamma, @SubmissionLeaderGamma, 1, DATEADD(DAY, -1, @SubmissionNow), DATEADD(DAY, -2, @SubmissionNow));
+END
+GO
+
+DECLARE @TargetAlpha INT = (
+    SELECT TOP 1 t.TargetID
+    FROM dbo.SubmissionTarget t
+    INNER JOIN dbo.SubmissionRequest r ON r.RequestID = t.RequestID
+    WHERE r.Title = N'Checkpoint 1 submission pack'
+      AND t.GroupID = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Alpha Team')
+);
+DECLARE @TargetBeta INT = (
+    SELECT TOP 1 t.TargetID
+    FROM dbo.SubmissionTarget t
+    INNER JOIN dbo.SubmissionRequest r ON r.RequestID = t.RequestID
+    WHERE r.Title = N'Checkpoint 1 submission pack'
+      AND t.GroupID = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Beta Builders')
+);
+DECLARE @LeaderAlpha INT = (SELECT TOP 1 StudentID FROM dbo.GroupMember WHERE GroupID = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Alpha Team') AND [Role] = 1 AND [Status] = 1);
+DECLARE @LeaderBeta INT = (SELECT TOP 1 StudentID FROM dbo.GroupMember WHERE GroupID = (SELECT TOP 1 GroupID FROM dbo.ProjectGroup WHERE GroupName = N'Beta Builders') AND [Role] = 1 AND [Status] = 1);
+
+IF @TargetAlpha IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM dbo.SubmissionFile WHERE TargetID = @TargetAlpha)
+BEGIN
+    INSERT INTO dbo.SubmissionFile (TargetID, RequirementID, OriginalFileName, StoredFileName, FilePath, FileSize, UploadedByStudentID, UploadedAt)
+    SELECT
+        @TargetAlpha,
+        RequirementID,
+        RequirementName + RequiredExtension,
+        N'alpha_' + CAST(RequirementID AS NVARCHAR(10)) + RequiredExtension,
+        N'submissions/alpha/' + CAST(RequirementID AS NVARCHAR(10)) + RequiredExtension,
+        1024 + (RequirementID * 256),
+        @LeaderAlpha,
+        DATEADD(DAY, -3, GETDATE())
+    FROM dbo.SubmissionRequirement
+    WHERE RequestID = (SELECT TOP 1 RequestID FROM dbo.SubmissionRequest WHERE Title = N'Checkpoint 1 submission pack')
+      AND RequirementName IN (N'Database', N'Project report', N'Source Code', N'Slide PowerPoint');
+
+    UPDATE dbo.SubmissionTarget
+    SET Status = 3,
+        SubmittedAt = DATEADD(DAY, -3, GETDATE())
+    WHERE TargetID = @TargetAlpha;
+END
+
+IF @TargetBeta IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM dbo.SubmissionFile WHERE TargetID = @TargetBeta)
+BEGIN
+    INSERT INTO dbo.SubmissionFile (TargetID, RequirementID, OriginalFileName, StoredFileName, FilePath, FileSize, UploadedByStudentID, UploadedAt)
+    SELECT TOP 2
+        @TargetBeta,
+        RequirementID,
+        RequirementName + RequiredExtension,
+        N'beta_' + CAST(RequirementID AS NVARCHAR(10)) + RequiredExtension,
+        N'submissions/beta/' + CAST(RequirementID AS NVARCHAR(10)) + RequiredExtension,
+        2048 + (RequirementID * 300),
+        @LeaderBeta,
+        DATEADD(DAY, -1, GETDATE())
+    FROM dbo.SubmissionRequirement
+    WHERE RequestID = (SELECT TOP 1 RequestID FROM dbo.SubmissionRequest WHERE Title = N'Checkpoint 1 submission pack')
+    ORDER BY SortOrder;
+
+    UPDATE dbo.SubmissionTarget
+    SET Status = 2
+    WHERE TargetID = @TargetBeta;
+END
+GO
+
+-- ============================================================
+-- Additional dashboard variation seed
+-- Adds more spread across managers, advisors, statuses, and months
+-- ============================================================
+
+DECLARE @ChartSeedHash NVARCHAR(255) = N'$2a$10$rBOX8JhuiuGuuyuBNltmNuloJgp0MSCFercS7fNY.toW4tV0tpafm';
+DECLARE @ChartNow DATETIME = GETDATE();
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST013')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST013', @ChartSeedHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -5, @ChartNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST014')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST014', @ChartSeedHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -4, @ChartNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST015')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST015', @ChartSeedHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -4, @ChartNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST016')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST016', @ChartSeedHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -3, @ChartNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST017')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST017', @ChartSeedHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -2, @ChartNow));
+
+IF NOT EXISTS (SELECT 1 FROM Account WHERE UPPER(Username) = N'ST018')
+    INSERT INTO Account (Username, PasswordHash, [Role], IsFirstLogin, PhotoUrl, IsActive, CreatedAt)
+    VALUES (N'ST018', @ChartSeedHash, 2, 0, N'no-image.jpg', 1, DATEADD(MONTH, -1, @ChartNow));
+GO
+
+DECLARE @ChartStaff1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff001');
+DECLARE @ChartStaff2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+
+IF NOT EXISTS (SELECT 1 FROM Class WHERE ClassName = N'T2405M01')
+    INSERT INTO Class (ClassName, AcademicYear, ManagerID, CreatedAt)
+    VALUES (N'T2405M01', N'2025-2026', @ChartStaff1ID, DATEADD(MONTH, -3, GETDATE()));
+
+IF NOT EXISTS (SELECT 1 FROM Class WHERE ClassName = N'T2405M02')
+    INSERT INTO Class (ClassName, AcademicYear, ManagerID, CreatedAt)
+    VALUES (N'T2405M02', N'2025-2026', @ChartStaff2ID, DATEADD(MONTH, -2, GETDATE()));
+GO
+
+DECLARE @ChartStaff1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff001');
+DECLARE @ChartStaff2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @ChartClassE INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2405M01');
+DECLARE @ChartClassF INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2405M02');
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST013')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST013', N'Mason Le', N'st013@aptech.local', @ChartClassE, AccountID, @ChartStaff1ID
+    FROM Account WHERE UPPER(Username) = N'ST013';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST014')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST014', N'Sophia Nguyen', N'st014@aptech.local', @ChartClassE, AccountID, @ChartStaff1ID
+    FROM Account WHERE UPPER(Username) = N'ST014';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST015')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST015', N'Lucas Tran', N'st015@aptech.local', @ChartClassE, AccountID, @ChartStaff1ID
+    FROM Account WHERE UPPER(Username) = N'ST015';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST016')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST016', N'Emma Ho', N'st016@aptech.local', @ChartClassF, AccountID, @ChartStaff2ID
+    FROM Account WHERE UPPER(Username) = N'ST016';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST017')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST017', N'Noah Pham', N'st017@aptech.local', @ChartClassF, AccountID, @ChartStaff2ID
+    FROM Account WHERE UPPER(Username) = N'ST017';
+
+IF NOT EXISTS (SELECT 1 FROM Student WHERE StudentCode = N'ST018')
+    INSERT INTO Student (StudentCode, FullName, Email, ClassID, AccountID, CreatedByStaffId)
+    SELECT N'ST018', N'Olivia Vu', N'st018@aptech.local', @ChartClassF, AccountID, @ChartStaff2ID
+    FROM Account WHERE UPPER(Username) = N'ST018';
+GO
+
+DECLARE @ChartClassA INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2305M01');
+DECLARE @ChartClassC INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2401M01');
+DECLARE @ChartClassE INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2405M01');
+DECLARE @ChartClassF INT = (SELECT TOP 1 ClassID FROM Class WHERE ClassName = N'T2405M02');
+
+IF NOT EXISTS (SELECT 1 FROM ProjectGroup WHERE GroupName = N'Omega Lab')
+    INSERT INTO ProjectGroup (ClassID, GroupName, CreatedAt)
+    VALUES (@ChartClassA, N'Omega Lab', DATEADD(MONTH, -5, GETDATE()));
+
+IF NOT EXISTS (SELECT 1 FROM ProjectGroup WHERE GroupName = N'Nova Crew')
+    INSERT INTO ProjectGroup (ClassID, GroupName, CreatedAt)
+    VALUES (@ChartClassC, N'Nova Crew', DATEADD(MONTH, -4, GETDATE()));
+
+IF NOT EXISTS (SELECT 1 FROM ProjectGroup WHERE GroupName = N'Pixel Forge')
+    INSERT INTO ProjectGroup (ClassID, GroupName, CreatedAt)
+    VALUES (@ChartClassE, N'Pixel Forge', DATEADD(MONTH, -3, GETDATE()));
+
+IF NOT EXISTS (SELECT 1 FROM ProjectGroup WHERE GroupName = N'Insight Hub')
+    INSERT INTO ProjectGroup (ClassID, GroupName, CreatedAt)
+    VALUES (@ChartClassF, N'Insight Hub', DATEADD(MONTH, -2, GETDATE()));
+GO
+
+DECLARE @ChartNow DATETIME = GETDATE();
+DECLARE @ChartTeacher1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv001');
+DECLARE @ChartTeacher2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv002');
+DECLARE @ChartTeacher3ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'gv003');
+DECLARE @ChartStaff1ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff001');
+DECLARE @ChartStaff2ID INT = (SELECT TOP 1 s.StaffID FROM Staff s INNER JOIN Account a ON a.AccountID = s.AccountID WHERE a.Username = N'staff002');
+DECLARE @ChartGroupOmega INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Omega Lab');
+DECLARE @ChartGroupNova INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Nova Crew');
+DECLARE @ChartGroupPixel INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Pixel Forge');
+DECLARE @ChartGroupInsight INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Insight Hub');
+
+IF NOT EXISTS (SELECT 1 FROM Project WHERE Title = N'Event Check-in Kiosk')
+BEGIN
+    INSERT INTO Project (GroupID, Title, Description, Semester, StartDate, EndDate, ReportDate, AdvisorID, CreatedBy, Status, CreatedAt)
+    VALUES
+        (@ChartGroupOmega, N'Event Check-in Kiosk', N'Self-service check-in tool for school events.', N'S1',
+            CAST(DATEADD(MONTH, -5, @ChartNow) AS DATE), CAST(DATEADD(MONTH, -1, @ChartNow) AS DATE), CAST(DATEADD(DAY, -3, DATEADD(MONTH, -1, @ChartNow)) AS DATE),
+            @ChartTeacher1ID, @ChartStaff1ID, 2, DATEADD(MONTH, -5, @ChartNow)),
+        (@ChartGroupNova, N'Course Feedback Portal', N'Collect and analyze end-of-course feedback.', N'S2',
+            CAST(DATEADD(MONTH, -4, @ChartNow) AS DATE), CAST(DATEADD(MONTH, 1, @ChartNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, 1, @ChartNow)) AS DATE),
+            @ChartTeacher2ID, @ChartStaff2ID, 1, DATEADD(MONTH, -4, @ChartNow)),
+        (@ChartGroupPixel, N'Internship Tracker', N'Track company applications and mentor feedback.', N'S2',
+            CAST(DATEADD(MONTH, -3, @ChartNow) AS DATE), CAST(DATEADD(MONTH, 2, @ChartNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, 2, @ChartNow)) AS DATE),
+            @ChartTeacher3ID, @ChartStaff1ID, 1, DATEADD(MONTH, -3, @ChartNow)),
+        (@ChartGroupInsight, N'Lab Asset Monitor', N'Monitor equipment issues and usage trends.', N'S2',
+            CAST(DATEADD(MONTH, -2, @ChartNow) AS DATE), CAST(DATEADD(MONTH, 2, @ChartNow) AS DATE), CAST(DATEADD(DAY, -2, DATEADD(MONTH, 2, @ChartNow)) AS DATE),
+            @ChartTeacher2ID, @ChartStaff2ID, 1, DATEADD(MONTH, -2, @ChartNow));
+END
+GO
+
+DECLARE @ChartNow DATETIME = GETDATE();
+DECLARE @ChartGroupOmega INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Omega Lab');
+DECLARE @ChartGroupNova INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Nova Crew');
+DECLARE @ChartGroupPixel INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Pixel Forge');
+DECLARE @ChartGroupInsight INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Insight Hub');
+DECLARE @ChartSt2 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST002');
+DECLARE @ChartSt3 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST003');
+DECLARE @ChartSt7 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST007');
+DECLARE @ChartSt8 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST008');
+DECLARE @ChartSt13 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST013');
+DECLARE @ChartSt14 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST014');
+DECLARE @ChartSt15 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST015');
+DECLARE @ChartSt16 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST016');
+DECLARE @ChartSt17 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST017');
+DECLARE @ChartSt18 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST018');
+DECLARE @ChartSt10 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST010');
+DECLARE @ChartSt11 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST011');
+
+IF NOT EXISTS (SELECT 1 FROM GroupMember WHERE GroupID = @ChartGroupOmega AND StudentID = @ChartSt2)
+BEGIN
+    INSERT INTO GroupMember (GroupID, StudentID, Role, Status, JoinedAt)
+    VALUES
+        (@ChartGroupOmega, @ChartSt2, 1, 1, DATEADD(MONTH, -5, @ChartNow)),
+        (@ChartGroupOmega, @ChartSt3, 2, 1, DATEADD(MONTH, -5, @ChartNow)),
+        (@ChartGroupOmega, @ChartSt13, 2, 1, DATEADD(MONTH, -5, @ChartNow)),
+        (@ChartGroupNova, @ChartSt7, 1, 1, DATEADD(MONTH, -4, @ChartNow)),
+        (@ChartGroupNova, @ChartSt8, 2, 1, DATEADD(MONTH, -4, @ChartNow)),
+        (@ChartGroupNova, @ChartSt14, 2, 1, DATEADD(MONTH, -4, @ChartNow)),
+        (@ChartGroupPixel, @ChartSt15, 1, 1, DATEADD(MONTH, -3, @ChartNow)),
+        (@ChartGroupPixel, @ChartSt16, 2, 1, DATEADD(MONTH, -3, @ChartNow)),
+        (@ChartGroupPixel, @ChartSt17, 2, 1, DATEADD(MONTH, -3, @ChartNow)),
+        (@ChartGroupInsight, @ChartSt18, 1, 1, DATEADD(MONTH, -2, @ChartNow)),
+        (@ChartGroupInsight, @ChartSt10, 2, 1, DATEADD(MONTH, -2, @ChartNow)),
+        (@ChartGroupInsight, @ChartSt11, 2, 1, DATEADD(MONTH, -2, @ChartNow));
+END
+GO
+
+DECLARE @ChartNow DATETIME = GETDATE();
+DECLARE @ChartGroupOmega INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Omega Lab');
+DECLARE @ChartGroupNova INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Nova Crew');
+DECLARE @ChartGroupPixel INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Pixel Forge');
+DECLARE @ChartGroupInsight INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Insight Hub');
+DECLARE @ChartSt2 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST002');
+DECLARE @ChartSt3 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST003');
+DECLARE @ChartSt7 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST007');
+DECLARE @ChartSt8 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST008');
+DECLARE @ChartSt10 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST010');
+DECLARE @ChartSt11 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST011');
+DECLARE @ChartSt13 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST013');
+DECLARE @ChartSt14 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST014');
+DECLARE @ChartSt15 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST015');
+DECLARE @ChartSt16 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST016');
+DECLARE @ChartSt17 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST017');
+DECLARE @ChartSt18 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST018');
+
+IF NOT EXISTS (SELECT 1 FROM Task WHERE Title = N'Prepare kiosk layout')
+BEGIN
+    INSERT INTO Task (GroupID, Title, Description, EstimatedStartDate, EstimatedEndDate, ActualStartDate, ActualEndDate, Status, AssignedTo, ReviewedBy, CreatedBy, IsLate, CreatedAt)
+    VALUES
+        (@ChartGroupOmega, N'Prepare kiosk layout', N'Design the event check-in screen flow.', DATEADD(MONTH, -5, @ChartNow), DATEADD(MONTH, -4, @ChartNow), DATEADD(MONTH, -5, @ChartNow), DATEADD(MONTH, -4, @ChartNow), 5, @ChartSt3, @ChartSt2, @ChartSt2, 0, DATEADD(MONTH, -5, @ChartNow)),
+        (@ChartGroupOmega, N'Add QR validation', N'Validate QR payload and access logs.', DATEADD(MONTH, -4, @ChartNow), DATEADD(MONTH, -3, @ChartNow), DATEADD(MONTH, -4, @ChartNow), DATEADD(MONTH, -3, @ChartNow), 5, @ChartSt13, @ChartSt2, @ChartSt2, 0, DATEADD(MONTH, -4, @ChartNow)),
+        (@ChartGroupNova, N'Collect survey requirements', N'Interview students and map survey fields.', DATEADD(MONTH, -4, @ChartNow), DATEADD(MONTH, -3, @ChartNow), DATEADD(MONTH, -4, @ChartNow), DATEADD(MONTH, -3, @ChartNow), 5, @ChartSt8, @ChartSt7, @ChartSt7, 0, DATEADD(MONTH, -4, @ChartNow)),
+        (@ChartGroupNova, N'Build sentiment dashboard', N'Create charts for ratings and comments.', DATEADD(MONTH, -2, @ChartNow), DATEADD(DAY, -12, @ChartNow), DATEADD(MONTH, -2, @ChartNow), NULL, 3, @ChartSt14, @ChartSt7, @ChartSt7, 0, DATEADD(MONTH, -2, @ChartNow)),
+        (@ChartGroupPixel, N'Create internship pipeline', N'Define application stages and notifications.', DATEADD(MONTH, -3, @ChartNow), DATEADD(MONTH, -2, @ChartNow), DATEADD(MONTH, -3, @ChartNow), DATEADD(MONTH, -2, @ChartNow), 5, @ChartSt16, @ChartSt15, @ChartSt15, 0, DATEADD(MONTH, -3, @ChartNow)),
+        (@ChartGroupPixel, N'Integrate mentor feedback', N'Store mentor remarks and score history.', DATEADD(DAY, -40, @ChartNow), DATEADD(DAY, 3, @ChartNow), DATEADD(DAY, -35, @ChartNow), NULL, 2, @ChartSt17, @ChartSt15, @ChartSt15, 0, DATEADD(DAY, -40, @ChartNow)),
+        (@ChartGroupInsight, N'Create asset issue board', N'Track broken lab assets and repair tickets.', DATEADD(DAY, -20, @ChartNow), DATEADD(DAY, -4, @ChartNow), DATEADD(DAY, -19, @ChartNow), NULL, 4, @ChartSt10, @ChartSt18, @ChartSt18, 1, DATEADD(DAY, -20, @ChartNow)),
+        (@ChartGroupInsight, N'Publish maintenance report', N'Finalize summary report for lab managers.', DATEADD(DAY, -10, @ChartNow), DATEADD(DAY, 6, @ChartNow), NULL, NULL, 1, @ChartSt11, @ChartSt18, @ChartSt18, 0, DATEADD(DAY, -10, @ChartNow));
+END
+GO
+
+DECLARE @ChartNow DATETIME = GETDATE();
+DECLARE @ChartGroupOmega INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Omega Lab');
+DECLARE @ChartGroupNova INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Nova Crew');
+DECLARE @ChartGroupPixel INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Pixel Forge');
+DECLARE @ChartGroupInsight INT = (SELECT TOP 1 GroupID FROM ProjectGroup WHERE GroupName = N'Insight Hub');
+DECLARE @ChartSt2 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST002');
+DECLARE @ChartSt7 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST007');
+DECLARE @ChartSt8 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST008');
+DECLARE @ChartSt10 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST010');
+DECLARE @ChartSt11 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST011');
+DECLARE @ChartSt13 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST013');
+DECLARE @ChartSt14 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST014');
+DECLARE @ChartSt15 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST015');
+DECLARE @ChartSt16 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST016');
+DECLARE @ChartSt17 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST017');
+DECLARE @ChartSt18 INT = (SELECT TOP 1 StudentID FROM Student WHERE StudentCode = N'ST018');
+
+IF NOT EXISTS (SELECT 1 FROM Task WHERE Title = N'Event report reconciliation')
+BEGIN
+    INSERT INTO Task (GroupID, Title, Description, EstimatedStartDate, EstimatedEndDate, ActualStartDate, ActualEndDate, Status, AssignedTo, ReviewedBy, CreatedBy, IsLate, CreatedAt)
+    VALUES
+        (@ChartGroupOmega, N'Event report reconciliation', N'Close out event records and export summaries.', DATEADD(MONTH, -3, @ChartNow), DATEADD(MONTH, -2, @ChartNow), DATEADD(MONTH, -3, @ChartNow), DATEADD(MONTH, -2, @ChartNow), 5, @ChartSt13, @ChartSt2, @ChartSt2, 0, DATEADD(MONTH, -3, @ChartNow)),
+        (@ChartGroupOmega, N'Kiosk support handbook', N'Document operator guide and troubleshooting.', DATEADD(MONTH, -1, @ChartNow), DATEADD(DAY, 8, @ChartNow), DATEADD(MONTH, -1, @ChartNow), NULL, 2, @ChartSt2, @ChartSt13, @ChartSt13, 0, DATEADD(MONTH, -1, @ChartNow)),
+        (@ChartGroupNova, N'Feedback heatmap export', N'Export heatmap-ready metrics for classrooms.', DATEADD(MONTH, -1, @ChartNow), DATEADD(DAY, -6, @ChartNow), DATEADD(MONTH, -1, @ChartNow), NULL, 4, @ChartSt14, @ChartSt7, @ChartSt7, 1, DATEADD(MONTH, -1, @ChartNow)),
+        (@ChartGroupNova, N'Survey reminder workflow', N'Build reminder sequence for pending respondents.', DATEADD(DAY, -12, @ChartNow), DATEADD(DAY, 10, @ChartNow), DATEADD(DAY, -10, @ChartNow), NULL, 3, @ChartSt8, @ChartSt7, @ChartSt7, 0, DATEADD(DAY, -12, @ChartNow)),
+        (@ChartGroupPixel, N'Application scoring matrix', N'Create scoring rules for internship applications.', DATEADD(MONTH, -2, @ChartNow), DATEADD(MONTH, -1, @ChartNow), DATEADD(MONTH, -2, @ChartNow), DATEADD(DAY, -18, @ChartNow), 5, @ChartSt16, @ChartSt15, @ChartSt15, 0, DATEADD(MONTH, -2, @ChartNow)),
+        (@ChartGroupPixel, N'Mentor note digest', N'Weekly digest of mentor comments for students.', DATEADD(DAY, -16, @ChartNow), DATEADD(DAY, 12, @ChartNow), DATEADD(DAY, -15, @ChartNow), NULL, 2, @ChartSt17, @ChartSt15, @ChartSt15, 0, DATEADD(DAY, -16, @ChartNow)),
+        (@ChartGroupInsight, N'Asset warranty audit', N'Check warranty status for damaged equipment.', DATEADD(MONTH, -2, @ChartNow), DATEADD(DAY, -9, @ChartNow), DATEADD(MONTH, -2, @ChartNow), NULL, 4, @ChartSt10, @ChartSt18, @ChartSt18, 1, DATEADD(MONTH, -2, @ChartNow)),
+        (@ChartGroupInsight, N'Inventory snapshot API', N'Expose current lab inventory for dashboards.', DATEADD(DAY, -8, @ChartNow), DATEADD(DAY, 14, @ChartNow), DATEADD(DAY, -7, @ChartNow), NULL, 2, @ChartSt11, @ChartSt18, @ChartSt18, 0, DATEADD(DAY, -8, @ChartNow));
+END
 GO
