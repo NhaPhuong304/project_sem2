@@ -7,10 +7,10 @@
             fx:controller="com.aptech.projectmgmt.controller.staff.StudentCreateDialogController"
             prefWidth="420" prefHeight="170">
 
-    <Label text="Ma SV:" layoutX="20" layoutY="24" />
+    <Label text="Student Id:" layoutX="20" layoutY="24" />
     <TextField fx:id="studentCodeField" layoutX="130" layoutY="20" prefWidth="250" />
 
-    <Label text="Ho ten:" layoutX="20" layoutY="68" />
+    <Label text="Full Name:" layoutX="20" layoutY="68" />
     <TextField fx:id="fullNameField" layoutX="130" layoutY="64" prefWidth="250" />
 
     <Label text="Email:" layoutX="20" layoutY="112" />

@@ -14,7 +14,7 @@
 
 	<HBox layoutX="24" layoutY="20" spacing="10">
 		<Button fx:id="addStudentBtn" styleClass="add-student-btn"
-			text="+ Them sinh vien" />
+			text="+ Add Student" />
 	</HBox>
 
 	<TableView fx:id="studentTable" layoutX="24" layoutY="64"
@@ -22,18 +22,24 @@
 		<columns>
 			<TableColumn fx:id="avatarColumn" prefWidth="55.0"
 				text="Avatar" />
-			<TableColumn fx:id="studentCodeColumn" prefWidth="80.0"
-				text="Ma SV" />
-			<TableColumn fx:id="fullNameColumn" prefWidth="125.0"
-				text="Ho ten" />
-			<TableColumn fx:id="emailColumn" prefWidth="155.0"
+
+			<TableColumn fx:id="studentCodeColumn" prefWidth="100.0"
+				text="Student ID" />
+
+			<TableColumn fx:id="fullNameColumn" prefWidth="160.0"
+				text="Full Name" />
+
+			<TableColumn fx:id="emailColumn" prefWidth="200.0"
 				text="Email" />
-			<TableColumn fx:id="classNameColumn" prefWidth="75.0"
-				text="Lop" />
-			<TableColumn fx:id="createdByColumn" prefWidth="95.0"
-				text="Nguoi tao" />
-			<TableColumn fx:id="actionColumn" prefWidth="190.0"
-				text="Action" />
+
+			<TableColumn fx:id="classNameColumn" prefWidth="120.0"
+				text="Class" />
+
+			<TableColumn fx:id="createdByColumn" prefWidth="140.0"
+				text="Created By" />
+
+			<TableColumn fx:id="actionColumn" prefWidth="160.0"
+				text="Actions" />
 		</columns>
 	</TableView>
 </AnchorPane>

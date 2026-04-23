@@ -19,7 +19,6 @@ public class AdminStaffCreateDialogController {
         fullNameField.setText(staff.getFullName());
         emailField.setText(staff.getEmail());
 
-        // Khong cho sua username va email khi edit
         usernameField.setEditable(false);
         usernameField.setDisable(true);
 

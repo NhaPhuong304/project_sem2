@@ -37,6 +37,17 @@ public class OtpController {
 	private PasswordField newPasswordField;
 	@FXML
 	private PasswordField confirmPasswordField;
+	@FXML
+	private TextField newPasswordVisibleField;
+
+	@FXML
+	private TextField confirmPasswordVisibleField;
+
+	@FXML
+	private Button toggleNewPasswordBtn;
+
+	@FXML
+	private Button toggleConfirmPasswordBtn;
 
 	private final OtpService otpService = new OtpService();
 	private int accountId;
@@ -50,6 +61,35 @@ public class OtpController {
 	public void initialize() {
 		confirmBtn.setOnAction(e -> handleConfirm());
 		resendBtn.setOnAction(e -> handleResend());
+
+		toggleNewPasswordBtn
+				.setOnAction(e -> togglePassword(newPasswordField, newPasswordVisibleField, toggleNewPasswordBtn));
+
+		toggleConfirmPasswordBtn.setOnAction(
+				e -> togglePassword(confirmPasswordField, confirmPasswordVisibleField, toggleConfirmPasswordBtn));
+	}
+
+	private void togglePassword(PasswordField hiddenField, TextField visibleField, Button toggleBtn) {
+
+		if (hiddenField.isVisible()) {
+			visibleField.setText(hiddenField.getText());
+			visibleField.setVisible(true);
+			visibleField.setManaged(true);
+
+			hiddenField.setVisible(false);
+			hiddenField.setManaged(false);
+
+			toggleBtn.setText("🙈");
+		} else {
+			hiddenField.setText(visibleField.getText());
+			hiddenField.setVisible(true);
+			hiddenField.setManaged(true);
+
+			visibleField.setVisible(false);
+			visibleField.setManaged(false);
+
+			toggleBtn.setText("👁");
+		}
 	}
 
 	public void initData(int accountId, OtpPurpose purpose) {
@@ -130,10 +170,14 @@ public class OtpController {
 		return String.format("%02d:%02d", minutes, seconds);
 	}
 
+	private String getPassword(PasswordField hiddenField, TextField visibleField) {
+		return hiddenField.isVisible() ? hiddenField.getText() : visibleField.getText();
+	}
+
 	private void handleConfirm() {
 		String otp = otpField.getText().trim();
-		String newPass = newPasswordField.getText();
-		String confirmPass = confirmPasswordField.getText();
+		String newPass = getPassword(newPasswordField, newPasswordVisibleField);
+		String confirmPass = getPassword(confirmPasswordField, confirmPasswordVisibleField);
 
 		if (otp.isEmpty()) {
 			AlertUtil.showError("Vui long nhap ma OTP");

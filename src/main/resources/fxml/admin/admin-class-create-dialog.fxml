@@ -1,37 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<?import javafx.scene.control.ComboBox?>
+<AnchorPane prefHeight="220.0" prefWidth="420.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.admin.AdminClassCreateDialogController">
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.admin.AdminClassCreateDialogController"
-            prefWidth="420.0" prefHeight="220.0"
-            style="-fx-background-color: white;">
+    <Label layoutX="20.0" layoutY="28.0" style="-fx-font-size: 13px; -fx-font-weight: bold;" text="Class Name:" />
+    <TextField fx:id="classNameField" layoutX="120.0" layoutY="22.0" prefHeight="34.0" prefWidth="250.0" promptText="EX: SE1901" />
 
-    <Label text="Ten lop:"
-           layoutX="20.0" layoutY="28.0"
-           style="-fx-font-size: 13px; -fx-font-weight: bold;" />
-    <TextField fx:id="classNameField"
-               layoutX="120.0" layoutY="22.0"
-               prefWidth="250.0" prefHeight="34.0"
-               promptText="Vi du: SE1901" />
+    <Label layoutX="20.0" layoutY="82.0" style="-fx-font-size: 13px; -fx-font-weight: bold;" text="Semester" />
+    <TextField fx:id="academicYearField" layoutX="120.0" layoutY="76.0" prefHeight="34.0" prefWidth="250.0" promptText="EX: 2024-2025" />
 
-    <Label text="Nam hoc:"
-           layoutX="20.0" layoutY="82.0"
-           style="-fx-font-size: 13px; -fx-font-weight: bold;" />
-    <TextField fx:id="academicYearField"
-               layoutX="120.0" layoutY="76.0"
-               prefWidth="250.0" prefHeight="34.0"
-               promptText="Vi du: 2024-2025" />
-
-    <Label fx:id="managerLabel" text="Giao vu:"
-           layoutX="20.0" layoutY="136.0"
-           style="-fx-font-size: 13px; -fx-font-weight: bold;" />
-    <ComboBox fx:id="managerComboBox"
-              layoutX="120.0" layoutY="130.0"
-              prefWidth="250.0" prefHeight="34.0" />
+    <Label fx:id="managerLabel" layoutX="20.0" layoutY="136.0" style="-fx-font-size: 13px; -fx-font-weight: bold;" text="Staff: " />
+    <ComboBox fx:id="managerComboBox" layoutX="120.0" layoutY="130.0" prefHeight="34.0" prefWidth="250.0" />
 </AnchorPane>

@@ -1,28 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.student.MyProjectListController"
-            prefWidth="880" prefHeight="620">
+<AnchorPane prefHeight="620" prefWidth="880" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.student.MyProjectListController">
 
-    <Label text="Du an cua toi"
-           layoutX="20" layoutY="20"
-           style="-fx-font-size: 16; -fx-font-weight: bold;" />
+    <Label layoutX="20" layoutY="20" style="-fx-font-size: 16; -fx-font-weight: bold;" text="My Project" />
 
-    <TableView fx:id="projectTable"
-               layoutX="20" layoutY="55"
-               prefWidth="840" prefHeight="540">
+    <TableView fx:id="projectTable" layoutX="20" layoutY="55" prefHeight="540" prefWidth="840">
         <columns>
-            <TableColumn fx:id="projectNameColumn" text="Ten project" prefWidth="200.0" />
-            <TableColumn fx:id="semesterColumn" text="Hoc ky" prefWidth="90.0" />
-            <TableColumn fx:id="supervisorColumn" text="Thay huong dan" prefWidth="150.0" />
-            <TableColumn fx:id="dateRangeColumn" text="Thoi gian" prefWidth="210.0" />
-            <TableColumn fx:id="statusColumn" text="Trang thai" prefWidth="90.0" />
-            <TableColumn fx:id="roleColumn" text="Vai tro" prefWidth="100.0" />
+            <TableColumn fx:id="projectNameColumn" prefWidth="200.0" text="Project Name" />
+            <TableColumn fx:id="semesterColumn" prefWidth="90.0" text="Semester" />
+            <TableColumn fx:id="supervisorColumn" prefWidth="150.0" text="Supervisor" />
+            <TableColumn fx:id="dateRangeColumn" prefWidth="210.0" text="Time" />
+            <TableColumn fx:id="statusColumn" prefWidth="90.0" text="Status" />
+            <TableColumn fx:id="roleColumn" prefWidth="100.0" text="Role" />
         </columns>
     </TableView>
 </AnchorPane>

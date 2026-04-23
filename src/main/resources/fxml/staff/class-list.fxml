@@ -16,9 +16,9 @@
         <TextField fx:id="searchField"
                    prefWidth="260.0"
                    prefHeight="34.0"
-                   promptText="Tim kiem theo ten lop..." />
+                   promptText="Find By Name..." />
         <Button fx:id="addClassBtn"
-                text="+ Them lop moi"
+                text="+ Add Class"
                 prefWidth="120.0"
                 prefHeight="34.0" />
     </HBox>
@@ -28,12 +28,12 @@
                prefWidth="840.0" prefHeight="530.0">
         <columns>
             <TableColumn fx:id="noColumn" text="STT" prefWidth="45.0" />
-            <TableColumn fx:id="classNameColumn" text="Ten lop" prefWidth="165.0" />
-            <TableColumn fx:id="academicYearColumn" text="Nam hoc" prefWidth="130.0" />
-            <TableColumn fx:id="studentCountColumn" text="SL Sinh vien" prefWidth="95.0" />
-            <TableColumn fx:id="managerColumn" text="Giao vu" prefWidth="145.0" />
-            <TableColumn fx:id="createdAtColumn" text="Ngay tao" prefWidth="140.0" />
-            <TableColumn fx:id="actionColumn" text="Hanh dong" prefWidth="100.0" />
+            <TableColumn fx:id="classNameColumn" text="Name" prefWidth="165.0" />
+            <TableColumn fx:id="academicYearColumn" text="Semester" prefWidth="130.0" />
+            <TableColumn fx:id="studentCountColumn" text="Students" prefWidth="95.0" />
+            <TableColumn fx:id="managerColumn" text="Staff" prefWidth="145.0" />
+            <TableColumn fx:id="createdAtColumn" text="Created_at" prefWidth="140.0" />
+            <TableColumn fx:id="actionColumn" text="Action" prefWidth="100.0" />
         </columns>
     </TableView>
 </AnchorPane>

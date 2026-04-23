@@ -7,6 +7,6 @@
             fx:controller="com.aptech.projectmgmt.controller.staff.GroupCreateDialogController"
             prefWidth="420" prefHeight="100">
 
-    <Label text="Ten nhom:" layoutX="20" layoutY="28" />
+    <Label text="Name:" layoutX="20" layoutY="28" />
     <TextField fx:id="groupNameField" layoutX="110" layoutY="24" prefWidth="280" />
 </AnchorPane>

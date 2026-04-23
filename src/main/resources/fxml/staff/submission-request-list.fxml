@@ -22,15 +22,15 @@
             <padding>
                 <Insets bottom="8.0" left="20.0" right="20.0" top="18.0" />
             </padding>
-            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Yêu cầu nộp đồ án" />
-            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Tạo yêu cầu, theo dõi bài nộp của từng nhóm và tải file đã nộp về máy." />
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Project Submission Request" />
+            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Create requests, track group submissions, and download submitted files." />
         </VBox>
     </top>
 
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
             <tabs>
-                <Tab text="Tạo yêu cầu">
+                <Tab text="Create Request">
                     <content>
                         <HBox spacing="18.0">
                             <padding>
@@ -38,17 +38,17 @@
                             </padding>
 
                             <VBox prefWidth="410.0" spacing="10.0">
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Thông tin yêu cầu" />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Request Information" />
 
-                                <TextField fx:id="titleField" promptText="Tiêu đề yêu cầu" />
-                                <TextArea fx:id="descriptionArea" prefHeight="88.0" promptText="Nội dung thông báo gửi cho leader" wrapText="true" />
+                                <TextField fx:id="titleField" promptText="Request title" />
+                                <TextArea fx:id="descriptionArea" prefHeight="88.0" promptText="Message sent to group leaders" wrapText="true" />
 
                                 <HBox spacing="8.0">
-                                    <DatePicker fx:id="deadlineDatePicker" prefWidth="245.0" promptText="Ngày hết hạn" />
-                                    <ComboBox fx:id="deadlineTimeCombo" prefWidth="145.0" promptText="Giờ" />
+                                    <DatePicker fx:id="deadlineDatePicker" prefWidth="245.0" promptText="Deadline date" />
+                                    <ComboBox fx:id="deadlineTimeCombo" prefWidth="145.0" promptText="Time" />
                                 </HBox>
 
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Nội dung cần nộp" />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Submission Requirements" />
                                 <ScrollPane fitToWidth="true" prefHeight="155.0">
                                     <content>
                                         <VBox fx:id="requirementBox" spacing="7.0">

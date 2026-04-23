@@ -7,6 +7,6 @@
             fx:controller="com.aptech.projectmgmt.controller.staff.StudentAssignDialogController"
             prefWidth="460" prefHeight="100">
 
-    <Label text="Sinh vien chua co lop:" layoutX="20" layoutY="28" />
+    <Label text="The student is not assigned to any class:" layoutX="20" layoutY="28" />
     <ComboBox fx:id="studentCombo" layoutX="160" layoutY="24" prefWidth="270" />
 </AnchorPane>

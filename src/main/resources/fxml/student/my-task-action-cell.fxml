@@ -22,48 +22,48 @@
                 managed="false"
                 styleClass="table-action-button">
             <tooltip>
-                <Tooltip fx:id="startTooltip" text="Chua den gio bat dau" />
+                <Tooltip fx:id="startTooltip" text="Not started yet" />
             </tooltip>
         </Button>
 
         <Button fx:id="submitReviewButton"
                 mnemonicParsing="false"
-                text="Gui kiem tra"
+                text="Submit for Review"
                 visible="false"
                 managed="false"
                 styleClass="table-action-button" />
 
         <Button fx:id="requestRevisionButton"
                 mnemonicParsing="false"
-                text="Yeu cau chinh sua"
+                text="Revision Request"
                 visible="false"
                 managed="false"
                 styleClass="table-action-button" />
 
         <Button fx:id="completeButton"
                 mnemonicParsing="false"
-                text="Xac nhan hoan thanh"
+                text="Confirm Completion"
                 visible="false"
                 managed="false"
                 styleClass="table-action-button" />
 
         <Button fx:id="resubmitButton"
                 mnemonicParsing="false"
-                text="Gui lai kiem tra"
+                text="Resubmit for Review"
                 visible="false"
                 managed="false"
                 styleClass="table-action-button" />
 
         <Button fx:id="assignButton"
                 mnemonicParsing="false"
-                text="Phan cong"
+                text="Assign"
                 visible="false"
                 managed="false"
                 styleClass="table-action-button" />
 
         <Button fx:id="detailButton"
                 mnemonicParsing="false"
-                text="Chi tiet"
+                text="Detail"
                 visible="false"
                 managed="false"
                 styleClass="table-action-button" />

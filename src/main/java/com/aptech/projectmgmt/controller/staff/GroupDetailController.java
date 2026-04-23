@@ -114,7 +114,7 @@ public class GroupDetailController {
                     avatarView = loader.load();
                     controller = loader.getController();
                 } catch (Exception ex) {
-                    throw new IllegalStateException("Khong the tai avatar cell nhom", ex);
+                    throw new IllegalStateException("Unable to load the group avatar cell", ex);
                 }
             }
 
@@ -141,7 +141,7 @@ public class GroupDetailController {
 
         statusColumn.setCellValueFactory(c -> {
             MemberStatus s = c.getValue().getStatus();
-            return new SimpleStringProperty(s == MemberStatus.ACTIVE ? "Dang hoat dong" : "Da bi loai");
+            return new SimpleStringProperty(s == MemberStatus.ACTIVE ? "Active" : "Removed.");
         });
 
         abandonCountColumn.setCellValueFactory(new PropertyValueFactory<>("abandonCount"));
@@ -179,7 +179,7 @@ public class GroupDetailController {
                 secondaryBtn.setOnAction(null);
 
                 if (member.getStatus() == MemberStatus.EXCLUDED) {
-                    primaryBtn.setText("Kich hoat lai");
+                    primaryBtn.setText("Reactivate.");
                     primaryBtn.setOnAction(e -> handleReactivate(member));
                     primaryBtn.setVisible(true);
                     primaryBtn.setManaged(true);
@@ -187,7 +187,7 @@ public class GroupDetailController {
                     secondaryBtn.setVisible(false);
                     secondaryBtn.setManaged(false);
                 } else if (member.getRole() == MemberRole.LEADER) {
-                    primaryBtn.setText(projectHasStarted ? "Huy quyen" : "Xoa");
+                    primaryBtn.setText(projectHasStarted ? "Revoke access" : "Delete");
                     primaryBtn.setOnAction(e -> {
                         if (projectHasStarted) {
                             handleExclude(member);
@@ -201,12 +201,12 @@ public class GroupDetailController {
                     secondaryBtn.setVisible(false);
                     secondaryBtn.setManaged(false);
                 } else {
-                    primaryBtn.setText("Doi leader");
+                    primaryBtn.setText("Change Leader");
                     primaryBtn.setOnAction(e -> handleChangeLeader(member));
                     primaryBtn.setVisible(true);
                     primaryBtn.setManaged(true);
 
-                    secondaryBtn.setText(projectHasStarted ? "Huy quyen" : "Xoa");
+                    secondaryBtn.setText(projectHasStarted ? "Revoke access" : "Delete");
                     secondaryBtn.setOnAction(e -> {
                         if (projectHasStarted) {
                             handleExclude(member);
@@ -225,17 +225,17 @@ public class GroupDetailController {
 
     private void handleChangeLeader(GroupMember newLeader) {
         if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin nhom");
+            AlertUtil.showError("Teacher accounts can only view group information");
             return;
         }
 
         if (newLeader.getStatus() != MemberStatus.ACTIVE) {
-            AlertUtil.showError("Chi duoc chon thanh vien dang hoat dong");
+            AlertUtil.showError("Only active members can be selected");
             return;
         }
 
         if (newLeader.getRole() == MemberRole.LEADER) {
-            AlertUtil.showError("Thanh vien nay da la leader");
+            AlertUtil.showError("This member is already the leader");
             return;
         }
 
@@ -258,7 +258,7 @@ public class GroupDetailController {
         };
 
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            AlertUtil.showSuccess("Doi leader thanh cong");
+            AlertUtil.showSuccess("Leader changed successfully");
             loadMembers();
         }));
 
@@ -272,17 +272,17 @@ public class GroupDetailController {
 
     private void handleReactivate(GroupMember member) {
         if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin nhom");
+            AlertUtil.showError("Teacher accounts can only view group information");
             return;
         }
 
         var currentStaff = SessionManager.getInstance().getCurrentStaff();
         if (currentStaff == null) {
-            AlertUtil.showError("Khong xac dinh duoc staff");
+            AlertUtil.showError("Unable to identify the staff member");
             return;
         }
 
-        if (!AlertUtil.showConfirm("Kich hoat lai thanh vien " + member.getStudentFullName() + "?")) {
+        if (!AlertUtil.showConfirm("Reactivate member " + member.getStudentFullName() + "?")) {
             return;
         }
 
@@ -295,13 +295,13 @@ public class GroupDetailController {
         };
 
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            AlertUtil.showSuccess("Da kich hoat lai thanh vien");
+            AlertUtil.showSuccess("Member reactivated successfully.");
             loadMembers();
         }));
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi kich hoat lai thanh vien: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Error reactivating member.: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -322,16 +322,16 @@ public class GroupDetailController {
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai thanh vien: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Error loading members: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
     }
 
     private void updateGroupNameLabel() {
-        String displayName = groupName != null && !groupName.isBlank() ? groupName : "Nhom";
-        String suffix = readOnlyMode ? "" : " - double click de doi ten";
-        groupNameLabel.setText("Chi tiet " + displayName + " (" + memberList.size() + " thanh vien)" + suffix);
+        String displayName = groupName != null && !groupName.isBlank() ? groupName : "Group";
+        String suffix = readOnlyMode ? "" : " Double-click to rename";
+        groupNameLabel.setText("Detail " + displayName + " (" + memberList.size() + " member)" + suffix);
     }
 
     private void handleRenameGroup() {
@@ -353,12 +353,12 @@ public class GroupDetailController {
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             groupName = newName;
             updateGroupNameLabel();
-            AlertUtil.showSuccess("Doi ten nhom thanh cong");
+            AlertUtil.showSuccess("Group name changed successfully");
         }));
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi doi ten nhom: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Group rename error: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -372,11 +372,11 @@ public class GroupDetailController {
 
         var currentStaff = SessionManager.getInstance().getCurrentStaff();
         if (currentStaff == null) {
-            AlertUtil.showError("Khong xac dinh duoc staff");
+            AlertUtil.showError("Unable to identify staff");
             return;
         }
 
-        if (!AlertUtil.showConfirm("Xac nhan huy quyen tham gia cua " + member.getStudentFullName() + "?")) {
+        if (!AlertUtil.showConfirm("Confirm revoking participation for " + member.getStudentFullName() + "?")) {
             return;
         }
 
@@ -390,7 +390,7 @@ public class GroupDetailController {
         if (member.getRole() == MemberRole.LEADER && member.getStatus() == MemberStatus.ACTIVE) {
             List<GroupMember> candidates = groupService.getActiveMembersExcept(groupId, member.getMemberId());
             if (candidates.isEmpty()) {
-                AlertUtil.showError("Khong the huy quyen leader vi nhom khong con thanh vien active nao de thay the");
+                AlertUtil.showError("Cannot revoke the leader's participation because the group has no active member available to replace them.");
                 return;
             }
 
@@ -415,13 +415,13 @@ public class GroupDetailController {
             };
 
             task.setOnSucceeded(e -> Platform.runLater(() -> {
-                AlertUtil.showSuccess("Da chuyen leader va huy quyen thanh vien cu");
+                AlertUtil.showSuccess("Leader transferred and previous member participation revoked");
                 loadMembers();
             }));
 
             task.setOnFailed(e -> Platform.runLater(() -> {
                 Throwable ex = task.getException();
-                AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+                AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
             }));
 
             new Thread(task).start();
@@ -437,13 +437,13 @@ public class GroupDetailController {
         };
 
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            AlertUtil.showSuccess("Da huy quyen tham gia");
+            AlertUtil.showSuccess("Participation revoked");
             loadMembers();
         }));
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Error:" + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -451,11 +451,11 @@ public class GroupDetailController {
 
     private void handleHardDelete(GroupMember member) {
         if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin nhom");
+            AlertUtil.showError("Teacher accounts are only allowed to view group information");
             return;
         }
 
-        if (!AlertUtil.showConfirm("Ban co chac muon xoa " + member.getStudentFullName() + " khoi nhom?")) {
+        if (!AlertUtil.showConfirm("Are you sure you want to delete " + member.getStudentFullName() + "from the group?")) {
             return;
         }
 
@@ -468,13 +468,13 @@ public class GroupDetailController {
         };
 
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            AlertUtil.showSuccess("Da xoa thanh vien khoi nhom");
+            AlertUtil.showSuccess("Member removed from the group");
             loadMembers();
         }));
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi xoa thanh vien: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Error removing member: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -498,8 +498,8 @@ public class GroupDetailController {
         });
 
         Dialog<GroupMember> dialog = new Dialog<>();
-        dialog.setTitle("Chon leader moi");
-        dialog.setHeaderText("Thanh vien nay la truong nhom. Hay chon leader moi truoc khi huy quyen.");
+        dialog.setTitle("Chose New Leader");
+        dialog.setHeaderText("This member is the group leader. Please choose a new leader before revoking their participation.");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.getDialogPane().setContent(comboBox);
 
@@ -515,7 +515,7 @@ public class GroupDetailController {
 
     private void handleAddMember() {
         if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin nhom");
+            AlertUtil.showError("Teacher accounts are only allowed to view group information");
             return;
         }
 
@@ -530,7 +530,7 @@ public class GroupDetailController {
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Khong tai duoc danh sach sinh vien: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Unable to load the student list: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -538,7 +538,7 @@ public class GroupDetailController {
 
     private void showAddMemberDialog(List<Student> students) {
         if (students == null || students.isEmpty()) {
-            AlertUtil.showError("Khong con sinh vien nao trong lop de them vao nhom");
+            AlertUtil.showError("There are no students left in the class to add to the group.");
             return;
         }
 
@@ -554,7 +554,7 @@ public class GroupDetailController {
             controller.configureRoleOptions(isFirstMember, hasLeader);
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Them sinh vien vao nhom");
+            dialog.setTitle("Add student to group");
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialog.getDialogPane().setContent(content);
             dialog.getDialogPane().setPrefWidth(500);
@@ -576,18 +576,18 @@ public class GroupDetailController {
             };
 
             addTask.setOnSucceeded(e -> Platform.runLater(() -> {
-                AlertUtil.showSuccess("Them sinh vien vao nhom thanh cong");
+                AlertUtil.showSuccess("Student added to the group successfully");
                 loadMembers();
             }));
 
             addTask.setOnFailed(e -> Platform.runLater(() -> {
                 Throwable ex = addTask.getException();
-                AlertUtil.showError("Loi them sinh vien vao nhom: " + (ex != null ? ex.getMessage() : ""));
+                AlertUtil.showError("Error adding student to the group: " + (ex != null ? ex.getMessage() : ""));
             }));
 
             new Thread(addTask).start();
         } catch (Exception e) {
-            AlertUtil.showError("Khong the mo form them sinh vien vao nhom: " + e.getMessage());
+            AlertUtil.showError("Unable to open the add-student-to-group form: " + e.getMessage());
         }
     }
 
@@ -596,10 +596,10 @@ public class GroupDetailController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.TEXT_PROMPT_DIALOG));
             Parent content = loader.load();
             TextPromptDialogController controller = loader.getController();
-            controller.initData("Ly do huy quyen tham gia", "Nhap ly do huy quyen cua " + studentName, "");
+            controller.initData("Reason for revoking participation", "Enter the reason for revoking participation of " + studentName, "");
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Huy quyen tham gia");
+            dialog.setTitle("Revoke participation");
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialog.getDialogPane().setContent(content);
             dialog.getDialogPane().setPrefWidth(520);
@@ -617,7 +617,7 @@ public class GroupDetailController {
 
             return Optional.of(reason);
         } catch (Exception ex) {
-            AlertUtil.showError("Khong the mo form nhap ly do: " + ex.getMessage());
+            AlertUtil.showError("Unable to open the reason input form: " + ex.getMessage());
             return Optional.empty();
         }
     }
@@ -627,10 +627,10 @@ public class GroupDetailController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.TEXT_PROMPT_DIALOG));
             Parent content = loader.load();
             TextPromptDialogController controller = loader.getController();
-            controller.initData("Doi ten nhom", "Nhap ten nhom moi", groupName);
+            controller.initData("Rename group", "Enter the new group name", groupName);
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Doi ten nhom");
+            dialog.setTitle("Rename group");
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialog.getDialogPane().setContent(content);
             dialog.getDialogPane().setPrefWidth(520);
@@ -642,13 +642,13 @@ public class GroupDetailController {
 
             String name = controller.getContent();
             if (name.isBlank()) {
-                AlertUtil.showError("Ten nhom khong duoc de trong");
+                AlertUtil.showError("Group name cannot be empty");
                 return Optional.empty();
             }
 
             return Optional.of(name);
         } catch (Exception ex) {
-            AlertUtil.showError("Khong the mo form doi ten nhom: " + ex.getMessage());
+            AlertUtil.showError("Unable to open the rename-group form: " + ex.getMessage());
             return Optional.empty();
         }
     }

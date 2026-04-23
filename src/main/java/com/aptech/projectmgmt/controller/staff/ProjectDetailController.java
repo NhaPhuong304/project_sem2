@@ -67,8 +67,8 @@ public class ProjectDetailController {
 	private final ProjectService projectService = new ProjectService();
 	private final GroupService groupService = new GroupService();
 	private final ObservableList<ProjectGroup> groups = FXCollections.observableArrayList();
-	private final ObservableList<String> taskStatusFilters = FXCollections.observableArrayList("Tat ca", "Cho xu ly",
-			"Dang thuc hien", "Dang kiem tra", "Dang chinh sua", "Hoan thanh");
+	private final ObservableList<String> taskStatusFilters = FXCollections.observableArrayList("All", "Pending",
+			"In Progress", "Under Review", "Being Revised", "Completed");
 	private int projectId;
 	private Project currentProject;
 	private TaskListController activeTaskListController;
@@ -123,7 +123,7 @@ public class ProjectDetailController {
 			currentProject = task.getValue();
 
 			if (currentProject == null) {
-				AlertUtil.showError("Ban khong co quyen xem project nay");
+				AlertUtil.showError("You do not have permission to view this project");
 				return;
 			}
 
@@ -134,7 +134,7 @@ public class ProjectDetailController {
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai project: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error loading project: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -172,7 +172,7 @@ public class ProjectDetailController {
 
 			groupContentPane.getChildren().setAll(content);
 		} catch (Exception e) {
-			AlertUtil.showError("Loi tai chi tiet nhom: " + e.getMessage());
+			AlertUtil.showError("Error loading group details: " + e.getMessage());
 		}
 	}
 
@@ -215,7 +215,7 @@ public class ProjectDetailController {
 
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
 			taskMembers.clear();
-			taskMembers.add("Tat ca");
+			taskMembers.add("All");
 			taskMembers.addAll(task.getValue());
 
 			taskMemberCombo.getSelectionModel().selectFirst();
@@ -278,10 +278,10 @@ public class ProjectDetailController {
 				taskMemberCombo.getSelectionModel().clearSelection();
 
 				taskContentPane.getChildren().setAll(taskPlaceholderLabel);
-				taskPlaceholderLabel.setText("Project nay chua co nhom");
+				taskPlaceholderLabel.setText("This project does not have a group yet");
 
 				groupContentPane.getChildren().setAll(groupPlaceholderLabel);
-				groupPlaceholderLabel.setText("Project nay chua co nhom");
+				groupPlaceholderLabel.setText("This project does not have a group yet");
 
 				if (activeTaskListController != null) {
 					activeTaskListController.onDestroy();
@@ -299,7 +299,7 @@ public class ProjectDetailController {
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach nhom: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error loading group list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -309,7 +309,7 @@ public class ProjectDetailController {
 		String selectedMember = taskMemberCombo.getSelectionModel().getSelectedItem();
 		if (selectedMember == null || selectedMember.isBlank()) {
 			taskContentPane.getChildren().setAll(taskPlaceholderLabel);
-			taskPlaceholderLabel.setText("Chon thanh vien de xem danh sach cong viec");
+			taskPlaceholderLabel.setText("Select a member to view the task list");
 			return;
 		}
 
@@ -334,13 +334,13 @@ public class ProjectDetailController {
 			activeTaskListController = controller;
 			taskContentPane.getChildren().setAll(content);
 		} catch (Exception e) {
-			AlertUtil.showError("Loi tai danh sach cong viec: " + e.getMessage());
+			AlertUtil.showError("Error loading task list: " + e.getMessage());
 		}
 	}
 
 	private void handleSave() {
 		if (readOnlyMode) {
-			AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin project");
+			AlertUtil.showError("Teacher accounts are only allowed to view project information");
 			return;
 		}
 		if (currentProject == null)
@@ -359,20 +359,20 @@ public class ProjectDetailController {
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Luu thanh cong");
+			AlertUtil.showSuccess("Saved successfully");
 			setEditMode(false);
 			updateAccessMode();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi luu: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
 
 	private void handleMarkCompleted() {
 		if (readOnlyMode) {
-			AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin project");
+			AlertUtil.showError("Teacher accounts are only allowed to view project information");
 			return;
 		}
 		if (currentProject == null) {
@@ -382,7 +382,7 @@ public class ProjectDetailController {
 			AlertUtil.showError("Chi duoc danh dau hoan thanh khi project da qua han ngay bao cao");
 			return;
 		}
-		if (!AlertUtil.showConfirm("Danh dau project nay la hoan thanh?")) {
+		if (!AlertUtil.showConfirm("Mark this project as completed?")) {
 			return;
 		}
 		Task<Void> task = new Task<>() {
@@ -394,7 +394,7 @@ public class ProjectDetailController {
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
 			currentProject.setStatus(com.aptech.projectmgmt.model.ProjectStatus.COMPLETED);
-			AlertUtil.showSuccess("Project da duoc danh dau hoan thanh");
+			AlertUtil.showSuccess("The project has been marked as completed");
 			updateAccessMode();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> {
@@ -405,7 +405,7 @@ public class ProjectDetailController {
 	}
 
 	private void handleAddGroup() {
-		AlertUtil.showError("Schema moi chi cho moi project gan voi 1 nhom. Hay tao project moi neu can nhom khac.");
+		AlertUtil.showError("The current schema only allows each project to be associated with one group. Please create a new project if you need a different group.");
 	}
 
 	private void updateAccessMode() {

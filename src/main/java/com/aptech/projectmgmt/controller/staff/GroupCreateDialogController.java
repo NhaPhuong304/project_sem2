@@ -10,7 +10,7 @@ public class GroupCreateDialogController {
     public String buildGroupName() {
         String groupName = groupNameField.getText() != null ? groupNameField.getText().trim() : "";
         if (groupName.isEmpty()) {
-            throw new RuntimeException("Ten nhom khong duoc de trong");
+            throw new RuntimeException("Group name cannot be empty.");
         }
         return groupName;
     }

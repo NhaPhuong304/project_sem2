@@ -10,20 +10,20 @@
 <AnchorPane prefHeight="620" prefWidth="880" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.staff.ProjectListController">
 
     <HBox layoutX="20" layoutY="20" spacing="10">
-        <ComboBox fx:id="classCombo" prefWidth="250" promptText="Chon lop..." />
-        <ComboBox fx:id="semesterCombo" prefWidth="200" promptText="Chon hoc ky..." />
-        <Button fx:id="addProjectBtn" text="+ Tao Project moi" />
+        <ComboBox fx:id="classCombo" prefWidth="250" promptText="Chose Class..." />
+        <ComboBox fx:id="semesterCombo" prefWidth="200" promptText="Chose Semester..." />
+        <Button fx:id="addProjectBtn" text="+ Create Project" />
     </HBox>
 
     <TableView fx:id="projectTable" layoutX="20" layoutY="65" prefHeight="530" prefWidth="840">
         <columns>
-            <TableColumn fx:id="projectNameColumn" prefWidth="200.0" text="Ten project" />
-            <TableColumn fx:id="semesterColumn" prefWidth="80.0" text="Hoc ky" />
-            <TableColumn fx:id="supervisorColumn" prefWidth="150.0" text="Thay huong dan" />
-            <TableColumn fx:id="startDateColumn" prefWidth="100.0" text="Bat dau" />
-            <TableColumn fx:id="endDateColumn" prefWidth="100.0" text="Ket thuc" />
-            <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trang thai" />
-            <TableColumn fx:id="actionColumn" prefWidth="88.57135009765625" text="Chi tiet" />
+            <TableColumn fx:id="projectNameColumn" prefWidth="200.0" text="Project Name" />
+            <TableColumn fx:id="semesterColumn" prefWidth="80.0" text="Semester" />
+            <TableColumn fx:id="supervisorColumn" prefWidth="150.0" text="Supervisor" />
+            <TableColumn fx:id="startDateColumn" prefWidth="100.0" text="Start" />
+            <TableColumn fx:id="endDateColumn" prefWidth="100.0" text="End" />
+            <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
+            <TableColumn fx:id="actionColumn" prefWidth="88.57135009765625" text="Detail" />
         </columns>
     </TableView>
 </AnchorPane>

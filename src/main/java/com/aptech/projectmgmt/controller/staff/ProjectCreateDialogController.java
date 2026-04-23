@@ -74,12 +74,12 @@ public class ProjectCreateDialogController {
     }
     public Project buildUpdatedProject(Project oldProject) {
         if (oldProject == null) {
-            throw new IllegalArgumentException("Project khong hop le");
+            throw new IllegalArgumentException("Invalid project");
         }
 
         Staff selectedSupervisor = supervisorCombo.getValue();
         if (selectedSupervisor == null) {
-            throw new IllegalArgumentException("Vui long chon giao vien huong dan");
+            throw new IllegalArgumentException("Please select a supervising teacher");
         }
 
         oldProject.setProjectName(projectNameField.getText() != null ? projectNameField.getText().trim() : "");

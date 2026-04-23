@@ -105,7 +105,7 @@ public class ClassListController {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.SINGLE_ACTION_CELL));
                     actionView = loader.load();
                     controller = loader.getController();
-                    controller.setActionText("Xem SV");
+                    controller.setActionText("View");
                     controller.setOnAction(() -> {
                         SchoolClass schoolClass = getTableRow() != null ? getTableRow().getItem() : null;
                         if (schoolClass != null) {
@@ -113,7 +113,7 @@ public class ClassListController {
                         }
                     });
                 } catch (Exception ex) {
-                    throw new IllegalStateException("Khong the tai action cell lop", ex);
+                    throw new IllegalStateException("Unable to load the class action cell.", ex);
                 }
             }
 
@@ -165,14 +165,14 @@ public class ClassListController {
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai danh sach lop: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Error loading class list: " + (ex != null ? ex.getMessage() : ""));
         }));
         new Thread(task).start();
     }
 
     private void handleAddClass() {
         if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin lop");
+            AlertUtil.showError("Teacher accounts can only view class information");
             return;
         }
         try {
@@ -181,8 +181,8 @@ public class ClassListController {
             AdminClassCreateDialogController controller = loader.getController();
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Them lop moi");
-            dialog.setHeaderText("Nhap thong tin lop moi");
+            dialog.setTitle("Create Class");
+            dialog.setHeaderText("Enter new class information");
             
             var account = SessionManager.getInstance().getCurrentAccount();
             boolean isAdmin = account != null && account.getRole() == UserRole.ADMIN;
@@ -200,17 +200,17 @@ public class ClassListController {
             String academicYear = controller.getAcademicYear();
 
             if (className.isEmpty()) {
-                AlertUtil.showError("Ten lop khong duoc de trong");
+                AlertUtil.showError("Class name cannot be empty.");
                 return;
             }
 
             if (academicYear.isEmpty()) {
-                AlertUtil.showError("Nam hoc khong duoc de trong");
+                AlertUtil.showError("Academic year cannot be empty.");
                 return;
             }
 
             if (!academicYear.matches("\\d{4}-\\d{4}")) {
-                AlertUtil.showError("Nam hoc phai dung dinh dang YYYY-YYYY");
+                AlertUtil.showError("Academic year must be in YYYY-YYYY format.");
                 return;
             }
 
@@ -230,16 +230,16 @@ public class ClassListController {
                 }
             };
             task.setOnSucceeded(e -> Platform.runLater(() -> {
-                AlertUtil.showSuccess("Tao lop thanh cong");
+                AlertUtil.showSuccess("Class created successfully");
                 loadClasses();
             }));
             task.setOnFailed(e -> Platform.runLater(() -> {
                 Throwable ex = task.getException();
-                AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+                AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
             }));
             new Thread(task).start();
         } catch (Exception e) {
-            AlertUtil.showError("Khong the mo form tao lop: " + e.getMessage());
+            AlertUtil.showError("Unable to open the create class form: " + e.getMessage());
         }
     }
 
@@ -260,7 +260,7 @@ public class ClassListController {
                     controller.initData(classId);
                     contentArea.getChildren().setAll(content);
                 } catch (Exception e) {
-                    AlertUtil.showError("Loi chuyen man hinh: " + e.getMessage());
+                    AlertUtil.showError("Screen navigation error: " + e.getMessage());
                 }
                 break;
             }

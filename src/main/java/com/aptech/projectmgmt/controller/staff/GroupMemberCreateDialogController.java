@@ -48,7 +48,7 @@ public class GroupMemberCreateDialogController {
 				if (role == null) {
 					return "";
 				}
-				return role == MemberRole.LEADER ? "Truong nhom" : "Thanh vien";
+				return role == MemberRole.LEADER ? "Leader" : "Member";
 			}
 
 			@Override
@@ -83,7 +83,7 @@ public class GroupMemberCreateDialogController {
 	public Student getSelectedStudent() {
 		Student student = studentCombo.getValue();
 		if (student == null) {
-			throw new RuntimeException("Vui long chon sinh vien");
+			throw new RuntimeException("Please chose student");
 		}
 		return student;
 	}
@@ -91,7 +91,7 @@ public class GroupMemberCreateDialogController {
 	public MemberRole getSelectedRole() {
 		MemberRole role = roleCombo.getValue();
 		if (role == null) {
-			throw new RuntimeException("Vui long chon vai tro");
+			throw new RuntimeException("Please chose role");
 		}
 		return role;
 	}

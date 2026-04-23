@@ -16,8 +16,8 @@
             <padding>
                 <Insets bottom="8.0" left="20.0" right="20.0" top="18.0" />
             </padding>
-            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Nộp đồ án" />
-            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Leader chọn đúng file theo yêu cầu và hoàn tất nộp cho nhóm." />
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Submit Project" />
+            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="The leader selects the correct files as required and completes the submission for the group." />
         </VBox>
     </top>
 
@@ -29,14 +29,14 @@
 
             <VBox prefWidth="330.0" spacing="10.0">
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Yêu cầu được giao" />
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Assigned Request" />
                     <Button fx:id="refreshButton" text="Tải lại" />
                 </HBox>
                 <TableView fx:id="targetTable" prefHeight="505.0" styleClass="student-table" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="requestTitleColumn" prefWidth="145.0" text="Yêu cầu" />
-                        <TableColumn fx:id="deadlineColumn" prefWidth="105.0" text="Hạn nộp" />
-                        <TableColumn fx:id="targetStatusColumn" prefWidth="95.0" text="Trạng thái" />
+                        <TableColumn fx:id="requestTitleColumn" prefWidth="145.0" text="Request" />
+                        <TableColumn fx:id="deadlineColumn" prefWidth="105.0" text="Deadline" />
+                        <TableColumn fx:id="targetStatusColumn" prefWidth="95.0" text="Status" />
                     </columns>
                 </TableView>
             </VBox>
@@ -49,7 +49,7 @@
                     <Label fx:id="descriptionLabel" style="-fx-text-fill: #64748b;" wrapText="true" />
                 </VBox>
 
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="File cần nộp" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Required Files" />
                 <ScrollPane fitToWidth="true" prefHeight="385.0" VBox.vgrow="ALWAYS">
                     <content>
                         <VBox fx:id="fileBox" spacing="8.0">
@@ -61,7 +61,7 @@
                 </ScrollPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
-                    <Button fx:id="completeButton" disable="true" styleClass="add-btn" text="Hoàn tất nộp" />
+                    <Button fx:id="completeButton" disable="true" styleClass="add-btn" text="Complete Submission" />
                     <Label fx:id="statusLabel" style="-fx-text-fill: #475569;" />
                 </HBox>
             </VBox>

@@ -10,24 +10,24 @@
             fx:controller="com.aptech.projectmgmt.controller.staff.ProjectCreateDialogController"
             prefWidth="500" prefHeight="300">
 
-    <Label text="Ten project:" layoutX="20" layoutY="20" />
+    <Label text="Project Name:" layoutX="20" layoutY="20" />
     <TextField fx:id="projectNameField" layoutX="140" layoutY="16" prefWidth="320" />
 
-    <Label text="Mo ta:" layoutX="20" layoutY="58" />
+    <Label text="Description:" layoutX="20" layoutY="58" />
     <TextArea fx:id="descriptionArea" layoutX="140" layoutY="54" prefWidth="320" prefHeight="60" />
 
-    <Label text="Hoc ky:" layoutX="20" layoutY="132" />
+    <Label text="Semester:" layoutX="20" layoutY="132" />
     <TextField fx:id="semesterField" layoutX="140" layoutY="128" prefWidth="150" />
 
-    <Label text="Bat dau:" layoutX="20" layoutY="170" />
+    <Label text="Start:" layoutX="20" layoutY="170" />
     <DatePicker fx:id="startDatePicker" layoutX="140" layoutY="166" prefWidth="150" />
 
-    <Label text="Ket thuc:" layoutX="20" layoutY="208" />
+    <Label text="End:" layoutX="20" layoutY="208" />
     <DatePicker fx:id="endDatePicker" layoutX="140" layoutY="204" prefWidth="150" />
 
-    <Label text="Bao cao:" layoutX="310" layoutY="170" />
+    <Label text="Report:" layoutX="310" layoutY="170" />
     <DatePicker fx:id="reportDatePicker" layoutX="370" layoutY="166" prefWidth="90" />
 
-    <Label text="Thay huong dan:" layoutX="20" layoutY="246" />
+    <Label text="Supervisor:" layoutX="20" layoutY="246" />
     <ComboBox fx:id="supervisorCombo" layoutX="140" layoutY="242" prefWidth="320" />
 </AnchorPane>

@@ -18,50 +18,50 @@
 	<TabPane fx:id="tabPane" layoutX="10" layoutY="10"
 		prefWidth="880" prefHeight="630">
 
-		<Tab text="Thong tin Project" closable="false">
+		<Tab text="Project Information" closable="false">
 			<AnchorPane>
-				<Label text="Ten project:" layoutX="20" layoutY="20" />
+				<Label text="Project Name:" layoutX="20" layoutY="20" />
 				<TextField fx:id="projectNameField" layoutX="20"
 					layoutY="40" prefWidth="320" />
 
-				<Label text="Hoc ky:" layoutX="370" layoutY="20" />
+				<Label text="Semester:" layoutX="370" layoutY="20" />
 				<TextField fx:id="semesterField" layoutX="370"
 					layoutY="40" prefWidth="160" />
 
-				<Label text="Thay huong dan:" layoutX="560" layoutY="20" />
+				<Label text="Supervisor:" layoutX="560" layoutY="20" />
 				<TextField fx:id="supervisorField" layoutX="560"
 					layoutY="40" prefWidth="280" editable="false" />
 
-				<Label text="Ngay bat dau:" layoutX="20" layoutY="95" />
+				<Label text="Start:" layoutX="20" layoutY="95" />
 				<DatePicker fx:id="startDatePicker" layoutX="20"
 					layoutY="115" prefWidth="180" />
 
-				<Label text="Ngay ket thuc:" layoutX="220" layoutY="95" />
+				<Label text="End:" layoutX="220" layoutY="95" />
 				<DatePicker fx:id="endDatePicker" layoutX="220"
 					layoutY="115" prefWidth="180" />
 
-				<Label text="Ngay bao cao:" layoutX="420" layoutY="95" />
+				<Label text="Report:" layoutX="420" layoutY="95" />
 				<DatePicker fx:id="reportDatePicker" layoutX="420"
 					layoutY="115" prefWidth="180" />
 
-				<Label text="Mo ta:" layoutX="20" layoutY="170" />
+				<Label text="Description:" layoutX="20" layoutY="170" />
 				<TextArea fx:id="descriptionArea" layoutX="20"
 					layoutY="190" prefWidth="820" prefHeight="320" wrapText="true" />
 
-				<Button fx:id="editBtn" text="Chinh sua" layoutX="20"
+				<Button fx:id="editBtn" text="Edit" layoutX="20"
 					layoutY="535" />
-				<Button fx:id="saveBtn" text="Luu" layoutX="110"
+				<Button fx:id="saveBtn" text="Save" layoutX="110"
 					layoutY="535" />
-				<Button fx:id="cancelBtn" text="Huy" layoutX="170"
+				<Button fx:id="cancelBtn" text="Cancel" layoutX="170"
 					layoutY="535" />
-				<Button fx:id="completeBtn" text="Danh dau hoan thanh"
+				<Button fx:id="completeBtn" text="Completed"
 					layoutX="240" layoutY="535" />
 			</AnchorPane>
 		</Tab>
 
-		<Tab fx:id="groupTab" text="Nhom" closable="false">
+		<Tab fx:id="groupTab" text="Group" closable="false">
 			<AnchorPane>
-				<Button fx:id="addGroupBtn" text="+ Tao nhom" layoutX="10"
+				<Button fx:id="addGroupBtn" text="+ Create Group " layoutX="10"
 					layoutY="10" />
 
 				<StackPane fx:id="groupContentPane" layoutX="10"
@@ -69,17 +69,17 @@
 					AnchorPane.topAnchor="50.0" AnchorPane.rightAnchor="10.0"
 					AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
 					<Label fx:id="groupPlaceholderLabel"
-						text="Project nay chua co nhom" />
+						text="This project has no group yet" />
 				</StackPane>
 			</AnchorPane>
 		</Tab>
 
-		<Tab text="Cong viec" closable="false">
+		<Tab text="Task" closable="false">
 			<AnchorPane>
-				<Label text="Chon thanh vien:" layoutX="20" layoutY="20" />
+				<Label text="Chose Member:" layoutX="20" layoutY="20" />
 				<ComboBox fx:id="taskMemberCombo" layoutX="20" layoutY="45"
 					prefWidth="280" />
-				<Label text="Trang thai:" layoutX="330" layoutY="20" />
+				<Label text="Status:" layoutX="330" layoutY="20" />
 				<ComboBox fx:id="taskStatusFilterCombo" layoutX="330"
 					layoutY="45" prefWidth="220" />
 				<StackPane fx:id="taskContentPane" layoutX="20"
@@ -87,7 +87,7 @@
 					AnchorPane.topAnchor="95.0" AnchorPane.rightAnchor="20.0"
 					AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0">
 					<Label fx:id="taskPlaceholderLabel"
-						text="Chon nhom de xem danh sach cong viec" />
+						text="Select a group to view the task list" />
 				</StackPane>
 			</AnchorPane>
 		</Tab>

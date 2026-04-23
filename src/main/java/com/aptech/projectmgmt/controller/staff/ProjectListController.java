@@ -95,7 +95,7 @@ public class ProjectListController {
 		semesterCombo.setOnAction(e -> applyFilters());
 		addProjectBtn.setOnAction(e -> handleAddProject());
 		refreshReadOnlyState();
-		projectTable.setPlaceholder(new Label("Dang tai danh sach project..."));
+		projectTable.setPlaceholder(new Label("Loading project list..."));
 		Platform.runLater(() -> {
 			loadClasses();
 			loadProjects();
@@ -179,7 +179,7 @@ public class ProjectListController {
 
 			SchoolClass allClasses = new SchoolClass();
 			allClasses.setClassId(ALL_CLASSES_ID);
-			allClasses.setClassName("Tat ca lop");
+			allClasses.setClassName("All class");
 			items.add(allClasses);
 
 			items.addAll(task.getValue());
@@ -189,7 +189,7 @@ public class ProjectListController {
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach lop: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error loading class list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -214,7 +214,7 @@ public class ProjectListController {
 	}
 	private void handleEditProject(Project project) {
 	    if (readOnlyMode) {
-	        AlertUtil.showError("Tai khoan giao vien chi duoc xem project huong dan");
+	        AlertUtil.showError("Teacher accounts are only allowed to view supervised projects");
 	        return;
 	    }
 
@@ -250,12 +250,12 @@ public class ProjectListController {
 	            java.time.LocalDate startDate = updatedProject.getStartDate();
 	            java.time.LocalDate endDate = updatedProject.getEndDate();
 	            if (startDate == null || endDate == null) {
-	                AlertUtil.showError("Vui long chon ngay bat dau va ngay ket thuc cho project.");
+	                AlertUtil.showError("Please select a start date and an end date for the project.");
 	                return;
 	            }
 
 	            if (!endDate.equals(startDate.plusMonths(1))) {
-	                AlertUtil.showError("Thoi gian du an phai dung 1 thang (ngay ket thuc = ngay bat dau + 1 thang).");
+	                AlertUtil.showError("The project duration must be exactly 1 month (end date = start date + 1 month).");
 	                return;
 	            }
 
@@ -268,33 +268,33 @@ public class ProjectListController {
 	            };
 
 	            updateTask.setOnSucceeded(ev -> Platform.runLater(() -> {
-	                AlertUtil.showSuccess("Cap nhat project thanh cong");
+	                AlertUtil.showSuccess("Project updated successfully");
 	                loadProjects();
 	            }));
 
 	            updateTask.setOnFailed(ev -> Platform.runLater(() -> {
 	                Throwable ex = updateTask.getException();
-	                AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+	                AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 	            }));
 
 	            new Thread(updateTask).start();
 
 	        } catch (Exception ex) {
-	            AlertUtil.showError("Khong the mo form sua project: " + ex.getMessage());
+	            AlertUtil.showError("Unable to open the edit project form:" + ex.getMessage());
 	        }
 	    }));
 
 	    loadStaffTask.setOnFailed(e -> Platform.runLater(() -> {
 	        Throwable ex = loadStaffTask.getException();
-	        AlertUtil.showError("Khong tai duoc danh sach giao vien: " + (ex != null ? ex.getMessage() : ""));
+	        AlertUtil.showError("Unable to load the teacher list: " + (ex != null ? ex.getMessage() : ""));
 	    }));
 
 	    new Thread(loadStaffTask).start();
 	}
 	private TableCell<Project, Void> createActionCell() {
 		return new TableCell<>() {
-			private final Button viewBtn = new Button("Xem");
-			private final Button editBtn = new Button("Sua");
+			private final Button viewBtn = new Button("View");
+			private final Button editBtn = new Button("Edit");
 			private final HBox box = new HBox(8, viewBtn, editBtn);
 
 			{
@@ -365,13 +365,13 @@ public class ProjectListController {
 			refreshSemesterOptions();
 			applyFilters();
 			if (allProjects.isEmpty()) {
-				projectTable.setPlaceholder(new Label("Chua co project nao"));
+				projectTable.setPlaceholder(new Label("There are no projects yet"));
 			}
 		}));
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach project: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -400,12 +400,12 @@ public class ProjectListController {
 		filteredProjects.setPredicate(project -> {
 			boolean classMatch = selectedClass == null || selectedClass.getClassId() == ALL_CLASSES_ID
 					|| project.getClassId() == selectedClass.getClassId();
-			boolean semesterMatch = selectedSemester == null || "Tat ca".equals(selectedSemester)
+			boolean semesterMatch = selectedSemester == null || "All".equals(selectedSemester)
 					|| selectedSemester.equals(project.getSemester());
 			return classMatch && semesterMatch;
 		});
 		if (filteredProjects.isEmpty()) {
-			projectTable.setPlaceholder(new Label("Khong co project phu hop"));
+			projectTable.setPlaceholder(new Label("No matching projects found"));
 		}
 	}
 

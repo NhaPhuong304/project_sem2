@@ -9,9 +9,9 @@
 	fx:controller="com.aptech.projectmgmt.controller.staff.GroupDetailController"
 	prefWidth="800" prefHeight="500">
 
-	<Label fx:id="groupNameLabel" text="Chi tiet Nhom" layoutX="20"
+	<Label fx:id="groupNameLabel" text="Detail" layoutX="20"
 		layoutY="20" style="-fx-font-size: 16; -fx-font-weight: bold;" />
-	<Button fx:id="addMemberBtn" text="+ Them sinh vien"
+	<Button fx:id="addMemberBtn" text="+ Add Student"
 		layoutX="640" layoutY="18" />
 
 	<TableView fx:id="memberTable" layoutX="20" layoutY="60"
@@ -19,17 +19,17 @@
 		<columns>
 			<TableColumn fx:id="avatarColumn" text="Avatar"
 				prefWidth="70.0" />
-			<TableColumn fx:id="studentCodeColumn" text="Ma SV"
+			<TableColumn fx:id="studentCodeColumn" text="Student ID"
 				prefWidth="90.0" />
-			<TableColumn fx:id="studentNameColumn" text="Ho ten"
+			<TableColumn fx:id="studentNameColumn" text="Full name"
 				prefWidth="150.0" />
-			<TableColumn fx:id="roleColumn" text="Vai tro"
+			<TableColumn fx:id="roleColumn" text="Position"
 				prefWidth="90.0" />
-			<TableColumn fx:id="statusColumn" text="Trang thai"
+			<TableColumn fx:id="statusColumn" text="Status"
 				prefWidth="120.0" />
 			<TableColumn fx:id="abandonCountColumn"
-				text="So lan bo task" prefWidth="90.0" />
-			<TableColumn fx:id="actionColumn" text="Hanh dong"
+				text="Missed Task Count" prefWidth="90.0" />
+			<TableColumn fx:id="actionColumn" text="Action"
 				prefWidth="220.0" />
 		</columns>
 	</TableView>

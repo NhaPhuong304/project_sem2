@@ -75,7 +75,7 @@ public class AdminStaffListController {
 					avatarView = loader.load();
 					controller = loader.getController();
 				} catch (Exception ex) {
-					throw new IllegalStateException("Khong the tai avatar cell giao vien", ex);
+					throw new IllegalStateException("Cannot load teacher avatar cell", ex);
 				}
 			}
 
@@ -104,8 +104,8 @@ public class AdminStaffListController {
 		accountStatusColumn
 				.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isActive() ? "Hoat dong" : "Da khoa"));
 		actionColumn.setCellFactory(col -> new TableCell<>() {
-			private final Button editBtn = new Button("Sua");
-			private final Button lockBtn = new Button("Khoa/Mo");
+			private final Button editBtn = new Button("Edit");
+			private final Button lockBtn = new Button("Lock/Unlock");
 
 			{
 				editBtn.setOnAction(e -> {
@@ -146,7 +146,7 @@ public class AdminStaffListController {
 		task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach giao vien: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load teacher list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
@@ -158,7 +158,7 @@ public class AdminStaffListController {
 			AdminStaffCreateDialogController controller = loader.getController();
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Them giao vu");
+			dialog.setTitle("Create Staff");
 			DialogPane dialogPane = dialog.getDialogPane();
 			dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialogPane.setContent(content);
@@ -183,13 +183,13 @@ public class AdminStaffListController {
 				    dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
 
 				    TeacherCreationResult resultInfo = task.getValue();
-				    String successMessage = "Them nhan su thanh cong. Tai khoan mac dinh: "
+				    String successMessage = "Staff added successfully. Default account created.: "
 				            + resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
 
 				    if (resultInfo.isNotificationEmailSent()) {
-				        successMessage += ". Da gui email thong bao.";
+				        successMessage += ". Notification email sent.";
 				    } else {
-				        successMessage += ". Chua gui duoc email thong bao.";
+				        successMessage += ". Failed to send notification email.";
 				    }
 
 				    String finalSuccessMessage = successMessage;
@@ -213,7 +213,7 @@ public class AdminStaffListController {
 
 			dialog.showAndWait();
 		} catch (Exception ex) {
-			AlertUtil.showError("Khong the mo form them giao vien: " + ex.getMessage());
+			AlertUtil.showError("Unable to open Created Staff form: " + ex.getMessage());
 		}
 	}
 
@@ -260,7 +260,7 @@ public class AdminStaffListController {
 					okButton.setDisable(false);
 					dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
 					Throwable ex = task.getException();
-					AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+					AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 				}));
 
 				new Thread(task).start();
@@ -268,13 +268,13 @@ public class AdminStaffListController {
 
 			dialog.showAndWait();
 		} catch (Exception ex) {
-			AlertUtil.showError("Khong the mo form sua giao vu: " + ex.getMessage());
+			AlertUtil.showError("Unable to open Edit Academic Staff form: " + ex.getMessage());
 		}
 	}
 
 	private void handleToggleStatus(Staff staff) {
-		String message = staff.isActive() ? "Ban co chac muon khoa tai khoan giao vu nay?"
-				: "Ban co chac muon mo khoa tai khoan giao vu nay?";
+		String message = staff.isActive() ? "Are you sure you want to lock this academic staff account?"
+				: "Are you sure you want to unlock this academic staff account?";
 
 		boolean confirmed = AlertUtil.showConfirm(message);
 		if (!confirmed) {
@@ -290,13 +290,13 @@ public class AdminStaffListController {
 		};
 
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Cap nhat trang thai giao vu thanh cong");
+			AlertUtil.showSuccess("Academic staff status updated successfully");
 			loadTeachers();
 		}));
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi cap nhat trang thai: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to update status: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
