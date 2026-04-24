@@ -150,7 +150,7 @@ public class ProjectDetailController {
 	private void loadGroupDetailIntoTab() {
 		if (groups.isEmpty()) {
 			groupContentPane.getChildren().setAll(groupPlaceholderLabel);
-			groupPlaceholderLabel.setText("Project nay chua co nhom");
+			groupPlaceholderLabel.setText("This project does not have a group yet");
 			return;
 		}
 
@@ -224,7 +224,7 @@ public class ProjectDetailController {
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach thanh vien: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load the member list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -399,7 +399,7 @@ public class ProjectDetailController {
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi danh dau hoan thanh: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to mark as completed: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}

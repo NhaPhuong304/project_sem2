@@ -63,9 +63,8 @@ public class SceneManager {
         Scene scene = new Scene(root);
         addStylesheet(scene);
         stage.setScene(scene);
-        stage.sizeToScene();
         stage.show();
-        stage.centerOnScreen();
+
     }
 
     public static void openModal(String fxmlPath, String title) throws IOException {

@@ -96,10 +96,14 @@ public class AdminTeacherListController {
         );
 
         actionColumn.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn = new Button("Sua");
-            private final Button lockBtn = new Button("Khoa/Mo");
+            private final Button editBtn = new Button("✎");
+            private final Button lockBtn = new Button("🔒");
 
             {
+                editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+                editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit Teacher"));
+                lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+                lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock/Unlock Teacher"));
                 editBtn.setOnAction(e -> {
                     Staff teacher = getTableRow().getItem();
                     if (teacher != null) {
@@ -140,7 +144,7 @@ public class AdminTeacherListController {
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai danh sach giao vien: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Failed to load the teacher list: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();

@@ -92,12 +92,12 @@ public class StudentSubmissionController {
 
     private void loadTargets() {
         if (studentId <= 0) {
-            statusLabel.setText("Không tìm thấy tài khoản sinh viên đang đăng nhập.");
+            statusLabel.setText("No logged-in student account was found.");
             completeButton.setDisable(true);
             return;
         }
 
-        setLoading(true, "Đang tải yêu cầu nộp đồ án...");
+        setLoading(true, "Loading submission requests...");
         Task<List<SubmissionTarget>> task = new Task<>() {
             @Override
             protected List<SubmissionTarget> call() {
@@ -108,7 +108,7 @@ public class StudentSubmissionController {
             List<SubmissionTarget> targets = task.getValue();
             targetTable.setItems(FXCollections.observableArrayList(targets));
             if (targets.isEmpty()) {
-                clearDetail("Bạn chưa có yêu cầu nộp đồ án nào. Chỉ leader của nhóm mới thấy yêu cầu ở đây.");
+                clearDetail("You do not have any project submission requests yet. Only group leaders can see requests here.");
                 setLoading(false, "");
                 return;
             }
@@ -117,14 +117,14 @@ public class StudentSubmissionController {
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setLoading(false, "Lỗi tải yêu cầu.");
-            AlertUtil.showError("Lỗi tải yêu cầu nộp đồ án: " + (ex != null ? ex.getMessage() : ""));
+            setLoading(false, "Failed to load requests.");
+            AlertUtil.showError("Failed to load project submission requests: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "student-submission-load-targets");
     }
 
     private void loadTargetDetail(SubmissionTarget target) {
-        setLoading(true, "Đang tải nội dung cần nộp...");
+        setLoading(true, "Loading submission requirements...");
         Task<DetailData> task = new Task<>() {
             @Override
             protected DetailData call() {
@@ -142,16 +142,16 @@ public class StudentSubmissionController {
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setLoading(false, "Lỗi tải chi tiết yêu cầu.");
-            AlertUtil.showError("Lỗi tải nội dung cần nộp: " + (ex != null ? ex.getMessage() : ""));
+            setLoading(false, "Failed to load request details.");
+            AlertUtil.showError("Failed to load submission requirements: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "student-submission-load-detail");
     }
 
     private void renderDetail(SubmissionTarget target) {
         selectedTitleLabel.setText(target.getRequestTitle() != null ? target.getRequestTitle() : "");
-        selectedGroupLabel.setText("Nhóm: " + (target.getGroupName() != null ? target.getGroupName() : ""));
-        selectedDeadlineLabel.setText("Hạn nộp: " + formatDateTime(target.getRequestDeadline()));
+        selectedGroupLabel.setText("Group: " + (target.getGroupName() != null ? target.getGroupName() : ""));
+        selectedDeadlineLabel.setText("Deadline: " + formatDateTime(target.getRequestDeadline()));
         descriptionLabel.setText(target.getRequestDescription() != null ? target.getRequestDescription() : "");
 
         fileBox.getChildren().clear();
@@ -167,9 +167,9 @@ public class StudentSubmissionController {
         boolean complete = !currentRequirements.isEmpty() && uploadedCount == currentRequirements.size();
         completeButton.setDisable(target.getStatus() == 3 || !complete);
         if (target.getStatus() == 3) {
-            statusLabel.setText("Yêu cầu này đã được hoàn tất nộp.");
+            statusLabel.setText("This request has already been completed.");
         } else {
-            statusLabel.setText("Đã nộp " + uploadedCount + "/" + currentRequirements.size() + " file.");
+            statusLabel.setText("Submitted " + uploadedCount + "/" + currentRequirements.size() + " files.");
         }
     }
 
@@ -179,12 +179,12 @@ public class StudentSubmissionController {
 
         String fileText = uploadedFile != null
                 ? uploadedFile.getOriginalFileName() + " (" + formatSize(uploadedFile.getFileSize()) + ")"
-                : "Chưa nộp";
+                : "Not submitted";
         Label fileLabel = new Label(fileText);
         fileLabel.setWrapText(true);
         fileLabel.setStyle("-fx-text-fill: " + (uploadedFile != null ? "#166534" : "#64748b") + ";");
 
-        Button chooseButton = new Button(uploadedFile == null ? "Chọn file" : "Nộp lại");
+        Button chooseButton = new Button(uploadedFile == null ? "Choose File" : "Replace File");
         chooseButton.setDisable(locked);
         chooseButton.setOnAction(e -> chooseAndUpload(requirement));
 
@@ -203,7 +203,7 @@ public class StudentSubmissionController {
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chọn file " + requirement.getRequirementName());
+        fileChooser.setTitle("Choose file for " + requirement.getRequirementName());
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
                 requirement.getRequirementName() + " (" + requirement.getRequiredExtension() + ")",
                 "*" + requirement.getRequiredExtension()));
@@ -213,7 +213,7 @@ public class StudentSubmissionController {
             return;
         }
 
-        setLoading(true, "Đang lưu file...");
+        setLoading(true, "Saving file...");
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
@@ -223,13 +223,13 @@ public class StudentSubmissionController {
             }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            setLoading(false, "Đã lưu file.");
+            setLoading(false, "File saved.");
             loadTargetDetail(selectedTarget);
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setLoading(false, "Lưu file thất bại.");
-            AlertUtil.showError("Không lưu được file: " + (ex != null ? ex.getMessage() : ""));
+            setLoading(false, "Failed to save file.");
+            AlertUtil.showError("Could not save the file: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "student-submission-save-file");
     }
@@ -238,11 +238,11 @@ public class StudentSubmissionController {
         if (selectedTarget == null) {
             return;
         }
-        if (!AlertUtil.showConfirm("Xác nhận hoàn tất nộp đồ án? Sau khi hoàn tất, bạn sẽ không nộp lại trong màn hình này.")) {
+        if (!AlertUtil.showConfirm("Confirm project submission completion? After completion, you will not be able to submit again from this screen.")) {
             return;
         }
 
-        setLoading(true, "Đang hoàn tất nộp đồ án...");
+        setLoading(true, "Completing project submission...");
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
@@ -251,14 +251,14 @@ public class StudentSubmissionController {
             }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            setLoading(false, "Đã hoàn tất nộp đồ án.");
-            AlertUtil.showSuccess("Đã hoàn tất nộp đồ án.");
+            setLoading(false, "Project submission completed.");
+            AlertUtil.showSuccess("Project submission completed.");
             loadTargets();
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setLoading(false, "Hoàn tất thất bại.");
-            AlertUtil.showError("Không thể hoàn tất nộp đồ án: " + (ex != null ? ex.getMessage() : ""));
+            setLoading(false, "Completion failed.");
+            AlertUtil.showError("Could not complete the project submission: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "student-submission-complete");
     }
@@ -295,9 +295,9 @@ public class StudentSubmissionController {
 
     private String formatStatus(int status) {
         return switch (status) {
-            case 3 -> "Đã nộp";
-            case 2 -> "Đang nộp";
-            default -> "Chưa hoàn tất";
+            case 3 -> "Submitted";
+            case 2 -> "In Progress";
+            default -> "Incomplete";
         };
     }
 

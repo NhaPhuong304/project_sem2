@@ -110,7 +110,7 @@ public class MyTaskListController {
 		TaskViewModel selectedTask = taskTable.getSelectionModel().getSelectedItem();
 
 		if (selectedTask == null) {
-			AlertUtil.showError("Vui long chon 1 task truoc khi hoi giao vien");
+			AlertUtil.showError("Please select a task before asking the teacher");
 			return;
 		}
 
@@ -119,7 +119,7 @@ public class MyTaskListController {
 			protected Staff call() {
 				Project project = projectService.getProjectById(projectId);
 				if (project == null || project.getSupervisorId() == null) {
-					throw new RuntimeException("Khong tim thay giao vien huong dan cua project");
+					throw new RuntimeException("Could not find the project supervisor");
 				}
 				return staffService.findById(project.getSupervisorId());
 			}
@@ -128,17 +128,17 @@ public class MyTaskListController {
 		teacherTask.setOnSucceeded(e -> {
 			Staff teacher = teacherTask.getValue();
 			if (teacher == null) {
-				AlertUtil.showError("Khong tim thay thong tin giao vien");
+				AlertUtil.showError("Teacher information could not be found");
 				return;
 			}
 
-			Optional<String> result = showTextPromptDialog("Hoi giao vien", "Nhap noi dung cau hoi gui giao vien",
-					"Noi dung cau hoi");
+			Optional<String> result = showTextPromptDialog("Ask the Teacher", "Enter the question to send to the teacher",
+					"Question content");
 
 			result.ifPresent(content -> {
 				String trimmed = content != null ? content.trim() : "";
 				if (trimmed.isEmpty()) {
-					AlertUtil.showError("Noi dung cau hoi khong duoc de trong");
+					AlertUtil.showError("Question content must not be empty");
 					return;
 				}
 
@@ -149,11 +149,11 @@ public class MyTaskListController {
 								trimmed);
 
 						if (teacher == null) {
-							throw new RuntimeException("Khong tim thay giao vien");
+							throw new RuntimeException("Teacher could not be found");
 						}
 
 						if (teacher.getEmail() == null || teacher.getEmail().isBlank()) {
-							throw new RuntimeException("Giao vien chua co email");
+							throw new RuntimeException("The teacher does not have an email address yet");
 						}
 
 						System.out.println("=== ASK MAIL DEBUG ===");
@@ -162,9 +162,9 @@ public class MyTaskListController {
 						System.out.println("Task ID = " + selectedTask.getTaskId());
 						System.out.println("Task title = " + selectedTask.getTitle());
 
-						String subject = "[Hoi bai] " + selectedTask.getTitle();
-						String body = "Sinh vien gui cau hoi cho giao vien.\n\n" + "Task: " + selectedTask.getTitle()
-								+ "\n" + "Sinh vien ID: " + currentStudentId + "\n\n" + "Noi dung cau hoi:\n" + trimmed;
+						String subject = "[Question] " + selectedTask.getTitle();
+						String body = "A student sent a question to the teacher.\n\n" + "Task: " + selectedTask.getTitle()
+								+ "\n" + "Student ID: " + currentStudentId + "\n\n" + "Question content:\n" + trimmed;
 
 						mailService.sendEmail(teacher.getEmail(), subject, body);
 						return true;
@@ -174,15 +174,15 @@ public class MyTaskListController {
 				askTask.setOnSucceeded(ev -> Platform.runLater(() -> {
 					Boolean mailSent = askTask.getValue();
 					if (Boolean.TRUE.equals(mailSent)) {
-						AlertUtil.showSuccess("Gui cau hoi thanh cong va da gui email cho giao vien");
+						AlertUtil.showSuccess("Question sent successfully and email delivered to the teacher");
 					} else {
-						AlertUtil.showSuccess("Gui cau hoi thanh cong, nhung chua gui duoc email");
+						AlertUtil.showSuccess("Question sent successfully, but the email could not be delivered");
 					}
 				}));
 
 				askTask.setOnFailed(ev -> Platform.runLater(() -> {
 					Throwable ex = askTask.getException();
-					AlertUtil.showError(ex != null ? ex.getMessage() : "Gui cau hoi that bai");
+					AlertUtil.showError(ex != null ? ex.getMessage() : "Failed to send the question");
 				}));
 
 				new Thread(askTask).start();
@@ -191,7 +191,7 @@ public class MyTaskListController {
 
 		teacherTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = teacherTask.getException();
-			AlertUtil.showError(ex != null ? ex.getMessage() : "Khong lay duoc giao vien huong dan");
+			AlertUtil.showError(ex != null ? ex.getMessage() : "Could not retrieve the supervising teacher");
 		}));
 
 		new Thread(teacherTask).start();
@@ -249,7 +249,7 @@ public class MyTaskListController {
 					actionView = loader.load();
 					controller = loader.getController();
 				} catch (Exception ex) {
-					throw new IllegalStateException("Khong the tai action cell task sinh vien", ex);
+					throw new IllegalStateException("Could not load the student task action cell", ex);
 				}
 			}
 
@@ -336,7 +336,7 @@ public class MyTaskListController {
 			try {
 				List<GroupMember> members = loadMembersTask.getValue();
 				if (members == null || members.isEmpty()) {
-					AlertUtil.showError("Khong co thanh vien hoat dong de phan cong");
+					AlertUtil.showError("There are no active members available for assignment");
 					return;
 				}
 
@@ -406,7 +406,7 @@ public class MyTaskListController {
 					}
 
 					if (taskVm.getReviewedById() != null && taskVm.getReviewedById() == selected.getStudentId()) {
-						AlertUtil.showError("Nguoi thuc hien khong duoc trung voi nguoi kiem tra");
+						AlertUtil.showError("The assignee must not be the same as the reviewer");
 						event.consume();
 						return;
 					}
@@ -455,19 +455,19 @@ public class MyTaskListController {
 
 				assignTask.setOnFailed(ev -> Platform.runLater(() -> {
 					Throwable ex = assignTask.getException();
-					AlertUtil.showError(ex != null ? ex.getMessage() : "Loi phan cong task");
+					AlertUtil.showError(ex != null ? ex.getMessage() : "Task assignment failed");
 				}));
 
 				new Thread(assignTask).start();
 
 			} catch (Exception ex) {
-				AlertUtil.showError("Khong the phan cong task: " + ex.getMessage());
+				AlertUtil.showError("Could not assign the task: " + ex.getMessage());
 			}
 		}));
 
 		loadMembersTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = loadMembersTask.getException();
-			AlertUtil.showError("Khong tai duoc thanh vien nhom: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Could not load group members: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(loadMembersTask).start();
@@ -494,7 +494,7 @@ public class MyTaskListController {
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai tasks: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load tasks: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -534,7 +534,7 @@ public class MyTaskListController {
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Da gui de kiem tra");
+			AlertUtil.showSuccess("Submitted for review");
 			loadTasks();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError(task.getException().getMessage())));
@@ -542,11 +542,11 @@ public class MyTaskListController {
 	}
 
 	private void handleRequestRevision(int taskId) {
-		Optional<String> result = showTextPromptDialog("Yeu cau chinh sua", "Nhap noi dung yeu cau chinh sua",
-				"Noi dung");
+		Optional<String> result = showTextPromptDialog("Revision Request", "Enter the revision request details",
+				"Content");
 		result.ifPresent(note -> {
 			if (note.trim().isEmpty()) {
-				AlertUtil.showError("Noi dung khong duoc de trong");
+				AlertUtil.showError("Content must not be empty");
 				return;
 			}
 			Task<Void> task = new Task<>() {
@@ -557,7 +557,7 @@ public class MyTaskListController {
 				}
 			};
 			task.setOnSucceeded(e -> Platform.runLater(() -> {
-				AlertUtil.showSuccess("Da gui yeu cau chinh sua");
+				AlertUtil.showSuccess("Revision request sent successfully");
 				loadTasks();
 			}));
 			task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError(task.getException().getMessage())));
@@ -592,7 +592,7 @@ public class MyTaskListController {
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Da gui lai de kiem tra");
+			AlertUtil.showSuccess("Resubmitted for review");
 			loadTasks();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError(task.getException().getMessage())));
@@ -601,7 +601,7 @@ public class MyTaskListController {
 
 	private void handleAddTask() {
 		if (!canCreateTask) {
-			AlertUtil.showError("Ban khong con quyen tao task trong nhom nay");
+			AlertUtil.showError("You no longer have permission to create tasks in this group");
 			return;
 		}
 		Task<List<GroupMember>> loadMembersTask = new Task<>() {
@@ -613,7 +613,7 @@ public class MyTaskListController {
 		loadMembersTask.setOnSucceeded(e -> Platform.runLater(() -> showAddTaskDialog(loadMembersTask.getValue())));
 		loadMembersTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = loadMembersTask.getException();
-			AlertUtil.showError("Khong tai duoc thanh vien nhom: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Could not load group members: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(loadMembersTask).start();
 	}
@@ -654,7 +654,7 @@ public class MyTaskListController {
 	private void showAddTaskDialog(List<GroupMember> members) {
 		try {
 			if (members == null || members.size() < 2) {
-				AlertUtil.showError("Nhom phai co toi thieu 2 sinh vien dang hoat dong moi duoc tao task");
+				AlertUtil.showError("A group must have at least 2 active students before a task can be created");
 				return;
 			}
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.TASK_CREATE_DIALOG));
@@ -687,7 +687,7 @@ public class MyTaskListController {
 				return;
 			}
 			if (pendingTask[0] == null) {
-				AlertUtil.showError("Khong doc duoc thong tin task vua nhap");
+				AlertUtil.showError("Could not read the task information you just entered");
 				return;
 			}
 			com.aptech.projectmgmt.model.Task newTask = pendingTask[0];
@@ -707,7 +707,7 @@ public class MyTaskListController {
 		} catch (IllegalArgumentException ex) {
 			AlertUtil.showError(ex.getMessage());
 		} catch (Exception ex) {
-			AlertUtil.showError("Khong the mo form them task: " + ex.getMessage());
+			AlertUtil.showError("Could not open the add task form: " + ex.getMessage());
 		}
 	}
 
@@ -722,7 +722,7 @@ public class MyTaskListController {
 		loadTask.setOnSucceeded(e -> Platform.runLater(() -> {
 			TaskDetailData taskDetailData = loadTask.getValue();
 			StringBuilder detailBuilder = new StringBuilder();
-			detailBuilder.append("=== LICH SU TRANG THAI ===\n");
+			detailBuilder.append("=== STATUS HISTORY ===\n");
 			for (TaskStatusHistory history : taskDetailData.history()) {
 				detailBuilder
 						.append(history.getChangedAt() != null ? history.getChangedAt().format(dateTimeFormatter) : "?")
@@ -730,7 +730,7 @@ public class MyTaskListController {
 						.append(" -> ").append(history.getToStatus()).append(" | ")
 						.append(history.getChangerName() != null ? history.getChangerName() : "").append("\n");
 			}
-			detailBuilder.append("\n=== YEU CAU CHINH SUA ===\n");
+			detailBuilder.append("\n=== REVISION REQUESTS ===\n");
 			for (TaskRevision revision : taskDetailData.revisions()) {
 				detailBuilder.append(
 						revision.getCreatedAt() != null ? revision.getCreatedAt().format(dateTimeFormatter) : "?")
@@ -748,7 +748,7 @@ public class MyTaskListController {
 			showTaskDetailModal(taskVm.getTitle(), detailBuilder.toString());
 		}));
 		loadTask.setOnFailed(e -> Platform
-				.runLater(() -> AlertUtil.showError("Loi tai chi tiet task: " + loadTask.getException().getMessage())));
+				.runLater(() -> AlertUtil.showError("Failed to load task details: " + loadTask.getException().getMessage())));
 		new Thread(loadTask).start();
 	}
 
@@ -773,7 +773,7 @@ public class MyTaskListController {
 				return Optional.of(controller.getContent());
 			}
 		} catch (Exception ex) {
-			AlertUtil.showError("Khong the mo form nhap noi dung: " + ex.getMessage());
+			AlertUtil.showError("Could not open the input form: " + ex.getMessage());
 		}
 		return Optional.empty();
 	}
@@ -801,7 +801,7 @@ public class MyTaskListController {
 			}
 			modal.showAndWait();
 		} catch (Exception ex) {
-			AlertUtil.showError("Khong the mo chi tiet task: " + ex.getMessage());
+			AlertUtil.showError("Could not open task details: " + ex.getMessage());
 		}
 	}
 

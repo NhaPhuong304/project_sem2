@@ -55,6 +55,10 @@ public class AdminDashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Node content = loader.load();
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load content: " + e.getMessage());
@@ -68,6 +72,10 @@ public class AdminDashboardController {
             Node content = loader.load();
             StudentListController controller = loader.getController();
             controller.initData(classId);
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load students: " + e.getMessage());

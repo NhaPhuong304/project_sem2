@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ClassRepository extends BaseRepository {
 
-	public static final String UNASSIGNED_CLASS_NAME = "Chua xep lop";
+	public static final String UNASSIGNED_CLASS_NAME = "Unassigned class";
 
 	public List<SchoolClass> findAll() {
 		String sql = "SELECT c.ClassID, c.ClassName, c.AcademicYear, c.ManagerID, st.FullName AS ManagerName, c.CreatedAt, "

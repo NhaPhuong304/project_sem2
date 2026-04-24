@@ -3,12 +3,12 @@
 }
 
 .dashboard-root {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: #f0fdf4;
 }
 
 /* Sidebar */
 .sidebar {
-    -fx-background-color: linear-gradient(to bottom, #0f172a, #1e293b);
+    -fx-background-color: linear-gradient(to bottom, #064e3b, #022c22);
 }
 
 .logo-box {
@@ -52,11 +52,11 @@
 }
 
 .sidebar-btn:hover {
-    -fx-background-color: #2563eb;
+    -fx-background-color: #ea580c;
 }
 
 .sidebar-btn:pressed {
-    -fx-background-color: #1d4ed8;
+    -fx-background-color: #c2410c;
 }
 
 /* Topbar */
@@ -67,13 +67,13 @@
 }
 
 .topbar-title {
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #064e3b;
     -fx-font-size: 22px;
     -fx-font-weight: bold;
 }
 
 .staff-name-label {
-    -fx-text-fill: #334155;
+    -fx-text-fill: #166534;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
@@ -101,18 +101,18 @@
 /* Center */
 .center-wrapper {
     -fx-padding: 22;
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: #f0fdf4;
 }
 
 .content-card {
     -fx-background-color: white;
     -fx-background-radius: 22;
     -fx-border-radius: 22;
-    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 18, 0.15, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(234,88,12,0.3), 20, 0.2, 0, 5);
 }
 
 .sidebar-btn-active {
-    -fx-background-color: #2563eb;
+    -fx-background-color: #ea580c;
 }
 
 .overview-scroll {
@@ -132,7 +132,7 @@
 .overview-title {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #064e3b;
 }
 
 .overview-subtitle {
@@ -143,10 +143,10 @@
 .overview-metric-card {
     -fx-background-color: linear-gradient(to bottom right, #ffffff, #f8fbff);
     -fx-background-radius: 18;
-    -fx-border-color: #dbeafe;
+    -fx-border-color: #ffedd5;
     -fx-border-radius: 18;
     -fx-padding: 18;
-    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.08), 16, 0.12, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(22,101,52,0.2), 16, 0.2, 0, 4);
 }
 
 .overview-metric-title {
@@ -158,7 +158,7 @@
 .overview-metric-value {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #064e3b;
 }
 
 .overview-metric-caption {
@@ -178,7 +178,7 @@
 .overview-chart-title {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #022c22;
 }
 
 .overview-chart-meta {
@@ -188,13 +188,13 @@
 }
 
 .chart-title {
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #064e3b;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
 }
 
 .axis-label {
-    -fx-text-fill: #334155;
+    -fx-text-fill: #166534;
     -fx-font-size: 12px;
     -fx-font-weight: 700;
 }
@@ -209,13 +209,13 @@
 }
 
 .axis {
-    -fx-tick-label-fill: #334155;
+    -fx-tick-label-fill: #166534;
     -fx-font-size: 11px;
     -fx-font-weight: 600;
 }
 
 .axis .tick-label {
-    -fx-fill: #334155;
+    -fx-fill: #166534;
     -fx-font-size: 11px;
     -fx-font-weight: 700;
 }
@@ -227,7 +227,7 @@
 
 .chart-vertical-grid-lines,
 .chart-horizontal-grid-lines {
-    -fx-stroke: #dbeafe;
+    -fx-stroke: #ffedd5;
     -fx-stroke-dash-array: 2 6;
 }
 
@@ -236,11 +236,11 @@
 }
 
 .default-color0.chart-series-line {
-    -fx-stroke: #2563eb;
+    -fx-stroke: #ea580c;
 }
 
 .default-color0.chart-line-symbol {
-    -fx-background-color: #2563eb, white;
+    -fx-background-color: #ea580c, white;
 }
 
 .default-color0.chart-area-symbol {
@@ -248,7 +248,7 @@
 }
 
 .default-color0.chart-bar {
-    -fx-bar-fill: #3b82f6;
+    -fx-bar-fill: #f97316;
 }
 
 .default-color0.chart-series-area-line {
@@ -261,7 +261,7 @@
 }
 
 .default-color0.chart-pie {
-    -fx-pie-color: #2563eb;
+    -fx-pie-color: #ea580c;
 }
 
 .default-color1.chart-pie {
@@ -281,13 +281,13 @@
 }
 
 .chart-value-label {
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #064e3b;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-background-color: rgba(255, 255, 255, 0.92);
     -fx-background-radius: 10;
     -fx-padding: 2 6 2 6;
-    -fx-border-color: #dbeafe;
+    -fx-border-color: #ffedd5;
     -fx-border-radius: 10;
 }
 /*dashboard*/
@@ -297,12 +297,13 @@
 }
 
 .student-root {
-    -fx-background-color: #f4f7fb;
+    -fx-background-color: #f0fdf4;
 }
 
-/* Nút thêm sinh viên */
+
+/* Add button */
 .add-btn {
-    -fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
+    -fx-background-color: linear-gradient(to right, #ea580c, #c2410c);
     -fx-text-fill: white;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
@@ -313,10 +314,12 @@
 }
 
 .add-btn:hover {
-    -fx-background-color: linear-gradient(to right, #1d4ed8, #1e40af);
+    -fx-background-color: linear-gradient(to right, #c2410c, #9a3412);
+    -fx-effect: dropshadow(gaussian, rgba(234,88,12,0.6), 15, 0.5, 0, 0);
 }
 
-/* Table chính */
+
+/* Main table */
 .student-table {
     -fx-background-color: white;
     -fx-background-radius: 16;
@@ -330,7 +333,7 @@
 
 /* Header */
 .student-table .column-header-background {
-    -fx-background-color: #eff6ff;
+    -fx-background-color: #fff7ed;
     -fx-background-radius: 12 12 0 0;
     -fx-padding: 6 0 6 0;
 }
@@ -338,12 +341,12 @@
 .student-table .column-header,
 .student-table .filler {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #dbeafe transparent;
+    -fx-border-color: transparent transparent #ffedd5 transparent;
     -fx-border-width: 0 0 1 0;
 }
 
 .student-table .column-header .label {
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #022c22;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-alignment: CENTER_LEFT;
@@ -353,7 +356,7 @@
 .student-table .table-row-cell {
     -fx-background-color: white;
     -fx-border-color: transparent;
-    -fx-table-cell-border-color: #f1f5f9;
+    -fx-table-cell-border-color: #f0fdf4;
     -fx-cell-size: 52px;
 }
 
@@ -362,22 +365,23 @@
 }
 
 .student-table .table-row-cell:filled:selected {
-    -fx-background-color: #dbeafe;
+    -fx-background-color: #ffedd5;
 }
 
 .student-table .table-row-cell:filled:selected .text {
-    -fx-fill: #0f172a;
+    -fx-fill: #064e3b;
 }
 
 /* Cell */
 .student-table .table-cell {
-    -fx-text-fill: #334155;
+    -fx-text-fill: #166534;
     -fx-font-size: 13px;
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 0 8 0 8;
 }
 
-/* Scrollbar nhẹ hơn */
+
+/* Lighter scrollbar */
 .student-table .scroll-bar:vertical,
 .student-table .scroll-bar:horizontal {
     -fx-background-color: transparent;
@@ -392,3 +396,4 @@
     -fx-background-color: #94a3b8;
 }
 /*student*/
+

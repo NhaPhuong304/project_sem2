@@ -176,7 +176,7 @@ public class TaskListController {
 					personView = loader.load();
 					controller = loader.getController();
 				} catch (Exception ex) {
-					throw new IllegalStateException("Khong the tai person cell", ex);
+					throw new IllegalStateException("Could not load the person cell", ex);
 				}
 			}
 
@@ -234,7 +234,7 @@ public class TaskListController {
 						}
 					});
 				} catch (Exception ex) {
-					throw new IllegalStateException("Khong the tai action cell task staff", ex);
+					throw new IllegalStateException("Could not load the staff task action cell", ex);
 				}
 			}
 
@@ -298,7 +298,7 @@ public class TaskListController {
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai tasks: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load tasks: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
@@ -343,15 +343,15 @@ public class TaskListController {
 			return;
 		}
 		Optional<String> result = showTextPromptDialog("Nhan tin nhac nho",
-				"Gui tin nhan nhac nho cho " + task.getAssignedToName(), "Noi dung");
+				"Send a reminder message to " + task.getAssignedToName(), "Content");
 		result.ifPresent(content -> {
 			if (content.trim().isEmpty()) {
-				AlertUtil.showError("Noi dung khong duoc de trong");
+				AlertUtil.showError("Content must not be empty");
 				return;
 			}
 			var staff = SessionManager.getInstance().getCurrentStaff();
 			if (staff == null) {
-				AlertUtil.showError("Khong xac dinh duoc staff");
+				AlertUtil.showError("Could not determine the staff account");
 				return;
 			}
 			Task<Void> sendTask = new Task<>() {
@@ -363,11 +363,11 @@ public class TaskListController {
 				}
 			};
 			sendTask.setOnSucceeded(e -> Platform.runLater(() -> {
-				AlertUtil.showSuccess("Da gui nhac nho");
+				AlertUtil.showSuccess("Reminder sent successfully");
 				loadTasks();
 			}));
 			sendTask.setOnFailed(
-					e -> Platform.runLater(() -> AlertUtil.showError("Loi: " + sendTask.getException().getMessage())));
+					e -> Platform.runLater(() -> AlertUtil.showError("Error: " + sendTask.getException().getMessage())));
 			new Thread(sendTask).start();
 		});
 	}
@@ -383,7 +383,7 @@ public class TaskListController {
 		loadTask.setOnSucceeded(e -> Platform.runLater(() -> {
 			TaskDetailData taskDetailData = loadTask.getValue();
 			StringBuilder detailBuilder = new StringBuilder();
-			detailBuilder.append("=== LICH SU TRANG THAI ===\n");
+			detailBuilder.append("=== STATUS HISTORY ===\n");
 			for (TaskStatusHistory history : taskDetailData.history()) {
 				detailBuilder
 						.append(history.getChangedAt() != null ? history.getChangedAt().format(dateTimeFormatter) : "?")
@@ -391,7 +391,7 @@ public class TaskListController {
 						.append(" -> ").append(history.getToStatus()).append(" | ")
 						.append(history.getChangerName() != null ? history.getChangerName() : "").append("\n");
 			}
-			detailBuilder.append("\n=== YEU CAU CHINH SUA ===\n");
+			detailBuilder.append("\n=== REVISION REQUESTS ===\n");
 			for (TaskRevision revision : taskDetailData.revisions()) {
 				detailBuilder.append(
 						revision.getCreatedAt() != null ? revision.getCreatedAt().format(dateTimeFormatter) : "?")
@@ -409,7 +409,7 @@ public class TaskListController {
 			showTaskDetailModal(taskVm.getTitle(), detailBuilder.toString());
 		}));
 		loadTask.setOnFailed(e -> Platform
-				.runLater(() -> AlertUtil.showError("Loi tai chi tiet: " + loadTask.getException().getMessage())));
+				.runLater(() -> AlertUtil.showError("Failed to load details: " + loadTask.getException().getMessage())));
 		new Thread(loadTask).start();
 	}
 
@@ -434,7 +434,7 @@ public class TaskListController {
 				return Optional.of(controller.getContent());
 			}
 		} catch (Exception ex) {
-			AlertUtil.showError("Khong the mo form nhap noi dung: " + ex.getMessage());
+			AlertUtil.showError("Could not open the input form: " + ex.getMessage());
 		}
 		return Optional.empty();
 	}
@@ -462,7 +462,7 @@ public class TaskListController {
 			}
 			modal.showAndWait();
 		} catch (Exception e) {
-			AlertUtil.showError("Khong the mo chi tiet task: " + e.getMessage());
+			AlertUtil.showError("Could not open task details: " + e.getMessage());
 		}
 	}
 

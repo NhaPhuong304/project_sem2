@@ -68,7 +68,7 @@ public class TeacherInboxController {
         createdAtColumn.setCellValueFactory(
                 c -> new SimpleStringProperty(c.getValue().getCreatedAt() != null ? c.getValue().getCreatedAt().format(formatter) : ""));
         statusColumn.setCellValueFactory(
-                c -> new SimpleStringProperty(c.getValue().isAnswered() ? "Da tra loi" : "Chua tra loi"));
+                c -> new SimpleStringProperty(c.getValue().isAnswered() ? "Answered" : "Pending"));
 
         questionTable.setItems(questionList);
 
@@ -91,7 +91,7 @@ public class TeacherInboxController {
         task.setOnSucceeded(e -> Platform.runLater(() -> questionList.setAll(task.getValue())));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai hop thu: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Failed to load the inbox: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -100,20 +100,20 @@ public class TeacherInboxController {
     private void handleReply() {
         Question selected = questionTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertUtil.showError("Vui long chon 1 cau hoi de tra loi");
+            AlertUtil.showError("Please select a question to answer.");
             return;
         }
 
         Optional<String> result = showTextPromptDialog(
-                "Tra loi sinh vien",
-                "Nhap noi dung tra loi",
-                "Noi dung tra loi"
+                "Reply to Student",
+                "Enter your reply",
+                "Reply content"
         );
 
         result.ifPresent(answer -> {
             String trimmed = answer != null ? answer.trim() : "";
             if (trimmed.isEmpty()) {
-                AlertUtil.showError("Noi dung tra loi khong duoc de trong");
+                AlertUtil.showError("Reply content must not be empty.");
                 return;
             }
 
@@ -122,32 +122,27 @@ public class TeacherInboxController {
                 protected Boolean call() {
                     questionService.answerQuestion(selected.getQuestionId(), trimmed);
                     messageService.createAnswerMessageForStudent(
-                    	    SessionManager.getInstance().getCurrentStaff().getStaffId(),
-                    	    selected.getStudentId(),
-                    	    selected.getTaskId(),
-                    	    trimmed
-                    	);
+                            SessionManager.getInstance().getCurrentStaff().getStaffId(),
+                            selected.getStudentId(),
+                            selected.getTaskId(),
+                            trimmed
+                    );
 
                     Student student = studentService.findById(selected.getStudentId());
 
                     if (student == null) {
-                        throw new RuntimeException("Khong tim thay sinh vien voi ID = " + selected.getStudentId());
+                        throw new RuntimeException("Could not find the student with ID = " + selected.getStudentId());
                     }
 
                     if (student.getEmail() == null || student.getEmail().isBlank()) {
-                        throw new RuntimeException("Sinh vien chua co email");
+                        throw new RuntimeException("The student does not have an email address yet.");
                     }
 
-                    System.out.println("=== REPLY MAIL DEBUG ===");
-                    System.out.println("Student ID = " + student.getStudentId());
-                    System.out.println("Student email = " + student.getEmail());
-                    System.out.println("Question ID = " + selected.getQuestionId());
-
-                    String subject = "[Tra loi cau hoi] "
+                    String subject = "[Question Reply] "
                             + (selected.getTaskTitle() != null ? selected.getTaskTitle() : "Task");
-                    String body = "Giao vien da tra loi cau hoi cua ban.\n\n"
-                            + "Cau hoi:\n" + selected.getQuestionContent() + "\n\n"
-                            + "Tra loi:\n" + trimmed;
+                    String body = "Your teacher has replied to your question.\n\n"
+                            + "Question:\n" + selected.getQuestionContent() + "\n\n"
+                            + "Reply:\n" + trimmed;
 
                     mailService.sendEmail(student.getEmail(), subject, body);
                     return true;
@@ -155,13 +150,13 @@ public class TeacherInboxController {
             };
 
             task.setOnSucceeded(e -> Platform.runLater(() -> {
-                AlertUtil.showSuccess("Tra loi thanh cong va da gui email cho sinh vien");
+                AlertUtil.showSuccess("Reply sent successfully and email notification delivered to the student.");
                 loadQuestions();
             }));
 
             task.setOnFailed(e -> Platform.runLater(() -> {
                 Throwable ex = task.getException();
-                AlertUtil.showError(ex != null ? ex.getMessage() : "Tra loi that bai");
+                AlertUtil.showError(ex != null ? ex.getMessage() : "Reply failed.");
             }));
 
             new Thread(task).start();
@@ -186,7 +181,7 @@ public class TeacherInboxController {
                 return Optional.of(controller.getContent());
             }
         } catch (Exception ex) {
-            AlertUtil.showError("Khong the mo form nhap noi dung: " + ex.getMessage());
+            AlertUtil.showError("Could not open the input form: " + ex.getMessage());
         }
         return Optional.empty();
     }

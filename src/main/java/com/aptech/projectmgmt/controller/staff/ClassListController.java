@@ -105,7 +105,7 @@ public class ClassListController {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.SINGLE_ACTION_CELL));
                     actionView = loader.load();
                     controller = loader.getController();
-                    controller.setActionText("View");
+                    controller.setActionText("👁");
                     controller.setOnAction(() -> {
                         SchoolClass schoolClass = getTableRow() != null ? getTableRow().getItem() : null;
                         if (schoolClass != null) {

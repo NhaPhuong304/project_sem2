@@ -17,7 +17,7 @@ public class AuthService {
 		Account account = accountRepository.findByUsername(username);
 
 		if (account == null) {
-			throw new AuthException("Tai khoan khong ton tai");
+			throw new AuthException("Account does not exist");
 		}
 
 		if (!account.isActive()) {
@@ -25,7 +25,7 @@ public class AuthService {
 		}
 
 		if (!BCrypt.checkpw(password, account.getPasswordHash())) {
-			throw new AuthException("Sai mat khau");
+			throw new AuthException("Incorrect password");
 		}
 
 		SessionManager sessionManager = SessionManager.getInstance();
@@ -35,13 +35,13 @@ public class AuthService {
 		if (account.getRole().isStaffRole()) {
 			var staff = staffRepository.findByAccountId(account.getAccountId());
 			if (staff == null) {
-				throw new AuthException("Khong tim thay thong tin nhan su");
+				throw new AuthException("Staff information could not be found");
 			}
 			sessionManager.setCurrentStaff(staff);
 		} else {
 			var student = studentRepository.findByAccountId(account.getAccountId());
 			if (student == null) {
-				throw new AuthException("Khong tim thay thong tin sinh vien");
+				throw new AuthException("Student information could not be found");
 			}
 			sessionManager.setCurrentStudent(student);
 		}
@@ -52,7 +52,7 @@ public class AuthService {
 	public Account findAccountForPasswordReset(String username) {
 		Account account = accountRepository.findByUsername(username);
 		if (account == null || !account.isActive()) {
-			throw new AuthException("Khong tim thay tai khoan voi ten dang nhap nay");
+			throw new AuthException("No account was found with this username");
 		}
 		return account;
 	}

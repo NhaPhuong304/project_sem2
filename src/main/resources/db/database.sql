@@ -1,4 +1,4 @@
-USE [master]
+﻿USE [master]
 GO
 
 /*
@@ -256,7 +256,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- ============================================================
--- VIEW: Tổng quan task
+-- VIEW: Task overview
 -- ============================================================
 CREATE   VIEW [dbo].[vw_TaskOverview] AS
 SELECT
@@ -275,14 +275,14 @@ SELECT
     t.ActualEndDate,
     t.[Status]           AS TaskStatus,
     CASE t.[Status]
-        WHEN 1 THEN N'Chờ thực hiện'
-        WHEN 2 THEN N'Đang thực hiện'
-        WHEN 3 THEN N'Đang kiểm tra'
-        WHEN 4 THEN N'Đang chỉnh sửa'
-        WHEN 5 THEN N'Hoàn thành'
+        WHEN 1 THEN N'Waiting to start'
+        WHEN 2 THEN N'In progress'
+        WHEN 3 THEN N'Under review'
+        WHEN 4 THEN N'Being revised'
+        WHEN 5 THEN N'Completed'
     END                  AS TaskStatusLabel,
     t.IsLate,
-    -- Avatar: join về Account để lấy PhotoUrl
+    -- Avatar: join Account to get PhotoUrl
     s_exec.FullName      AS AssignedToName,
     a_exec.PhotoUrl      AS AssignedToPhoto,
     s_rev.FullName       AS ReviewedByName,
@@ -470,7 +470,7 @@ SET IDENTITY_INSERT [dbo].[Class] ON
 INSERT [dbo].[Class] ([ClassID], [ClassName], [AcademicYear], [ManagerID], [CreatedAt]) VALUES (1, N'T2305M01', N'2025-2026', 2, CAST(N'2026-04-15T16:20:07.963' AS DateTime))
 INSERT [dbo].[Class] ([ClassID], [ClassName], [AcademicYear], [ManagerID], [CreatedAt]) VALUES (2, N'T2305M02', N'2025-2026', 2, CAST(N'2026-04-15T16:20:07.963' AS DateTime))
 INSERT [dbo].[Class] ([ClassID], [ClassName], [AcademicYear], [ManagerID], [CreatedAt]) VALUES (3, N'T2401M01', N'2025-2026', 3, CAST(N'2026-04-15T16:20:07.967' AS DateTime))
-INSERT [dbo].[Class] ([ClassID], [ClassName], [AcademicYear], [ManagerID], [CreatedAt]) VALUES (4, N'Chua xep lop', N'N/A', NULL, CAST(N'2026-04-16T15:14:23.230' AS DateTime))
+INSERT [dbo].[Class] ([ClassID], [ClassName], [AcademicYear], [ManagerID], [CreatedAt]) VALUES (4, N'Unassigned class', N'N/A', NULL, CAST(N'2026-04-16T15:14:23.230' AS DateTime))
 INSERT [dbo].[Class] ([ClassID], [ClassName], [AcademicYear], [ManagerID], [CreatedAt]) VALUES (5, N'C2010L', N'2025-2028', 7, CAST(N'2026-04-20T11:54:21.893' AS DateTime))
 SET IDENTITY_INSERT [dbo].[Class] OFF
 GO
@@ -498,7 +498,7 @@ INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Conten
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (12, 4, 6, 3, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T14:51:39.517' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (13, 4, 6, 2, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T14:52:50.127' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (14, 4, 6, 3, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T14:52:50.127' AS DateTime), 0)
-INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (15, 6, 1, 3, N'QUESTION|em k hiểu', CAST(N'2026-04-21T14:53:23.343' AS DateTime), 0)
+INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (15, 6, 1, 3, N'QUESTION|I do not understand', CAST(N'2026-04-21T14:53:23.343' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (16, 4, 6, 2, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T14:53:48.793' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (17, 4, 6, 3, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T14:53:48.793' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (18, 4, 6, 2, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T14:54:48.807' AS DateTime), 0)
@@ -532,7 +532,7 @@ INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Conten
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (46, 4, 6, 2, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T15:16:35.003' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (47, 4, 6, 2, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T15:16:55.460' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (48, 4, 6, 3, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T15:16:55.460' AS DateTime), 0)
-INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (49, 6, 1, 3, N'QUESTION|em k hiểu', CAST(N'2026-04-21T15:17:52.633' AS DateTime), 0)
+INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (49, 6, 1, 3, N'QUESTION|I do not understand', CAST(N'2026-04-21T15:17:52.633' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (50, 8, 6, 2, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T15:17:54.333' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (51, 8, 6, 3, N'SYSTEM_REMINDER|[DAILY] Task cua ban con duoi 3 ngay nua la het han.', CAST(N'2026-04-21T15:17:54.333' AS DateTime), 0)
 INSERT [dbo].[Message] ([MessageID], [SenderID], [ReceiverID], [TaskID], [Content], [SentAt], [IsRead]) VALUES (52, 8, 6, 2, N'SYSTEM_REMINDER|[DUE] Task cua ban sap het han trong 30 phut.', CAST(N'2026-04-21T15:18:54.337' AS DateTime), 0)
@@ -992,33 +992,33 @@ SET IDENTITY_INSERT [dbo].[OtpVerification] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Project] ON 
 
-INSERT [dbo].[Project] ([ProjectID], [GroupID], [Title], [Description], [Semester], [StartDate], [EndDate], [ReportDate], [AdvisorID], [CreatedBy], [Status], [CreatedAt]) VALUES (1, 1, N'quản lý học sinh', N'quản lý học sinh', N'2', CAST(N'2026-04-16' AS Date), CAST(N'2026-05-16' AS Date), CAST(N'2026-05-15' AS Date), 8, 2, 1, CAST(N'2026-04-16T17:49:46.287' AS DateTime))
-INSERT [dbo].[Project] ([ProjectID], [GroupID], [Title], [Description], [Semester], [StartDate], [EndDate], [ReportDate], [AdvisorID], [CreatedBy], [Status], [CreatedAt]) VALUES (2, 2, N'quản lý project', N'quản lý project', N'2', CAST(N'2026-04-16' AS Date), CAST(N'2026-05-16' AS Date), CAST(N'2026-05-15' AS Date), 8, 2, 1, CAST(N'2026-04-16T17:56:19.133' AS DateTime))
+INSERT [dbo].[Project] ([ProjectID], [GroupID], [Title], [Description], [Semester], [StartDate], [EndDate], [ReportDate], [AdvisorID], [CreatedBy], [Status], [CreatedAt]) VALUES (1, 1, N'Student management', N'Student management', N'2', CAST(N'2026-04-16' AS Date), CAST(N'2026-05-16' AS Date), CAST(N'2026-05-15' AS Date), 8, 2, 1, CAST(N'2026-04-16T17:49:46.287' AS DateTime))
+INSERT [dbo].[Project] ([ProjectID], [GroupID], [Title], [Description], [Semester], [StartDate], [EndDate], [ReportDate], [AdvisorID], [CreatedBy], [Status], [CreatedAt]) VALUES (2, 2, N'Project management', N'Project management', N'2', CAST(N'2026-04-16' AS Date), CAST(N'2026-05-16' AS Date), CAST(N'2026-05-15' AS Date), 8, 2, 1, CAST(N'2026-04-16T17:56:19.133' AS DateTime))
 SET IDENTITY_INSERT [dbo].[Project] OFF
 GO
 SET IDENTITY_INSERT [dbo].[ProjectGroup] ON 
 
-INSERT [dbo].[ProjectGroup] ([GroupID], [ClassID], [GroupName], [CreatedAt]) VALUES (1, 2, N'Nhom - quản lý học sinh', CAST(N'2026-04-16T17:49:46.270' AS DateTime))
-INSERT [dbo].[ProjectGroup] ([GroupID], [ClassID], [GroupName], [CreatedAt]) VALUES (2, 2, N'Nhom - quản lý project', CAST(N'2026-04-16T17:56:19.123' AS DateTime))
+INSERT [dbo].[ProjectGroup] ([GroupID], [ClassID], [GroupName], [CreatedAt]) VALUES (1, 2, N'Group - Student management', CAST(N'2026-04-16T17:49:46.270' AS DateTime))
+INSERT [dbo].[ProjectGroup] ([GroupID], [ClassID], [GroupName], [CreatedAt]) VALUES (2, 2, N'Group - Project management', CAST(N'2026-04-16T17:56:19.123' AS DateTime))
 SET IDENTITY_INSERT [dbo].[ProjectGroup] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Question] ON 
 
-INSERT [dbo].[Question] ([QuestionID], [StudentID], [TeacherID], [TaskID], [QuestionContent], [AnswerContent], [CreatedAt], [AnsweredAt], [IsAnswered]) VALUES (1, 6, 8, 3, N'em k hiểu', N'me too', CAST(N'2026-04-21T15:34:16.750' AS DateTime), CAST(N'2026-04-21T15:34:48.693' AS DateTime), 1)
-INSERT [dbo].[Question] ([QuestionID], [StudentID], [TeacherID], [TaskID], [QuestionContent], [AnswerContent], [CreatedAt], [AnsweredAt], [IsAnswered]) VALUES (2, 6, 8, 3, N'ssds', N'èwe', CAST(N'2026-04-21T15:42:58.547' AS DateTime), CAST(N'2026-04-21T15:45:07.893' AS DateTime), 1)
+INSERT [dbo].[Question] ([QuestionID], [StudentID], [TeacherID], [TaskID], [QuestionContent], [AnswerContent], [CreatedAt], [AnsweredAt], [IsAnswered]) VALUES (1, 6, 8, 3, N'I do not understand', N'Me too', CAST(N'2026-04-21T15:34:16.750' AS DateTime), CAST(N'2026-04-21T15:34:48.693' AS DateTime), 1)
+INSERT [dbo].[Question] ([QuestionID], [StudentID], [TeacherID], [TaskID], [QuestionContent], [AnswerContent], [CreatedAt], [AnsweredAt], [IsAnswered]) VALUES (2, 6, 8, 3, N'ssds', N'ewe', CAST(N'2026-04-21T15:42:58.547' AS DateTime), CAST(N'2026-04-21T15:45:07.893' AS DateTime), 1)
 INSERT [dbo].[Question] ([QuestionID], [StudentID], [TeacherID], [TaskID], [QuestionContent], [AnswerContent], [CreatedAt], [AnsweredAt], [IsAnswered]) VALUES (3, 6, 8, 3, N'jgtet', N'eeeeeeeer', CAST(N'2026-04-21T15:51:07.140' AS DateTime), CAST(N'2026-04-21T18:33:47.273' AS DateTime), 1)
 SET IDENTITY_INSERT [dbo].[Question] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Staff] ON 
 
 INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (1, N'Nguyen Minh Quan', N'admin@aptech.local', 1)
-INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (2, N'Tran Giao Vu', N'giaovu1@aptech.local', 2)
-INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (3, N'Le Quan Ly', N'giaovu2@aptech.local', 3)
+INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (2, N'Tran Staff Office', N'giaovu1@aptech.local', 2)
+INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (3, N'Le Coordinator', N'giaovu2@aptech.local', 3)
 INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (4, N'Tran Van K', N'gv001@aptech.local', 4)
 INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (5, N'Le Thi Hh', N'gv002@aptech.local', 5)
-INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (6, N'Nguyễn Nhã Phương', N'nguyennhaphuongbl2006@gmailll.com', 11)
-INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (7, N'Khiêm', N'khiem132@gmail.com', 13)
-INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (8, N'Nguyễn Nhã Phương', N'nguyennhaphuongbl2006@gmail.com', 14)
+INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (6, N'Nguyen Nha Phuong', N'nguyennhaphuongbl2006@gmailll.com', 11)
+INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (7, N'Khiem', N'khiem132@gmail.com', 13)
+INSERT [dbo].[Staff] ([StaffID], [FullName], [Email], [AccountID]) VALUES (8, N'Nguyen Nha Phuong', N'nguyennhaphuongbl2006@gmail.com', 14)
 SET IDENTITY_INSERT [dbo].[Staff] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Student] ON 
@@ -1028,7 +1028,7 @@ INSERT [dbo].[Student] ([StudentID], [StudentCode], [FullName], [Email], [ClassI
 INSERT [dbo].[Student] ([StudentID], [StudentCode], [FullName], [Email], [ClassID], [AccountID], [CreatedByStaffId]) VALUES (3, N'ST003', N'Vo Gia Bao', N'st003@aptech.local', 1, 8, 2)
 INSERT [dbo].[Student] ([StudentID], [StudentCode], [FullName], [Email], [ClassID], [AccountID], [CreatedByStaffId]) VALUES (4, N'ST004', N'Nguyen Hoang Nam', N'st004@aptech.local', 2, 9, 2)
 INSERT [dbo].[Student] ([StudentID], [StudentCode], [FullName], [Email], [ClassID], [AccountID], [CreatedByStaffId]) VALUES (5, N'ST005', N'Tran Thu Trang', N'st005@aptech.local', 2, 10, 2)
-INSERT [dbo].[Student] ([StudentID], [StudentCode], [FullName], [Email], [ClassID], [AccountID], [CreatedByStaffId]) VALUES (6, N'ST006', N'Nguyễn Nhã Phương', N'nguyennhaphuongbl2006@gmail.com', 2, 12, 2)
+INSERT [dbo].[Student] ([StudentID], [StudentCode], [FullName], [Email], [ClassID], [AccountID], [CreatedByStaffId]) VALUES (6, N'ST006', N'Nguyen Nha Phuong', N'nguyennhaphuongbl2006@gmail.com', 2, 12, 2)
 SET IDENTITY_INSERT [dbo].[Student] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Task] ON 
@@ -1040,9 +1040,9 @@ SET IDENTITY_INSERT [dbo].[Task] OFF
 GO
 SET IDENTITY_INSERT [dbo].[TaskAbandonLog] ON 
 
-INSERT [dbo].[TaskAbandonLog] ([LogID], [TaskID], [StudentID], [AbandonedAt], [Note]) VALUES (1, 1, 1, CAST(N'2026-04-16T19:39:25.997' AS DateTime), N'Tu dong: qua 1 gio khong xac nhan thuc hien')
-INSERT [dbo].[TaskAbandonLog] ([LogID], [TaskID], [StudentID], [AbandonedAt], [Note]) VALUES (2, 1, 1, CAST(N'2026-04-21T14:30:39.483' AS DateTime), N'Tu dong: qua 1 gio khong xac nhan thuc hien')
-INSERT [dbo].[TaskAbandonLog] ([LogID], [TaskID], [StudentID], [AbandonedAt], [Note]) VALUES (3, 1, 5, CAST(N'2026-04-21T14:32:39.477' AS DateTime), N'Tu dong: qua 1 gio khong xac nhan thuc hien')
+INSERT [dbo].[TaskAbandonLog] ([LogID], [TaskID], [StudentID], [AbandonedAt], [Note]) VALUES (1, 1, 1, CAST(N'2026-04-16T19:39:25.997' AS DateTime), N'Automatic reset: no execution confirmation after 1 hour')
+INSERT [dbo].[TaskAbandonLog] ([LogID], [TaskID], [StudentID], [AbandonedAt], [Note]) VALUES (2, 1, 1, CAST(N'2026-04-21T14:30:39.483' AS DateTime), N'Automatic reset: no execution confirmation after 1 hour')
+INSERT [dbo].[TaskAbandonLog] ([LogID], [TaskID], [StudentID], [AbandonedAt], [Note]) VALUES (3, 1, 5, CAST(N'2026-04-21T14:32:39.477' AS DateTime), N'Automatic reset: no execution confirmation after 1 hour')
 SET IDENTITY_INSERT [dbo].[TaskAbandonLog] OFF
 GO
 SET IDENTITY_INSERT [dbo].[TaskStatusHistory] ON 
@@ -1396,29 +1396,29 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- ============================================================
--- STORED PROCEDURE: Tạo OTP mới  [v3]
+-- STORED PROCEDURE: Generate a new OTP [v3]
 -- ============================================================
 /*
-  Gọi khi:
-    - Sinh viên/Staff yêu cầu đổi mật khẩu    → @Purpose = 1
-    - Sinh viên đăng nhập lần đầu (IsFirstLogin) → @Purpose = 2
+  Call when:
+    - A student/staff member requests a password reset -> @Purpose = 1
+    - A student logs in for the first time (IsFirstLogin) -> @Purpose = 2
 
-  Trả về: OtpCode (backend đọc và gửi email, không lưu plain trên client)
+  Returns: OtpCode (the backend reads it and sends the email; do not store plain text on the client)
 
   Backend flow (Java/Spring):
     1. EXEC sp_GenerateOtp @AccountID=42, @Purpose=1, @OtpCode OUTPUT
-    2. Dùng JavaMailSender gửi email: "Mã OTP của bạn là: " + @OtpCode
-    3. OTP hết hạn sau 5 phút — hiển thị countdown ở client
+    2. Use JavaMailSender to send: "Your OTP code is: " + @OtpCode
+    3. OTP expires after 5 minutes - show a countdown on the client
 */
 CREATE   PROCEDURE [dbo].[sp_GenerateOtp]
     @AccountID INT,
     @Purpose   TINYINT,           -- 1=ChangePassword, 2=FirstLogin
-    @OtpCode   NVARCHAR(6) OUTPUT -- trả về cho backend gửi mail
+    @OtpCode   NVARCHAR(6) OUTPUT -- returned to the backend for email delivery
 AS
 BEGIN
     SET NOCOUNT ON
 
-    -- Lấy email tương ứng với account (ưu tiên Student, fallback Staff)
+    -- Get the email for the account (prefer Student, fallback to Staff)
     DECLARE @Email NVARCHAR(100)
     SELECT @Email = COALESCE(
         (SELECT Email FROM Student WHERE AccountID = @AccountID),
@@ -1427,21 +1427,21 @@ BEGIN
 
     IF @Email IS NULL
     BEGIN
-        RAISERROR(N'Không tìm thấy email cho AccountID %d', 16, 1, @AccountID)
+        RAISERROR(N'No email found for AccountID %d', 16, 1, @AccountID)
         RETURN
     END
 
-    -- Vô hiệu hóa tất cả OTP cũ còn active của account này + purpose này
+    -- Invalidate all active older OTPs for this account and purpose
     UPDATE OtpVerification
     SET IsUsed = 1
     WHERE AccountID = @AccountID
       AND Purpose   = @Purpose
       AND IsUsed    = 0
 
-    -- Sinh mã OTP 6 chữ số ngẫu nhiên (000000 → 999999)
+    -- Generate a random 6-digit OTP (000000 -> 999999)
     SET @OtpCode = RIGHT('000000' + CAST(ABS(CHECKSUM(NEWID())) % 1000000 AS NVARCHAR), 6)
 
-    -- Lưu OTP vào bảng (TTL = 5 phút)
+    -- Save the OTP (TTL = 5 minutes)
     INSERT INTO OtpVerification (AccountID, Email, OtpCode, Purpose, ExpiresAt)
     VALUES (@AccountID, @Email, @OtpCode, @Purpose, DATEADD(MINUTE, 5, GETDATE()))
 END
@@ -1453,7 +1453,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- ============================================================
--- STORED PROCEDURE: Reset task quá 1 giờ không xác nhận
+-- STORED PROCEDURE: Reset tasks that were not confirmed within 1 hour
 -- ============================================================
 CREATE   PROCEDURE [dbo].[sp_ResetOverdueTasks]
 AS
@@ -1470,7 +1470,7 @@ BEGIN
       AND EstimatedStartDate <= DATEADD(HOUR, -1, GETDATE())
 
     INSERT INTO TaskAbandonLog (TaskID, StudentID, Note)
-    SELECT TaskID, StudentID, N'Tự động: quá 1 giờ không xác nhận thực hiện'
+    SELECT TaskID, StudentID, N'Automatic reset: no execution confirmation after 1 hour'
     FROM @OverdueTasks
 
     UPDATE Task
@@ -1485,17 +1485,17 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- ============================================================
--- STORED PROCEDURE: Xác thực OTP và đổi mật khẩu  [v3]
+-- STORED PROCEDURE: Verify OTP and change password [v3]
 -- ============================================================
 /*
-  Trả về ResultCode:
-    0 = Thành công — đổi mật khẩu xong
-    1 = Mã OTP không đúng (còn lượt thử)
-    2 = Mã OTP không đúng, đã bị khóa (AttemptCount >= 5)
-    3 = OTP hết hạn hoặc đã dùng rồi
-    4 = Không tồn tại OTP hợp lệ cho account + purpose này
+  Returns ResultCode:
+    0 = Success - password updated
+    1 = Incorrect OTP (attempts remaining)
+    2 = Incorrect OTP, now locked (AttemptCount >= 5)
+    3 = OTP expired or already used
+    4 = No valid OTP exists for this account and purpose
 
-  @NewPasswordHash: bcrypt hash từ backend — SP không hash, chỉ lưu
+  @NewPasswordHash: bcrypt hash from the backend - the SP does not hash, it only stores
 */
 CREATE   PROCEDURE [dbo].[sp_VerifyOtp]
     @AccountID       INT,
@@ -1514,7 +1514,7 @@ BEGIN
     DECLARE @IsUsed       BIT
     DECLARE @AttemptCount INT
 
-    -- Lấy OTP mới nhất còn hiệu lực của account + purpose
+    -- Get the latest valid OTP for this account and purpose
     SELECT TOP 1
         @OtpID        = OtpID,
         @OtpCode      = OtpCode,
@@ -1526,7 +1526,7 @@ BEGIN
       AND Purpose   = @Purpose
     ORDER BY CreatedAt DESC
 
-    -- Không tìm thấy OTP nào
+    -- No OTP found
     IF @OtpID IS NULL
     BEGIN
         SET @ResultCode = 4
@@ -1534,7 +1534,7 @@ BEGIN
         RETURN
     END
 
-    -- OTP đã dùng hoặc hết hạn
+    -- OTP already used or expired
     IF @IsUsed = 1 OR @ExpiresAt < GETDATE()
     BEGIN
         SET @ResultCode = 3
@@ -1542,7 +1542,7 @@ BEGIN
         RETURN
     END
 
-    -- Mã không đúng
+    -- Incorrect code
     IF @OtpCode != @InputCode
     BEGIN
         DECLARE @NewAttempt INT = @AttemptCount + 1
@@ -1557,14 +1557,14 @@ BEGIN
         RETURN
     END
 
-    -- OTP đúng → đổi mật khẩu + đánh dấu OTP đã dùng
+    -- Correct OTP -> change password and mark OTP as used
     UPDATE OtpVerification
     SET IsUsed = 1
     WHERE OtpID = @OtpID
 
     UPDATE Account
     SET PasswordHash = @NewPasswordHash,
-        IsFirstLogin = 0              -- tắt cờ bắt đổi mật khẩu lần đầu
+        IsFirstLogin = 0              -- disable the forced first-login password change flag
     WHERE AccountID = @AccountID
 
     SET @ResultCode = 0
@@ -2361,3 +2361,4 @@ BEGIN
         (@ChartGroupInsight, N'Inventory snapshot API', N'Expose current lab inventory for dashboards.', DATEADD(DAY, -8, @ChartNow), DATEADD(DAY, 14, @ChartNow), DATEADD(DAY, -7, @ChartNow), NULL, 2, @ChartSt11, @ChartSt18, @ChartSt18, 0, DATEADD(DAY, -8, @ChartNow));
 END
 GO
+

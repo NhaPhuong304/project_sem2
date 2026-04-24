@@ -64,6 +64,10 @@ public class StaffDashboardController {
                 }
             }
 
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load content: " + e.getMessage());
@@ -77,6 +81,10 @@ public class StaffDashboardController {
             Node content = loader.load();
             StudentListController controller = loader.getController();
             controller.initData(classId);
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load students: " + e.getMessage());
@@ -96,6 +104,10 @@ public class StaffDashboardController {
             }
 
             controller.initData(classId);
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load projects: " + e.getMessage());
@@ -109,6 +121,10 @@ public class StaffDashboardController {
             Node content = loader.load();
             ProjectDetailController controller = loader.getController();
             controller.initData(projectId);
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load project details: " + e.getMessage());

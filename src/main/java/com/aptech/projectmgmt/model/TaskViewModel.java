@@ -49,7 +49,7 @@ public class TaskViewModel {
         switch (status) {
             case PENDING: return "Cho xu ly";
             case IN_PROGRESS: return "Dang thuc hien";
-            case REVIEWING: return "Dang kiem tra";
+            case REVIEWING: return "Under review";
             case REVISING: return "Dang chinh sua";
             case COMPLETED: return "Hoan thanh";
             default: return status.name();

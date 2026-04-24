@@ -40,22 +40,22 @@ public class StaffService {
         String normalizedEmail = email != null ? email.trim() : "";
 
         if (normalizedUsername.isEmpty()) {
-            throw new RuntimeException("Username khong duoc de trong");
+            throw new RuntimeException("Username must not be empty");
         }
         if (normalizedFullName.isEmpty()) {
-            throw new RuntimeException("Ho ten giao vien khong duoc de trong");
+            throw new RuntimeException("Teacher name must not be empty");
         }
         if (normalizedEmail.isEmpty()) {
-            throw new RuntimeException("Email khong duoc de trong");
+            throw new RuntimeException("Email must not be empty");
         }
         if (!normalizedEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            throw new RuntimeException("Email khong hop le");
+            throw new RuntimeException("Invalid email address");
         }
         if (accountRepository.findByUsername(normalizedUsername) != null) {
             throw new RuntimeException("Username da ton tai");
         }
         if (staffRepository.findByEmail(normalizedEmail) != null) {
-            throw new RuntimeException("Email giao vien da ton tai");
+            throw new RuntimeException("Teacher email already exists");
         }
        
         String temporaryPassword = "123";
@@ -87,13 +87,13 @@ public class StaffService {
 
         boolean emailSent = mailService.sendEmailQuietly(
                 normalizedEmail,
-                "[Aptech] Tai khoan giao vien da duoc tao",
-                "Xin chao " + normalizedFullName + ",\n\n" +
-                "Tai khoan cua ban da duoc tao thanh cong tren he thong.\n" +
+                "[Aptech] Teacher account created",
+                "Hello " + normalizedFullName + ",\n\n" +
+                "Your account has been created successfully in the system.\n" +
                 "Username: " + normalizedUsername + "\n" +
-                "Mat khau tam thoi: " + temporaryPassword + "\n\n" +
-                "Vui long dang nhap vao he thong va doi mat khau ngay trong lan dau tien de bao mat tai khoan.\n\n" +
-                "Tran trong."
+                "Temporary password: " + temporaryPassword + "\n\n" +
+                "Please sign in to the system and change your password on first login to secure your account.\n\n" +
+                "Best regards."
         );
 
         return new TeacherCreationResult(normalizedUsername, temporaryPassword, emailSent);

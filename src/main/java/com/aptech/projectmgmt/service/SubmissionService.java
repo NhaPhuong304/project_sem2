@@ -45,16 +45,16 @@ public class SubmissionService {
             List<SubmissionRequirementTemplate> requirements, List<Integer> groupIds) {
         String normalizedTitle = title != null ? title.trim() : "";
         if (normalizedTitle.isEmpty()) {
-            throw new RuntimeException("Tiêu đề yêu cầu không được để trống");
+            throw new RuntimeException("Request title must not be empty");
         }
         if (deadline == null) {
-            throw new RuntimeException("Hạn nộp không được để trống");
+            throw new RuntimeException("Deadline must not be empty");
         }
         if (requirements == null || requirements.isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn ít nhất một nội dung cần nộp");
+            throw new RuntimeException("Please select at least one submission requirement");
         }
         if (groupIds == null || groupIds.isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn ít nhất một nhóm nhận yêu cầu");
+            throw new RuntimeException("Please select at least one recipient group");
         }
 
         Map<Integer, Integer> targetLeaders = new LinkedHashMap<>();
@@ -65,7 +65,7 @@ public class SubmissionService {
             }
         }
         if (targetLeaders.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy leader đang hoạt động trong các nhóm đã chọn");
+            throw new RuntimeException("No active leader was found in the selected groups");
         }
 
         SubmissionRequest request = new SubmissionRequest();
@@ -106,24 +106,24 @@ public class SubmissionService {
 
     public void saveSubmittedFile(SubmissionFile file) {
         if (file == null) {
-            throw new RuntimeException("Thông tin file không hợp lệ");
+            throw new RuntimeException("Invalid file information");
         }
         submissionRepository.upsertFile(file);
     }
 
     public void saveSubmittedFile(int targetId, SubmissionRequirement requirement, File sourceFile, int studentId) {
         if (targetId <= 0 || requirement == null || sourceFile == null || studentId <= 0) {
-            throw new RuntimeException("Thông tin file không hợp lệ");
+            throw new RuntimeException("Invalid file information");
         }
         if (!sourceFile.isFile()) {
-            throw new RuntimeException("File đã chọn không tồn tại");
+            throw new RuntimeException("The selected file does not exist");
         }
 
         String originalName = sourceFile.getName();
         String requiredExtension = requirement.getRequiredExtension();
         if (!hasRequiredExtension(originalName, requiredExtension)) {
             throw new RuntimeException("File " + requirement.getRequirementName()
-                    + " phải có định dạng " + requiredExtension);
+                    + " must use the " + requiredExtension + " format");
         }
 
         try {
@@ -147,7 +147,7 @@ public class SubmissionService {
             file.setUploadedByStudentId(studentId);
             submissionRepository.upsertFile(file);
         } catch (IOException e) {
-            throw new RuntimeException("Không thể lưu file nộp: " + e.getMessage(), e);
+            throw new RuntimeException("Could not save the submitted file: " + e.getMessage(), e);
         }
     }
 
@@ -164,7 +164,7 @@ public class SubmissionService {
         }
         for (SubmissionRequirement requirement : requirements) {
             if (requirement.isRequired() && !uploadedRequirementIds.contains(requirement.getRequirementId())) {
-                throw new RuntimeException("Chưa nộp đủ file. Thiếu: " + requirement.getRequirementName());
+                throw new RuntimeException("Submission is incomplete. Missing: " + requirement.getRequirementName());
             }
         }
         submissionRepository.markTargetSubmitted(targetId);
@@ -172,11 +172,11 @@ public class SubmissionService {
 
     public int downloadFilesForTarget(SubmissionTarget target, Path destinationRoot) {
         if (target == null || destinationRoot == null) {
-            throw new RuntimeException("Vui lòng chọn nhóm và thư mục tải file");
+            throw new RuntimeException("Please select a group and a destination folder");
         }
         List<SubmissionFile> files = submissionRepository.findFilesByTarget(target.getTargetId());
         if (files.isEmpty()) {
-            throw new RuntimeException("Nhóm này chưa nộp file nào");
+            throw new RuntimeException("This group has not submitted any files yet");
         }
 
         String requestFolder = "request_" + target.getRequestId() + "_"
@@ -191,7 +191,7 @@ public class SubmissionService {
             for (SubmissionFile file : files) {
                 Path source = Path.of(file.getFilePath());
                 if (!Files.exists(source)) {
-                    throw new RuntimeException("Không tìm thấy file đã lưu: " + file.getOriginalFileName());
+                    throw new RuntimeException("Stored file not found: " + file.getOriginalFileName());
                 }
                 String outputName = sanitizeFileName(file.getRequirementName()) + "_"
                         + sanitizeFileName(file.getOriginalFileName());
@@ -200,14 +200,14 @@ public class SubmissionService {
             }
             return copied;
         } catch (IOException e) {
-            throw new RuntimeException("Không thể tải file về máy: " + e.getMessage(), e);
+            throw new RuntimeException("Could not download the files: " + e.getMessage(), e);
         }
     }
 
     private void sendRequestMessage(int staffId, int leaderStudentId, String title, LocalDateTime deadline) {
         String content = REQUEST_MESSAGE_PREFIX
-                + "Bạn có yêu cầu nộp đồ án mới: " + title
-                + ". Hạn nộp: " + deadline;
+                + "You have a new project submission request: " + title
+                + ". Deadline: " + deadline;
         messageRepository.createMessage(staffId, leaderStudentId, null, content);
     }
 

@@ -94,6 +94,10 @@ public class TeacherDashboardController {
             ClassListController controller = loader.getController();
             controller.setReadOnlyMode(true);
             controller.setTeacherStaffId(currentTeacherStaffId);
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load classes: " + e.getMessage());
@@ -107,6 +111,10 @@ public class TeacherDashboardController {
             ProjectListController controller = loader.getController();
             controller.setReadOnlyMode(true);
             controller.setTeacherStaffId(currentTeacherStaffId);
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load supervised projects: " + e.getMessage());

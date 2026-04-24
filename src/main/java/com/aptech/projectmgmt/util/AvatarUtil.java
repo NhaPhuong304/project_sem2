@@ -32,7 +32,7 @@ public final class AvatarUtil {
         if (fallback != null) {
             return fallback;
         }
-        throw new IllegalStateException("Khong tim thay avatar mac dinh: " + DEFAULT_AVATAR_RESOURCE);
+        throw new IllegalStateException("Default avatar not found: " + DEFAULT_AVATAR_RESOURCE);
     }
 
     private static Image loadImage(String photoUrl) {

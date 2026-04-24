@@ -11,14 +11,14 @@ public class QuestionService {
 
     public void createQuestion(int studentId, int teacherId, Integer taskId, String questionContent) {
         if (questionContent == null || questionContent.trim().isEmpty()) {
-            throw new RuntimeException("Noi dung cau hoi khong duoc de trong");
+            throw new RuntimeException("Question content must not be empty");
         }
         questionRepository.createQuestion(studentId, teacherId, taskId, questionContent.trim());
     }
 
     public void answerQuestion(int questionId, String answerContent) {
         if (answerContent == null || answerContent.trim().isEmpty()) {
-            throw new RuntimeException("Noi dung tra loi khong duoc de trong");
+            throw new RuntimeException("Reply content must not be empty");
         }
         questionRepository.answerQuestion(questionId, answerContent.trim());
     }

@@ -44,36 +44,36 @@ public class ProjectService {
 
 	public void createProject(Project project) {
 		if (project.getProjectName() == null || project.getProjectName().trim().isEmpty()) {
-			throw new RuntimeException("Ten project khong duoc de trong");
+			throw new RuntimeException("Project name must not be empty");
 		}
 		if (project.getSemester() == null || project.getSemester().trim().isEmpty()) {
-			throw new RuntimeException("Hoc ky khong duoc de trong");
+			throw new RuntimeException("Semester must not be empty");
 		}
 		if (project.getClassId() <= 0) {
-			throw new RuntimeException("Project phai gan voi mot lop hop le");
+			throw new RuntimeException("A project must be assigned to a valid class");
 		}
 		if (project.getSupervisorId() == null) {
-			throw new RuntimeException("Vui long chon giao vien huong dan");
+			throw new RuntimeException("Please select a supervising teacher");
 		}
 		if (project.getStartDate() == null) {
-			throw new RuntimeException("Vui long chon ngay bat dau");
+			throw new RuntimeException("Please select a start date");
 		}
 		if (project.getEndDate() == null) {
-			throw new RuntimeException("Vui long chon ngay ket thuc");
+			throw new RuntimeException("Please select an end date");
 		}
 		if (project.getReportDate() == null) {
-			throw new RuntimeException("Vui long chon ngay bao cao");
+			throw new RuntimeException("Please select a report date");
 		}
 		if (project.getEndDate() != null && project.getStartDate() != null
 				&& project.getEndDate().isBefore(project.getStartDate())) {
-			throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
+			throw new RuntimeException("The end date must be after the start date");
 		}
 		if (project.getReportDate() != null && project.getEndDate() != null) {
 			if (project.getReportDate().isAfter(project.getEndDate())) {
-				throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
+				throw new RuntimeException("The report date must not be later than the end date");
 			}
 			if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
-				throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
+				throw new RuntimeException("The report date must be within 3 days before the end date");
 			}
 		}
 		if (project.getStatus() == null)
@@ -85,7 +85,7 @@ public class ProjectService {
 			}
 		}
 
-		String defaultGroupName = "Nhom - " + project.getProjectName().trim();
+		String defaultGroupName = "Group - " + project.getProjectName().trim();
 		if (groupRepository.existsGroupName(project.getClassId(), defaultGroupName)) {
 			defaultGroupName = defaultGroupName + " - " + System.currentTimeMillis();
 		}
@@ -98,24 +98,24 @@ public class ProjectService {
 
 	public void updateProject(Project project) {
 		if (project.getProjectName() == null || project.getProjectName().trim().isEmpty()) {
-			throw new RuntimeException("Ten project khong duoc de trong");
+			throw new RuntimeException("Project name must not be empty");
 		}
 		if (project.getSemester() == null || project.getSemester().trim().isEmpty()) {
-			throw new RuntimeException("Hoc ky khong duoc de trong");
+			throw new RuntimeException("Semester must not be empty");
 		}
 		if (project.getStartDate() == null || project.getEndDate() == null || project.getReportDate() == null) {
-			throw new RuntimeException("Vui long nhap day du ngay bat dau, ket thuc va bao cao");
+			throw new RuntimeException("Please enter the start, end, and report dates completely");
 		}
 		if (project.getEndDate() != null && project.getStartDate() != null
 				&& project.getEndDate().isBefore(project.getStartDate())) {
-			throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
+			throw new RuntimeException("The end date must be after the start date");
 		}
 		if (project.getReportDate() != null && project.getEndDate() != null) {
 			if (project.getReportDate().isAfter(project.getEndDate())) {
-				throw new RuntimeException("Ngay bao cao khong duoc vuot qua ngay ket thuc");
+				throw new RuntimeException("The report date must not be later than the end date");
 			}
 			if (project.getReportDate().isBefore(project.getEndDate().minusDays(3))) {
-				throw new RuntimeException("Ngay bao cao phai nam trong pham vi 3 ngay truoc ngay ket thuc");
+				throw new RuntimeException("The report date must be within 3 days before the end date");
 			}
 		}
 		projectRepository.update(project);
@@ -129,7 +129,7 @@ public class ProjectService {
 	public void markProjectCompleted(int projectId) {
 		Project project = projectRepository.findById(projectId);
 		if (project == null) {
-			throw new RuntimeException("Khong tim thay project");
+			throw new RuntimeException("Project could not be found");
 		}
 		if (!canMarkCompleted(project)) {
 			throw new RuntimeException("Chi duoc danh dau hoan thanh khi project da qua han bao cao");

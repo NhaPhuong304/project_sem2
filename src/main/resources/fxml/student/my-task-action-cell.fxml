@@ -17,55 +17,79 @@
 
         <Button fx:id="startButton"
                 mnemonicParsing="false"
-                text="Bat dau"
+                text="▶"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button">
+                styleClass="table-action-button action-start">
             <tooltip>
-                <Tooltip fx:id="startTooltip" text="Not started yet" />
+                <Tooltip fx:id="startTooltip" text="Bat dau (Not started yet)" />
             </tooltip>
         </Button>
 
         <Button fx:id="submitReviewButton"
                 mnemonicParsing="false"
-                text="Submit for Review"
+                text="📤"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button" />
+                styleClass="table-action-button action-submit">
+            <tooltip>
+                <Tooltip text="Submit for Review" />
+            </tooltip>
+        </Button>
 
         <Button fx:id="requestRevisionButton"
                 mnemonicParsing="false"
-                text="Revision Request"
+                text="🔄"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button" />
+                styleClass="table-action-button action-revision">
+            <tooltip>
+                <Tooltip text="Revision Request" />
+            </tooltip>
+        </Button>
 
         <Button fx:id="completeButton"
                 mnemonicParsing="false"
-                text="Confirm Completion"
+                text="✅"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button" />
+                styleClass="table-action-button action-complete">
+            <tooltip>
+                <Tooltip text="Confirm Completion" />
+            </tooltip>
+        </Button>
 
         <Button fx:id="resubmitButton"
                 mnemonicParsing="false"
-                text="Resubmit for Review"
+                text="🔃"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button" />
+                styleClass="table-action-button action-resubmit">
+            <tooltip>
+                <Tooltip text="Resubmit for Review" />
+            </tooltip>
+        </Button>
 
         <Button fx:id="assignButton"
                 mnemonicParsing="false"
-                text="Assign"
+                text="👤"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button" />
+                styleClass="table-action-button action-assign">
+            <tooltip>
+                <Tooltip text="Assign" />
+            </tooltip>
+        </Button>
 
         <Button fx:id="detailButton"
                 mnemonicParsing="false"
-                text="Detail"
+                text="👁"
                 visible="false"
                 managed="false"
-                styleClass="table-action-button" />
+                styleClass="table-action-button action-view">
+            <tooltip>
+                <Tooltip text="Detail" />
+            </tooltip>
+        </Button>
     </HBox>
 </AnchorPane>

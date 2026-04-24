@@ -96,18 +96,22 @@ public class AdminStaffListController {
 		roleColumn.setCellValueFactory(c -> {
 			com.aptech.projectmgmt.model.UserRole r = c.getValue().getRole();
 			if (r == com.aptech.projectmgmt.model.UserRole.STAFF)
-				return new SimpleStringProperty("Giao vu");
+				return new SimpleStringProperty("Staff");
 			if (r == com.aptech.projectmgmt.model.UserRole.TEACHER)
-				return new SimpleStringProperty("Giao vien");
+				return new SimpleStringProperty("Teacher");
 			return new SimpleStringProperty("");
 		});
 		accountStatusColumn
 				.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isActive() ? "Hoat dong" : "Da khoa"));
 		actionColumn.setCellFactory(col -> new TableCell<>() {
-			private final Button editBtn = new Button("Edit");
-			private final Button lockBtn = new Button("Lock/Unlock");
+			private final Button editBtn = new Button("✎");
+			private final Button lockBtn = new Button("🔒");
 
 			{
+				editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit Staff"));
+				lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock/Unlock Staff"));
 				editBtn.setOnAction(e -> {
 					Staff staff = getTableRow().getItem();
 					if (staff != null) {
@@ -206,7 +210,7 @@ public class AdminStaffListController {
 					okButton.setDisable(false);
 					dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
 					Throwable ex = task.getException();
-					AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+					AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 				}));
 				new Thread(task).start();
 			});
@@ -226,7 +230,7 @@ public class AdminStaffListController {
 			controller.setData(staff);
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Sua giao vu");
+			dialog.setTitle("Edit staff member");
 			DialogPane dialogPane = dialog.getDialogPane();
 			dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialogPane.setContent(content);
@@ -251,7 +255,7 @@ public class AdminStaffListController {
 				    dialog.close();
 
 				    Platform.runLater(() -> {
-				        AlertUtil.showSuccess("Cap nhat giao vu thanh cong");
+				        AlertUtil.showSuccess("Staff member updated successfully");
 				        loadTeachers();
 				    });
 				}));

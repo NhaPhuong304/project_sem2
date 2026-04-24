@@ -27,13 +27,13 @@ public class ClassService {
     public void createClass(String className, String academicYear, Integer managerId) {
         String normalizedClassName = className != null ? className.trim() : "";
         if (normalizedClassName.isEmpty()) {
-            throw new RuntimeException("Ten lop khong duoc de trong");
+            throw new RuntimeException("Class name must not be empty");
         }
         if (ClassRepository.UNASSIGNED_CLASS_NAME.equalsIgnoreCase(normalizedClassName)) {
-            throw new RuntimeException("Ten lop nay duoc he thong du phong, vui long chon ten khac");
+            throw new RuntimeException("This class name is reserved by the system. Please choose another name");
         }
         if (classRepository.findByName(normalizedClassName) != null) {
-            throw new RuntimeException("Ten lop da ton tai");
+            throw new RuntimeException("Class name already exists");
         }
         classRepository.create(normalizedClassName, academicYear, managerId);
     }

@@ -30,7 +30,7 @@ public class Main extends Application {
                 ? getClass().getResource("/css/style.css").toExternalForm() : null;
         if (css != null) scene.getStylesheets().add(css);
         primaryStage.setTitle("Project Management System - Aptech");
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.show();

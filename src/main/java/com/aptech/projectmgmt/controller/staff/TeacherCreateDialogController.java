@@ -1,9 +1,9 @@
 package com.aptech.projectmgmt.controller.staff;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
 import com.aptech.projectmgmt.model.UserRole;
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 
 public class TeacherCreateDialogController {
 
@@ -14,8 +14,8 @@ public class TeacherCreateDialogController {
 
     @FXML
     public void initialize() {
-        roleComboBox.getItems().addAll("Giáo viên", "Giáo vụ");
-        roleComboBox.setValue("Giáo viên");
+        roleComboBox.getItems().addAll("Teacher", "Staff");
+        roleComboBox.setValue("Teacher");
     }
 
     public String getUsername() {
@@ -31,7 +31,7 @@ public class TeacherCreateDialogController {
     }
 
     public UserRole getRole() {
-        if ("Giáo vụ".equals(roleComboBox.getValue())) {
+        if ("Staff".equals(roleComboBox.getValue())) {
             return UserRole.STAFF;
         }
         return UserRole.TEACHER;

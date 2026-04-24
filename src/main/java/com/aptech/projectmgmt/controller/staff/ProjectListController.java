@@ -293,11 +293,15 @@ public class ProjectListController {
 	}
 	private TableCell<Project, Void> createActionCell() {
 		return new TableCell<>() {
-			private final Button viewBtn = new Button("View");
-			private final Button editBtn = new Button("Edit");
+			private final Button viewBtn = new Button("👁");
+			private final Button editBtn = new Button("✎");
 			private final HBox box = new HBox(8, viewBtn, editBtn);
 
 			{
+				viewBtn.setStyle("-fx-text-fill: #3b82f6; -fx-font-size: 14px; -fx-background-color: #eff6ff; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				viewBtn.setTooltip(new javafx.scene.control.Tooltip("View Detail"));
+				editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit Project"));
 				viewBtn.setOnAction(e -> {
 					Project project = getTableRow() != null ? getTableRow().getItem() : null;
 					if (project != null) {
@@ -411,11 +415,11 @@ public class ProjectListController {
 
 	private void handleAddProject() {
 		if (readOnlyMode) {
-			AlertUtil.showError("Tai khoan giao vien chi duoc xem project huong dan");
+			AlertUtil.showError("Teacher accounts can only view supervised projects");
 			return;
 		}
 		if (classId <= ALL_CLASSES_ID) {
-			AlertUtil.showError("Vui long chon lop truoc khi tao project");
+			AlertUtil.showError("Please select a class before creating a project");
 			return;
 		}
 		Task<List<Staff>> loadStaffTask = new Task<>() {
@@ -427,14 +431,14 @@ public class ProjectListController {
 		loadStaffTask.setOnSucceeded(e -> Platform.runLater(() -> showAddProjectDialog(loadStaffTask.getValue())));
 		loadStaffTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = loadStaffTask.getException();
-			AlertUtil.showError("Khong tai duoc danh sach staff: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Could not load the staff list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(loadStaffTask).start();
 	}
 
 	private void showAddProjectDialog(List<Staff> staffList) {
 		if (staffList == null || staffList.isEmpty()) {
-			AlertUtil.showError("Chua co tai khoan giao vien nao. Hay tao account role TEACHER truoc.");
+			AlertUtil.showError("No teacher account exists yet. Please create a TEACHER account first.");
 			return;
 		}
 		try {
@@ -460,11 +464,11 @@ public class ProjectListController {
 			java.time.LocalDate startDate = project.getStartDate();
 			java.time.LocalDate endDate = project.getEndDate();
 			if (startDate == null || endDate == null) {
-				AlertUtil.showError("Vui long chon ngay bat dau va ngay ket thuc cho project.");
+				AlertUtil.showError("Please select a start date va ngay ket thuc cho project.");
 				return;
 			}
 			if (!endDate.equals(startDate.plusMonths(1))) {
-				AlertUtil.showError("Thoi gian du an phai dung 1 thang (ngay ket thuc = ngay bat dau + 1 thang).");
+				AlertUtil.showError("The project duration must be exactly 1 month (end date = start date + 1 month).");
 				return;
 			}
 
@@ -482,11 +486,11 @@ public class ProjectListController {
 			}));
 			task.setOnFailed(e -> Platform.runLater(() -> {
 				Throwable ex = task.getException();
-				AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+				AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 			}));
 			new Thread(task).start();
 		} catch (Exception e) {
-			AlertUtil.showError("Khong the mo form tao project: " + e.getMessage());
+			AlertUtil.showError("Could not open the create project form: " + e.getMessage());
 		}
 	}
 
@@ -555,7 +559,7 @@ public class ProjectListController {
 					controller.initData(projectId);
 					contentArea.getChildren().setAll(content);
 				} catch (Exception e) {
-					AlertUtil.showError("Loi: " + e.getMessage());
+					AlertUtil.showError("Error: " + e.getMessage());
 				}
 				break;
 			}

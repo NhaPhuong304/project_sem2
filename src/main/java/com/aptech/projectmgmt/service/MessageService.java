@@ -48,7 +48,7 @@ public class MessageService {
 
 	public void sendMessage(int senderId, int receiverId, Integer taskId, String content) {
 		if (content == null || content.trim().isEmpty()) {
-			throw new RuntimeException("Noi dung tin nhan khong duoc de trong");
+			throw new RuntimeException("Message content must not be empty");
 		}
 		Message msg = new Message();
 		msg.setSenderId(senderId);

@@ -242,7 +242,7 @@ public class TaskRepository extends BaseRepository {
 						insertLogPs.setInt(1, taskId);
 						insertLogPs.setInt(2, studentId);
 						insertLogPs.setTimestamp(3, Timestamp.valueOf(currentTime));
-						insertLogPs.setString(4, "Tu dong: qua 1 gio khong xac nhan thuc hien");
+						insertLogPs.setString(4, "Automatic reset: no execution confirmation after 1 hour");
 						insertLogPs.addBatch();
 
 						updateTaskPs.setInt(1, taskId);

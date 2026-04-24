@@ -48,7 +48,7 @@ public class MailService {
             message.setText(body);
             Transport.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Khong the gui email: " + e.getMessage(), e);
+            throw new RuntimeException("Could not send the email: " + e.getMessage(), e);
         }
     }
 
@@ -69,7 +69,7 @@ public class MailService {
                 props.load(in);
             }
         } catch (IOException e) {
-            System.err.println("Khong the doc application.properties: " + e.getMessage());
+            System.err.println("Could not read application.properties: " + e.getMessage());
         }
         return props;
     }

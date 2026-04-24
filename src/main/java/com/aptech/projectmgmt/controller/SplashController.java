@@ -60,7 +60,7 @@ public class SplashController {
             try {
                 SceneManager.switchScene(stage, SceneManager.LOGIN);
             } catch (Exception ex) {
-                AlertUtil.showError("Loi mo man hinh dang nhap: " + ex.getMessage());
+                AlertUtil.showError("Failed to open the login screen: " + ex.getMessage());
             }
         });
     }

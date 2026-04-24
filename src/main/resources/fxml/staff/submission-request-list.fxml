@@ -59,7 +59,7 @@
                                     </content>
                                 </ScrollPane>
 
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Người nhận" />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Recipients" />
                                 <ScrollPane fitToWidth="true" prefHeight="185.0">
                                     <content>
                                         <VBox fx:id="recipientBox" spacing="7.0">
@@ -71,27 +71,28 @@
                                 </ScrollPane>
 
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
-                                    <Button fx:id="sendRequestBtn" styleClass="add-btn" text="Gửi yêu cầu" />
+                                    <Button fx:id="sendRequestBtn" styleClass="add-btn" text="Send Request" />
                                     <Label fx:id="statusLabel" style="-fx-text-fill: #475569;" />
                                 </HBox>
                             </VBox>
 
                             <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Yêu cầu đã tạo" />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Created Requests" />
                                 <TableView fx:id="requestTable" prefHeight="520.0" styleClass="student-table" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="titleColumn" prefWidth="250.0" text="Tiêu đề" />
-                                        <TableColumn fx:id="deadlineColumn" prefWidth="140.0" text="Hạn nộp" />
-                                        <TableColumn fx:id="statusColumn" prefWidth="90.0" text="Trạng thái" />
-                                        <TableColumn fx:id="createdAtColumn" prefWidth="135.0" text="Ngày tạo" />
+                                        <TableColumn fx:id="titleColumn" prefWidth="250.0" text="Title" />
+                                        <TableColumn fx:id="deadlineColumn" prefWidth="140.0" text="Deadline" />
+                                        <TableColumn fx:id="statusColumn" prefWidth="90.0" text="Status" />
+                                        <TableColumn fx:id="createdAtColumn" prefWidth="135.0" text="Created At" />
                                     </columns>
+		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                                 </TableView>
                             </VBox>
                         </HBox>
                     </content>
                 </Tab>
 
-                <Tab text="Theo dõi bài nộp">
+                <Tab text="Submission Tracking">
                     <content>
                         <HBox spacing="16.0">
                             <padding>
@@ -100,43 +101,46 @@
 
                             <VBox prefWidth="285.0" spacing="10.0">
                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Yêu cầu" />
-                                    <Button fx:id="refreshMonitorBtn" text="Tải lại" />
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Requests" />
+                                    <Button fx:id="refreshMonitorBtn" text="Refresh" />
                                 </HBox>
                                 <TableView fx:id="monitorRequestTable" prefHeight="505.0" styleClass="student-table" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="monitorTitleColumn" prefWidth="145.0" text="Tiêu đề" />
-                                        <TableColumn fx:id="monitorDeadlineColumn" prefWidth="105.0" text="Hạn nộp" />
-                                        <TableColumn fx:id="monitorStatusColumn" prefWidth="80.0" text="Trạng thái" />
+                                        <TableColumn fx:id="monitorTitleColumn" prefWidth="145.0" text="Title" />
+                                        <TableColumn fx:id="monitorDeadlineColumn" prefWidth="105.0" text="Deadline" />
+                                        <TableColumn fx:id="monitorStatusColumn" prefWidth="80.0" text="Status" />
                                     </columns>
+		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                                 </TableView>
                             </VBox>
 
                             <VBox prefWidth="285.0" spacing="10.0">
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Nhóm nhận" />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Recipient Groups" />
                                 <TableView fx:id="targetTable" prefHeight="505.0" styleClass="student-table" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="groupColumn" prefWidth="120.0" text="Nhóm" />
+                                        <TableColumn fx:id="groupColumn" prefWidth="120.0" text="Group" />
                                         <TableColumn fx:id="leaderColumn" prefWidth="105.0" text="Leader" />
-                                        <TableColumn fx:id="targetStatusColumn" prefWidth="95.0" text="Trạng thái" />
-                                        <TableColumn fx:id="submittedAtColumn" prefWidth="115.0" text="Nộp lúc" />
+                                        <TableColumn fx:id="targetStatusColumn" prefWidth="95.0" text="Status" />
+                                        <TableColumn fx:id="submittedAtColumn" prefWidth="115.0" text="Submitted At" />
                                     </columns>
+		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                                 </TableView>
                             </VBox>
 
                             <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="File đã nộp" />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Submitted Files" />
                                 <TableView fx:id="submittedFileTable" prefHeight="450.0" styleClass="student-table" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="requirementColumn" prefWidth="170.0" text="Nội dung" />
-                                        <TableColumn fx:id="submittedFileNameColumn" prefWidth="170.0" text="Tên file" />
-                                        <TableColumn fx:id="submittedFileSizeColumn" prefWidth="80.0" text="Dung lượng" />
-                                        <TableColumn fx:id="uploadedAtColumn" prefWidth="125.0" text="Nộp lúc" />
+                                        <TableColumn fx:id="requirementColumn" prefWidth="170.0" text="Requirement" />
+                                        <TableColumn fx:id="submittedFileNameColumn" prefWidth="170.0" text="File Name" />
+                                        <TableColumn fx:id="submittedFileSizeColumn" prefWidth="80.0" text="Size" />
+                                        <TableColumn fx:id="uploadedAtColumn" prefWidth="125.0" text="Submitted At" />
                                     </columns>
+		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                                 </TableView>
 
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
-                                    <Button fx:id="downloadFilesBtn" disable="true" styleClass="add-btn" text="Tải file nhóm" />
+                                    <Button fx:id="downloadFilesBtn" disable="true" styleClass="add-btn" text="Download Group Files" />
                                     <Label fx:id="monitorStatusLabel" style="-fx-text-fill: #475569;" />
                                 </HBox>
                             </VBox>

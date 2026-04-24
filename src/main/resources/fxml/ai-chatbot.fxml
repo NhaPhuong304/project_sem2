@@ -5,29 +5,29 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.effect.DropShadow?>
 
-<!-- Thay bằng StackPane để làm Overlay hoàn hảo trong mọi kích thước màn hình -->
+<!-- Use StackPane for a consistent overlay across screen sizes -->
 <StackPane pickOnBounds="false" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aptech.projectmgmt.controller.AIChatBotController">
-   
-   <!-- HỘP THOẠI CHAT (Ẩn mặc định) -->
-   <!-- Cố định kích thước bằng maxHeight/maxWidth để không bị giãn theo màn hình -->
-   <VBox fx:id="chatWindow" visible="false" spacing="0" 
-         maxHeight="450.0" maxWidth="350.0" 
+
+   <!-- Chat dialog (hidden by default) -->
+   <!-- Keep a fixed size so it does not stretch with the screen -->
+   <VBox fx:id="chatWindow" visible="false" spacing="0"
+         maxHeight="450.0" maxWidth="350.0"
          StackPane.alignment="BOTTOM_LEFT"
          style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #DDDDDD; -fx-border-width: 1;">
-       
-       <!-- Viền đổ bóng cho khung chat -->
+
+       <!-- Shadow around the chat panel -->
        <effect>
            <DropShadow color="#00000040" radius="15" spread="0.1" />
        </effect>
 
-       <!-- Đẩy khung chat nhích ra từ lề trái, kế bên vị trí con Robot -->
+       <!-- Offset the chat panel from the left edge near the robot button -->
        <StackPane.margin>
            <Insets bottom="40.0" left="110.0" />
        </StackPane.margin>
@@ -38,22 +38,22 @@
            <Button text="X" onAction="#toggleChat" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
        </HBox>
 
-       <!-- Vùng hiện tin nhắn -->
+       <!-- Message list -->
        <ListView fx:id="chatListView" VBox.vgrow="ALWAYS" style="-fx-background-insets: 0; -fx-padding: 10;" />
 
-       <!-- Vùng nhập chat -->
+       <!-- Chat input area -->
        <HBox spacing="10" style="-fx-background-color: #F8F9FA; -fx-background-radius: 0 0 15 15; -fx-padding: 10;">
-           <TextField fx:id="inputField" promptText="Trợ lý ơi..." HBox.hgrow="ALWAYS" onAction="#sendMessage" style="-fx-background-radius: 20; -fx-padding: 8 15;" />
-           <Button text="Gửi" onAction="#sendMessage" style="-fx-background-color: #2F80ED; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;" />
+           <TextField fx:id="inputField" promptText="Ask the assistant..." HBox.hgrow="ALWAYS" onAction="#sendMessage" style="-fx-background-radius: 20; -fx-padding: 8 15;" />
+           <Button text="Send" onAction="#sendMessage" style="-fx-background-color: #2F80ED; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;" />
        </HBox>
    </VBox>
 
-   <!-- NÚT ROBOT VẪY TAY -->
-   <!-- Đẩy sang giữa lề trái màn hình -->
-   <Button fx:id="chatbotBtn" onAction="#toggleChat" 
+   <!-- Robot toggle button -->
+   <!-- Position it near the left edge of the screen -->
+   <Button fx:id="chatbotBtn" onAction="#toggleChat"
            StackPane.alignment="BOTTOM_LEFT"
            style="-fx-background-color: transparent; -fx-cursor: hand;">
-       
+
        <StackPane.margin>
            <Insets bottom="45.0" left="20.0" />
        </StackPane.margin>
@@ -65,7 +65,8 @@
                </image>
            </ImageView>
        </graphic>
-       <!-- Đổ bóng nút Robot -->
+
+       <!-- Shadow for the robot button -->
        <effect>
            <DropShadow color="#00000060" radius="10" spread="0.2"/>
        </effect>

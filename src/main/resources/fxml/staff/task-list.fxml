@@ -39,5 +39,6 @@
 			<TableColumn fx:id="actionColumn" text="Actions"
 				prefWidth="160.0" />
 		</columns>
+		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
 	</TableView>
 </AnchorPane>

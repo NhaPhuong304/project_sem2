@@ -46,17 +46,17 @@ public class GroupService {
 	public void createGroup(int projectId, String groupName) {
 		String normalizedName = groupName != null ? groupName.trim() : "";
 		if (normalizedName.isEmpty()) {
-			throw new RuntimeException("Ten nhom khong duoc de trong");
+			throw new RuntimeException("Group name must not be empty");
 		}
 		Project project = projectRepository.findById(projectId);
 		if (project == null) {
-			throw new RuntimeException("Khong tim thay project");
+			throw new RuntimeException("Project could not be found");
 		}
 		if (project.getGroupId() > 0) {
-			throw new RuntimeException("Moi project chi duoc gan 1 nhom");
+			throw new RuntimeException("Each project can only be assigned to one group");
 		}
 		if (groupRepository.existsGroupName(project.getClassId(), normalizedName)) {
-			throw new RuntimeException("Ten nhom da ton tai trong lop nay");
+			throw new RuntimeException("This group name already exists in the class");
 		}
 		groupRepository.createStandaloneGroup(project.getClassId(), normalizedName);
 	}
@@ -72,31 +72,31 @@ public class GroupService {
 	public void addMemberToGroup(int groupId, int studentId, MemberRole role) {
 		ProjectGroup group = groupRepository.findById(groupId);
 		if (group == null) {
-			throw new RuntimeException("Khong tim thay nhom");
+			throw new RuntimeException("Group could not be found");
 		}
 
 		Student student = studentRepository.findById(studentId);
 		if (student == null) {
-			throw new RuntimeException("Khong tim thay sinh vien");
+			throw new RuntimeException("Student could not be found");
 		}
 
 		if (student.getClassId() != group.getClassId()) {
-			throw new RuntimeException("Sinh vien khong thuoc lop cua nhom nay");
+			throw new RuntimeException("The student does not belong to this group's class");
 		}
 
 		if (group.getProjectId() > 0 && groupRepository.existsStudentInProject(group.getProjectId(), studentId)) {
-			throw new RuntimeException("Sinh vien nay da thuoc mot project dang hoat dong");
+			throw new RuntimeException("This student already belongs to an active project");
 		}
 
 		int activeMemberCount = groupRepository.countActiveMembers(groupId);
 		boolean hasLeader = groupRepository.hasActiveLeader(groupId);
 
 		if (activeMemberCount == 0 && role != MemberRole.LEADER) {
-			throw new RuntimeException("Sinh vien dau tien cua nhom bat buoc phai la Truong nhom");
+			throw new RuntimeException("The first student in the group must be the group leader");
 		}
 
 		if (hasLeader && role == MemberRole.LEADER) {
-			throw new RuntimeException("Moi nhom chi duoc co 1 Truong nhom");
+			throw new RuntimeException("Each group can only have one leader");
 		}
 
 		groupRepository.addMember(groupId, studentId, role);
@@ -109,7 +109,7 @@ public class GroupService {
 	public void reactivateMember(int memberId, int staffId) {
 		GroupMember member = groupRepository.findMemberById(memberId);
 		if (member == null) {
-			throw new RuntimeException("Khong tim thay thanh vien");
+			throw new RuntimeException("Member could not be found");
 		}
 
 		groupRepository.reactivateMember(memberId);
@@ -119,21 +119,21 @@ public class GroupService {
 	public void changeLeader(int groupId, int newLeaderMemberId, int staffId) {
 		GroupMember newLeader = groupRepository.findMemberById(newLeaderMemberId);
 		if (newLeader == null) {
-			throw new RuntimeException("Khong tim thay thanh vien duoc chon");
+			throw new RuntimeException("Member could not be found duoc chon");
 		}
 		if (newLeader.getGroupId() != groupId) {
-			throw new RuntimeException("Thanh vien khong thuoc nhom nay");
+			throw new RuntimeException("The member does not belong to this group");
 		}
 		if (newLeader.getStatus() != MemberStatus.ACTIVE) {
-			throw new RuntimeException("Chi duoc chon thanh vien dang hoat dong");
+			throw new RuntimeException("Only active members can be selected");
 		}
 		if (newLeader.getRole() == MemberRole.LEADER) {
-			throw new RuntimeException("Thanh vien nay da la leader");
+			throw new RuntimeException("Member nay da la leader");
 		}
 
 		GroupMember oldLeader = groupRepository.findMembersByGroupId(groupId).stream()
 				.filter(m -> m.getStatus() == MemberStatus.ACTIVE && m.getRole() == MemberRole.LEADER).findFirst()
-				.orElseThrow(() -> new RuntimeException("Khong tim thay leader hien tai"));
+				.orElseThrow(() -> new RuntimeException("The current leader could not be found"));
 
 		groupRepository.transferLeader(oldLeader.getMemberId(), newLeaderMemberId);
 
@@ -151,11 +151,11 @@ public class GroupService {
 			return;
 		}
 
-		String subject = "[Aptech] Thong bao thay doi leader nhom";
-		String body = "Xin chao " + oldLeaderStudent.getFullName() + ",\n\n"
-				+ "Ban khong con giu vai tro truong nhom.\n" + "Nguoi thuc hien: " + staff.getFullName() + "\n"
-				+ "Leader moi: " + (newLeaderStudent != null ? newLeaderStudent.getFullName() : "") + "\n\n"
-				+ "Vai tro cua ban da duoc chuyen thanh thanh vien.";
+		String subject = "[Aptech] Group leader change notification";
+		String body = "Hello " + oldLeaderStudent.getFullName() + ",\n\n"
+				+ "You no longer hold the group leader role.\n" + "Performed by: " + staff.getFullName() + "\n"
+				+ "New leader: " + (newLeaderStudent != null ? newLeaderStudent.getFullName() : "") + "\n\n"
+				+ "Your role has been changed to member.";
 
 		mailService.sendEmailQuietly(oldLeaderStudent.getEmail(), subject, body);
 	}
@@ -170,11 +170,11 @@ public class GroupService {
 			return;
 		}
 
-		String subject = "[Aptech] Thong bao duoc phan quyen truong nhom";
-		String body = "Xin chao " + newLeaderStudent.getFullName() + ",\n\n"
-				+ "Ban da duoc phan quyen lam truong nhom.\n" + "Nguoi thuc hien: " + staff.getFullName() + "\n"
-				+ "Leader cu: " + (oldLeaderStudent != null ? oldLeaderStudent.getFullName() : "") + "\n\n"
-				+ "Vui long dang nhap he thong de theo doi va quan ly task cua nhom.";
+		String subject = "[Aptech] Group leader assignment notification";
+		String body = "Hello " + newLeaderStudent.getFullName() + ",\n\n"
+				+ "You have been assigned as the group leader.\n" + "Performed by: " + staff.getFullName() + "\n"
+				+ "Previous leader: " + (oldLeaderStudent != null ? oldLeaderStudent.getFullName() : "") + "\n\n"
+				+ "Please sign in to the system to track and manage the group's tasks.";
 
 		mailService.sendEmailQuietly(newLeaderStudent.getEmail(), subject, body);
 	}
@@ -191,10 +191,10 @@ public class GroupService {
 			return;
 		}
 
-		String subject = "[Aptech] Thong bao kich hoat lai tham gia nhom";
-		String body = "Xin chao " + student.getFullName() + ",\n\n" + "Ban da duoc kich hoat lai tham gia nhom.\n"
-				+ "Nguoi thuc hien: " + staff.getFullName() + "\n\n"
-				+ "Vui long dang nhap he thong de tiep tuc theo doi cong viec va thong bao moi.";
+		String subject = "[Aptech] Group participation reactivation notification";
+		String body = "Hello " + student.getFullName() + ",\n\n" + "Your participation in the group has been reactivated.\n"
+				+ "Performed by: " + staff.getFullName() + "\n\n"
+				+ "Please sign in to continue tracking tasks and notifications.";
 
 		mailService.sendEmailQuietly(student.getEmail(), subject, body);
 	}
@@ -202,27 +202,27 @@ public class GroupService {
 	public void excludeLeaderAndTransfer(int oldLeaderMemberId, int newLeaderMemberId, int staffId, String reason) {
 		GroupMember oldLeader = groupRepository.findMemberById(oldLeaderMemberId);
 		if (oldLeader == null) {
-			throw new RuntimeException("Khong tim thay leader can huy quyen");
+			throw new RuntimeException("The leader to be revoked could not be found");
 		}
 		if (oldLeader.getStatus() != MemberStatus.ACTIVE) {
-			throw new RuntimeException("Leader nay khong con hoat dong");
+			throw new RuntimeException("This leader is no longer active");
 		}
 		if (oldLeader.getRole() != MemberRole.LEADER) {
-			throw new RuntimeException("Thanh vien nay khong phai leader");
+			throw new RuntimeException("This member is not a leader");
 		}
 
 		GroupMember newLeader = groupRepository.findMemberById(newLeaderMemberId);
 		if (newLeader == null) {
-			throw new RuntimeException("Khong tim thay thanh vien thay the");
+			throw new RuntimeException("Member could not be found thay the");
 		}
 		if (newLeader.getGroupId() != oldLeader.getGroupId()) {
-			throw new RuntimeException("Leader moi khong thuoc cung nhom");
+			throw new RuntimeException("The new leader does not belong to the same group");
 		}
 		if (newLeader.getStatus() != MemberStatus.ACTIVE) {
-			throw new RuntimeException("Chi duoc chon thanh vien dang hoat dong");
+			throw new RuntimeException("Only active members can be selected");
 		}
 		if (newLeader.getMemberId() == oldLeaderMemberId) {
-			throw new RuntimeException("Khong the chon chinh leader hien tai");
+			throw new RuntimeException("You cannot reselect the current leader");
 		}
 
 		String normalizedReason = reason != null ? reason.trim() : "";
@@ -242,10 +242,10 @@ public class GroupService {
 			return;
 		}
 
-		String subject = "[Aptech] Thong bao huy quyen tham gia nhom";
-		String body = "Xin chao " + student.getFullName() + ",\n\n" + "Ban da bi huy quyen tham gia nhom.\n"
-				+ "Nguoi thuc hien: " + staff.getFullName() + "\n" + "Ly do: " + reason + "\n\n"
-				+ "Vui long lien he giao vu hoac giang vien huong dan neu can them thong tin.";
+		String subject = "[Aptech] Group participation revocation notification";
+		String body = "Hello " + student.getFullName() + ",\n\n" + "Your participation in the group has been revoked.\n"
+				+ "Performed by: " + staff.getFullName() + "\n" + "Ly do: " + reason + "\n\n"
+				+ "Please contact the staff office or supervising teacher if you need more information.";
 
 		mailService.sendEmailQuietly(student.getEmail(), subject, body);
 	}
@@ -253,14 +253,14 @@ public class GroupService {
 	public void renameGroup(int groupId, String newGroupName) {
 		ProjectGroup group = groupRepository.findById(groupId);
 		if (group == null) {
-			throw new RuntimeException("Khong tim thay nhom");
+			throw new RuntimeException("Group could not be found");
 		}
 		String normalizedName = newGroupName != null ? newGroupName.trim() : "";
 		if (normalizedName.isEmpty()) {
-			throw new RuntimeException("Ten nhom khong duoc de trong");
+			throw new RuntimeException("Group name must not be empty");
 		}
 		if (groupRepository.existsGroupNameExcluding(group.getClassId(), groupId, normalizedName)) {
-			throw new RuntimeException("Ten nhom da ton tai trong lop nay");
+			throw new RuntimeException("This group name already exists in the class");
 		}
 		groupRepository.updateGroupName(groupId, normalizedName);
 	}
@@ -268,13 +268,13 @@ public class GroupService {
 	public void excludeMember(int memberId, int staffId, String reason) {
 		GroupMember member = groupRepository.findMemberById(memberId);
 		if (member == null) {
-			throw new RuntimeException("Khong tim thay thanh vien");
+			throw new RuntimeException("Member could not be found");
 		}
 		if (member.getStatus() != MemberStatus.ACTIVE) {
-			throw new RuntimeException("Thanh vien nay da bi loai");
+			throw new RuntimeException("Member nay da bi loai");
 		}
 		if (groupRepository.countActiveMembers(member.getGroupId()) <= 2) {
-			throw new RuntimeException("Moi nhom phai co toi thieu 2 sinh vien dang hoat dong");
+			throw new RuntimeException("Each group must have at least 2 active students");
 		}
 
 		String normalizedReason = reason != null ? reason.trim() : "";
@@ -289,7 +289,7 @@ public class GroupService {
 	public void removeMember(int memberId) {
 		GroupMember member = groupRepository.findMemberById(memberId);
 		if (member == null) {
-			throw new RuntimeException("Khong tim thay thanh vien");
+			throw new RuntimeException("Member could not be found");
 		}
 		groupRepository.removeMember(memberId);
 	}

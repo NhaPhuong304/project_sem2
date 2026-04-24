@@ -53,7 +53,7 @@ public class StudentTransferDialogController {
     public SchoolClass getSelectedClass() {
         SchoolClass selected = classCombo.getValue();
         if (selected == null) {
-            throw new RuntimeException("Vui long chon lop moi");
+            throw new RuntimeException("Please select a new class");
         }
         return selected;
     }

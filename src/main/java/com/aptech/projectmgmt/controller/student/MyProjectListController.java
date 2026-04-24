@@ -64,7 +64,7 @@ public class MyProjectListController {
 		statusColumn.setCellValueFactory(c -> new SimpleStringProperty(
 				c.getValue().getStatus() == ProjectStatus.ACTIVE ? "Dang hoat dong" : "Hoan thanh"));
 		roleColumn.setCellValueFactory(c -> new SimpleStringProperty(
-				c.getValue().getMyRole() == MemberRole.LEADER ? "Truong nhom" : "Thanh vien"));
+				c.getValue().getMyRole() == MemberRole.LEADER ? "Leader" : "Member"));
 
 		projectTable.setItems(allProjects);
 		projectTable.setRowFactory(tv -> {
@@ -92,14 +92,14 @@ public class MyProjectListController {
 		task.setOnSucceeded(e -> Platform.runLater(() -> allProjects.setAll(task.getValue())));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai du an: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load projects: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
 
 	private void navigateToTaskList(Project project) {
 		if (dashboardController == null) {
-			AlertUtil.showError("Khong tim thay dashboard controller");
+			AlertUtil.showError("Dashboard controller could not be found");
 			return;
 		}
 

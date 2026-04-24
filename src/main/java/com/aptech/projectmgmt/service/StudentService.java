@@ -62,25 +62,25 @@ public class StudentService {
 		String normalizedEmail = email != null ? email.trim() : "";
 
 		if (normalizedStudentCode.isEmpty()) {
-			throw new RuntimeException("Ma sinh vien khong duoc de trong");
+			throw new RuntimeException("Student code must not be empty");
 		}
 		if (normalizedFullName.isEmpty()) {
-			throw new RuntimeException("Ho ten khong duoc de trong");
+			throw new RuntimeException("Full name must not be empty");
 		}
 		if (normalizedEmail.isEmpty()) {
-			throw new RuntimeException("Email khong duoc de trong");
+			throw new RuntimeException("Email must not be empty");
 		}
 		if (!normalizedEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-			throw new RuntimeException("Email khong hop le");
+			throw new RuntimeException("Invalid email address");
 		}
 		if (studentRepository.findByStudentCode(normalizedStudentCode) != null) {
-			throw new RuntimeException("Ma sinh vien da ton tai");
+			throw new RuntimeException("Student code already exists");
 		}
 		if (studentRepository.findByEmail(normalizedEmail) != null) {
-			throw new RuntimeException("Email da ton tai");
+			throw new RuntimeException("Email already exists");
 		}
 		if (accountRepository.findByUsername(normalizedStudentCode) != null) {
-			throw new RuntimeException("Username mac dinh theo ma sinh vien da ton tai");
+			throw new RuntimeException("The default username based on the student code already exists");
 		}
 
 		String temporaryPassword = "123";
@@ -109,12 +109,13 @@ public class StudentService {
 			throw ex;
 		}
 
-		boolean emailSent = mailService.sendEmailQuietly(normalizedEmail, "[Aptech] Tai khoan sinh vien da duoc tao",
-				"Xin chao " + normalizedFullName + ",\n\n" + "Tai khoan sinh vien cua ban da duoc tao thanh cong.\n"
-						+ "Username: " + normalizedStudentCode + "\n" + "Mat khau tam thoi: " + temporaryPassword
+		boolean emailSent = mailService.sendEmailQuietly(normalizedEmail, "[Aptech] Student account created",
+				"Hello " + normalizedFullName + ",\n\n" + "Your student account has been created successfully.\n"
+						+ "Username: " + normalizedStudentCode + "\n" + "Temporary password: " + temporaryPassword
 						+ "\n\n"
-						+ "Vui long dang nhap vao he thong va doi mat khau ngay trong lan dau tien de bao mat tai khoan.\n"
-						+ "He thong se yeu cau xac thuc OTP qua email khi ban doi mat khau.\n\n" + "Tran trong.");
+						+ "Please sign in to the system and change your password on first login to secure your account.\n"
+						+ "The system will require OTP verification by email when you change your password.\n\n"
+						+ "Best regards.");
 
 		return new StudentCreationResult(normalizedStudentCode, temporaryPassword, emailSent);
 	}
@@ -122,11 +123,11 @@ public class StudentService {
 	public void assignStudentToClass(int studentId, int classId) {
 		Student student = studentRepository.findById(studentId);
 		if (student == null) {
-			throw new RuntimeException("Khong tim thay sinh vien");
+			throw new RuntimeException("Student could not be found");
 		}
 		int unassignedClassId = classService.ensureUnassignedClass();
 		if (student.getClassId() != unassignedClassId) {
-			throw new RuntimeException("Sinh vien nay da co lop, khong the them lai");
+			throw new RuntimeException("This student already has a class and cannot be added again");
 		}
 		studentRepository.updateClassId(studentId, classId);
 	}
@@ -134,19 +135,19 @@ public class StudentService {
 	public void lockStudent(int studentId) {
 		Student student = studentRepository.findById(studentId);
 		if (student == null) {
-			throw new RuntimeException("Khong tim thay sinh vien");
+			throw new RuntimeException("Student could not be found");
 		}
 
 		if (student.getAccountId() == null) {
-			throw new RuntimeException("Sinh vien chua co tai khoan");
+			throw new RuntimeException("This student does not have an account yet");
 		}
 
 		if (!student.isActive()) {
-			throw new RuntimeException("Tai khoan sinh vien da bi khoa");
+			throw new RuntimeException("The student account has already been locked");
 		}
 
 		if (studentRepository.isStudentWorkingOnProject(studentId)) {
-			throw new RuntimeException("Sinh vien dang tham gia project, khong duoc khoa");
+			throw new RuntimeException("The student is currently involved in a project and cannot be locked");
 		}
 
 		studentRepository.updateStudentAccountStatus(studentId, false);
@@ -155,15 +156,15 @@ public class StudentService {
 	public void unlockStudent(int studentId) {
 		Student student = studentRepository.findById(studentId);
 		if (student == null) {
-			throw new RuntimeException("Khong tim thay sinh vien");
+			throw new RuntimeException("Student could not be found");
 		}
 
 		if (student.getAccountId() == null) {
-			throw new RuntimeException("Sinh vien chua co tai khoan");
+			throw new RuntimeException("This student does not have an account yet");
 		}
 
 		if (student.isActive()) {
-			throw new RuntimeException("Tai khoan sinh vien dang hoat dong");
+			throw new RuntimeException("The student account is already active");
 		}
 
 		studentRepository.updateStudentAccountStatus(studentId, true);
@@ -176,25 +177,25 @@ public class StudentService {
 	public void transferStudentToClass(int studentId, int newClassId) {
 		Student student = studentRepository.findById(studentId);
 		if (student == null) {
-			throw new RuntimeException("Khong tim thay sinh vien");
+			throw new RuntimeException("Student could not be found");
 		}
 
 		var newClassObj = classService.getClassById(newClassId);
 		if (newClassObj == null) {
-			throw new RuntimeException("Khong tim thay lop moi");
+			throw new RuntimeException("The new class could not be found");
 		}
 
 		int unassignedClassId = classService.ensureUnassignedClass();
 		if (newClassId == unassignedClassId) {
-			throw new RuntimeException("Khong duoc chuyen ve lop du phong");
+			throw new RuntimeException("Transfer to the backup class is not allowed");
 		}
 
 		if (student.getClassId() == newClassId) {
-			throw new RuntimeException("Sinh vien da o lop nay");
+			throw new RuntimeException("The student is already in this class");
 		}
 
 		if (studentRepository.isStudentWorkingOnProject(studentId)) {
-			throw new RuntimeException("Sinh vien dang tham gia project, khong duoc chuyen lop");
+			throw new RuntimeException("The student is currently involved in a project and cannot be transferred");
 		}
 
 		studentRepository.updateClassId(studentId, newClassId);

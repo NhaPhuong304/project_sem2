@@ -68,7 +68,7 @@ public class MessageInboxController {
         task.setOnSucceeded(e -> Platform.runLater(() -> messages.setAll(task.getValue())));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai tin nhan: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Failed to load messages: " + (ex != null ? ex.getMessage() : ""));
         }));
         new Thread(task).start();
     }
@@ -105,7 +105,7 @@ public class MessageInboxController {
                     dashboardController.adjustUnreadBadge(1);
                 }
                 Throwable ex = task.getException();
-                AlertUtil.showError("Loi cap nhat trang thai tin nhan: " + (ex != null ? ex.getMessage() : ""));
+                AlertUtil.showError("Failed to update message status: " + (ex != null ? ex.getMessage() : ""));
             }));
             new Thread(task).start();
         }

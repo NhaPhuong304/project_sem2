@@ -20,11 +20,11 @@ public class OtpService {
     public OtpDispatchInfo generateAndSendOtp(int accountId, OtpPurpose purpose) {
         String otpCode = otpRepository.generateOtp(accountId, purpose.getValue());
         if (otpCode == null) {
-            throw new RuntimeException("Khong the tao ma OTP. Vui long thu lai.");
+            throw new RuntimeException("Could not generate the OTP code. Please try again.");
         }
         String email = getEmailByAccountId(accountId);
         if (email == null || email.isEmpty()) {
-            throw new RuntimeException("Khong tim thay email de gui OTP.");
+            throw new RuntimeException("No email address was found for OTP delivery.");
         }
         sendEmail(email, otpCode);
         return new OtpDispatchInfo(maskEmail(email), OTP_EXPIRY_SECONDS, RESEND_COOLDOWN_SECONDS);
@@ -53,11 +53,11 @@ public class OtpService {
     private void sendEmail(String toEmail, String otpCode) {
         mailService.sendEmail(
                 toEmail,
-                "[Aptech] Ma xac thuc OTP",
-                "Ma OTP cua ban la: " + otpCode + "\n" +
-                "Ma co hieu luc trong 5 phut.\n" +
-                "Ban co the yeu cau gui lai ma moi sau 60 giay tren ung dung.\n" +
-                "Khong chia se ma nay cho bat ky ai."
+                "[Aptech] OTP verification code",
+                "Your OTP code is: " + otpCode + "\n" +
+                "This code is valid for 5 minutes.\n" +
+                "You can request a new code after 60 seconds in the application.\n" +
+                "Do not share this code with anyone."
         );
     }
 

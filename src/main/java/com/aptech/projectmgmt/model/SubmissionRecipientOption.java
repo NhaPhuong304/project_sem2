@@ -77,11 +77,11 @@ public class SubmissionRecipientOption {
 
     public String getDisplayText() {
         StringBuilder text = new StringBuilder();
-        text.append(className != null ? className : "Chưa có lớp");
+        text.append(className != null ? className : "No class");
         text.append(" - ");
-        text.append(groupName != null ? groupName : "Chưa có nhóm");
+        text.append(groupName != null ? groupName : "No group");
         text.append(" - Leader: ");
-        text.append(leaderName != null ? leaderName : "Chưa rõ");
+        text.append(leaderName != null ? leaderName : "Unknown");
         if (leaderStudentCode != null && !leaderStudentCode.isBlank()) {
             text.append(" (").append(leaderStudentCode).append(")");
         }

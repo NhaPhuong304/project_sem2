@@ -21,282 +21,258 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class OtpController {
 
-	@FXML
-	private Label emailLabel;
-	@FXML
-	private TextField otpField;
-	@FXML
-	private Button confirmBtn;
-	@FXML
-	private Button resendBtn;
-	@FXML
-	private Label countdownLabel;
-	@FXML
-	private Label expiryLabel;
-	@FXML
-	private PasswordField newPasswordField;
-	@FXML
-	private PasswordField confirmPasswordField;
-	@FXML
-	private TextField newPasswordVisibleField;
+    @FXML
+    private Label emailLabel;
+    @FXML
+    private TextField otpField;
+    @FXML
+    private Button confirmBtn;
+    @FXML
+    private Button resendBtn;
+    @FXML
+    private Label countdownLabel;
+    @FXML
+    private Label expiryLabel;
+    @FXML
+    private PasswordField newPasswordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private TextField newPasswordVisibleField;
+    @FXML
+    private TextField confirmPasswordVisibleField;
+    @FXML
+    private Button toggleNewPasswordBtn;
+    @FXML
+    private Button toggleConfirmPasswordBtn;
 
-	@FXML
-	private TextField confirmPasswordVisibleField;
+    private final OtpService otpService = new OtpService();
+    private int accountId;
+    private OtpPurpose purpose;
+    private Timeline resendTimeline;
+    private Timeline expiryTimeline;
+    private int resendCountdown;
+    private int expiryCountdown;
 
-	@FXML
-	private Button toggleNewPasswordBtn;
+    @FXML
+    public void initialize() {
+        confirmBtn.setOnAction(e -> handleConfirm());
+        resendBtn.setOnAction(e -> handleResend());
+        toggleNewPasswordBtn.setOnAction(
+                e -> togglePassword(newPasswordField, newPasswordVisibleField, toggleNewPasswordBtn));
+        toggleConfirmPasswordBtn.setOnAction(
+                e -> togglePassword(confirmPasswordField, confirmPasswordVisibleField, toggleConfirmPasswordBtn));
+    }
 
-	@FXML
-	private Button toggleConfirmPasswordBtn;
+    private void togglePassword(PasswordField hiddenField, TextField visibleField, Button toggleBtn) {
+        if (hiddenField.isVisible()) {
+            visibleField.setText(hiddenField.getText());
+            visibleField.setVisible(true);
+            visibleField.setManaged(true);
+            hiddenField.setVisible(false);
+            hiddenField.setManaged(false);
+            toggleBtn.setText("ðŸ™ˆ");
+        } else {
+            hiddenField.setText(visibleField.getText());
+            hiddenField.setVisible(true);
+            hiddenField.setManaged(true);
+            visibleField.setVisible(false);
+            visibleField.setManaged(false);
+            toggleBtn.setText("ðŸ‘");
+        }
+    }
 
-	private final OtpService otpService = new OtpService();
-	private int accountId;
-	private OtpPurpose purpose;
-	private Timeline resendTimeline;
-	private Timeline expiryTimeline;
-	private int resendCountdown;
-	private int expiryCountdown;
+    public void initData(int accountId, OtpPurpose purpose) {
+        this.accountId = accountId;
+        this.purpose = purpose;
+        emailLabel.setText("Sending OTP...");
+        generateOtpAsync();
+    }
 
-	@FXML
-	public void initialize() {
-		confirmBtn.setOnAction(e -> handleConfirm());
-		resendBtn.setOnAction(e -> handleResend());
+    private void generateOtpAsync() {
+        resendBtn.setDisable(true);
+        Task<OtpDispatchInfo> task = new Task<>() {
+            @Override
+            protected OtpDispatchInfo call() {
+                return otpService.generateAndSendOtp(accountId, purpose);
+            }
+        };
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            emailLabel.setText(task.getValue().getMaskedEmail());
+            startCountdowns(task.getValue());
+        }));
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            Throwable ex = task.getException();
+            emailLabel.setText("Error: " + (ex != null ? ex.getMessage() : "Could not send OTP"));
+            resendBtn.setDisable(false);
+        }));
+        new Thread(task).start();
+    }
 
-		toggleNewPasswordBtn
-				.setOnAction(e -> togglePassword(newPasswordField, newPasswordVisibleField, toggleNewPasswordBtn));
+    private void startCountdowns(OtpDispatchInfo dispatchInfo) {
+        startResendCountdown(dispatchInfo.getResendCooldownSeconds());
+        startExpiryCountdown(dispatchInfo.getOtpExpirySeconds());
+    }
 
-		toggleConfirmPasswordBtn.setOnAction(
-				e -> togglePassword(confirmPasswordField, confirmPasswordVisibleField, toggleConfirmPasswordBtn));
-	}
+    private void startResendCountdown(int seconds) {
+        if (resendTimeline != null) {
+            resendTimeline.stop();
+        }
+        resendCountdown = seconds;
+        resendBtn.setDisable(true);
+        resendTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            resendCountdown--;
+            if (resendCountdown > 0) {
+                countdownLabel.setText("Resend in: " + resendCountdown + "s");
+            } else {
+                countdownLabel.setText("");
+                resendBtn.setDisable(false);
+                resendTimeline.stop();
+            }
+        }));
+        resendTimeline.setCycleCount(seconds);
+        resendTimeline.play();
+        countdownLabel.setText("Resend in: " + seconds + "s");
+    }
 
-	private void togglePassword(PasswordField hiddenField, TextField visibleField, Button toggleBtn) {
+    private void startExpiryCountdown(int seconds) {
+        if (expiryTimeline != null) {
+            expiryTimeline.stop();
+        }
+        expiryCountdown = seconds;
+        expiryLabel.setText("OTP expires in: " + formatSeconds(expiryCountdown));
+        expiryTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            expiryCountdown--;
+            if (expiryCountdown > 0) {
+                expiryLabel.setText("OTP expires in: " + formatSeconds(expiryCountdown));
+            } else {
+                expiryLabel.setText("The OTP has expired. Please request a new code.");
+                expiryTimeline.stop();
+            }
+        }));
+        expiryTimeline.setCycleCount(seconds);
+        expiryTimeline.play();
+    }
 
-		if (hiddenField.isVisible()) {
-			visibleField.setText(hiddenField.getText());
-			visibleField.setVisible(true);
-			visibleField.setManaged(true);
+    private String formatSeconds(int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
 
-			hiddenField.setVisible(false);
-			hiddenField.setManaged(false);
+    private String getPassword(PasswordField hiddenField, TextField visibleField) {
+        return hiddenField.isVisible() ? hiddenField.getText() : visibleField.getText();
+    }
 
-			toggleBtn.setText("🙈");
-		} else {
-			hiddenField.setText(visibleField.getText());
-			hiddenField.setVisible(true);
-			hiddenField.setManaged(true);
+    private void handleConfirm() {
+        String otp = otpField.getText().trim();
+        String newPass = getPassword(newPasswordField, newPasswordVisibleField);
+        String confirmPass = getPassword(confirmPasswordField, confirmPasswordVisibleField);
 
-			visibleField.setVisible(false);
-			visibleField.setManaged(false);
+        if (otp.isEmpty()) {
+            AlertUtil.showError("Please enter the OTP code.");
+            return;
+        }
 
-			toggleBtn.setText("👁");
-		}
-	}
+        if (!otp.matches("\\d{6}")) {
+            AlertUtil.showError("The OTP code must contain exactly 6 digits.");
+            return;
+        }
 
-	public void initData(int accountId, OtpPurpose purpose) {
-		this.accountId = accountId;
-		this.purpose = purpose;
-		emailLabel.setText("Dang gui ma OTP...");
-		generateOtpAsync();
-	}
+        String passwordError = validateStrongPassword(newPass);
+        if (passwordError != null) {
+            AlertUtil.showError(passwordError);
+            return;
+        }
 
-	private void generateOtpAsync() {
-		resendBtn.setDisable(true);
-		Task<OtpDispatchInfo> task = new Task<>() {
-			@Override
-			protected OtpDispatchInfo call() {
-				return otpService.generateAndSendOtp(accountId, purpose);
-			}
-		};
-		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			emailLabel.setText(task.getValue().getMaskedEmail());
-			startCountdowns(task.getValue());
-		}));
-		task.setOnFailed(e -> Platform.runLater(() -> {
-			Throwable ex = task.getException();
-			emailLabel.setText("Loi: " + (ex != null ? ex.getMessage() : "Khong the gui OTP"));
-			resendBtn.setDisable(false);
-		}));
-		new Thread(task).start();
-	}
+        if (confirmPass == null || confirmPass.isBlank()) {
+            AlertUtil.showError("Please confirm the new password.");
+            return;
+        }
 
-	private void startCountdowns(OtpDispatchInfo dispatchInfo) {
-		startResendCountdown(dispatchInfo.getResendCooldownSeconds());
-		startExpiryCountdown(dispatchInfo.getOtpExpirySeconds());
-	}
+        if (!newPass.equals(confirmPass)) {
+            AlertUtil.showError("The password confirmation does not match.");
+            return;
+        }
 
-	private void startResendCountdown(int seconds) {
-		if (resendTimeline != null) {
-			resendTimeline.stop();
-		}
-		resendCountdown = seconds;
-		resendBtn.setDisable(true);
-		resendTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-			resendCountdown--;
-			if (resendCountdown > 0) {
-				countdownLabel.setText("Gui lai sau: " + resendCountdown + "s");
-			} else {
-				countdownLabel.setText("");
-				resendBtn.setDisable(false);
-				resendTimeline.stop();
-			}
-		}));
-		resendTimeline.setCycleCount(seconds);
-		resendTimeline.play();
-		countdownLabel.setText("Gui lai sau: " + seconds + "s");
-	}
+        String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
+        confirmBtn.setDisable(true);
 
-	private void startExpiryCountdown(int seconds) {
-		if (expiryTimeline != null) {
-			expiryTimeline.stop();
-		}
-		expiryCountdown = seconds;
-		expiryLabel.setText("Ma OTP con hieu luc: " + formatSeconds(expiryCountdown));
-		expiryTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-			expiryCountdown--;
-			if (expiryCountdown > 0) {
-				expiryLabel.setText("Ma OTP con hieu luc: " + formatSeconds(expiryCountdown));
-			} else {
-				expiryLabel.setText("Ma OTP da het han. Vui long gui lai ma moi.");
-				expiryTimeline.stop();
-			}
-		}));
-		expiryTimeline.setCycleCount(seconds);
-		expiryTimeline.play();
-	}
+        Task<OtpVerificationResult> task = new Task<>() {
+            @Override
+            protected OtpVerificationResult call() {
+                return otpService.verifyOtp(accountId, purpose, otp, hashedPassword);
+            }
+        };
 
-	private String formatSeconds(int totalSeconds) {
-		int minutes = totalSeconds / 60;
-		int seconds = totalSeconds % 60;
-		return String.format("%02d:%02d", minutes, seconds);
-	}
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            confirmBtn.setDisable(false);
+            OtpVerificationResult result = task.getValue();
+            int resultCode = result.getResultCode();
 
-	private String getPassword(PasswordField hiddenField, TextField visibleField) {
-		return hiddenField.isVisible() ? hiddenField.getText() : visibleField.getText();
-	}
+            switch (resultCode) {
+                case 0 -> {
+                    if (resendTimeline != null) {
+                        resendTimeline.stop();
+                    }
+                    if (expiryTimeline != null) {
+                        expiryTimeline.stop();
+                    }
+                    AlertUtil.showSuccess("Password changed successfully. Please sign in again.");
+                    navigateToLogin();
+                }
+                case 1 -> AlertUtil.showError("Incorrect OTP. " + result.getRemainingAttempts() + " attempts remaining.");
+                case 2 -> AlertUtil.showError("The OTP has been locked after 5 failed attempts. Please request a new code.");
+                case 3 -> AlertUtil.showError("The OTP has expired. Please request a new code.");
+                case 4 -> AlertUtil.showError("No OTP request was found.");
+                default -> AlertUtil.showError("Unknown error (code: " + resultCode + ").");
+            }
+        }));
 
-	private void handleConfirm() {
-		String otp = otpField.getText().trim();
-		String newPass = getPassword(newPasswordField, newPasswordVisibleField);
-		String confirmPass = getPassword(confirmPasswordField, confirmPasswordVisibleField);
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            confirmBtn.setDisable(false);
+            Throwable ex = task.getException();
+            AlertUtil.showError(ex != null ? ex.getMessage() : "System error.");
+        }));
 
-		if (otp.isEmpty()) {
-			AlertUtil.showError("Vui long nhap ma OTP");
-			return;
-		}
+        new Thread(task).start();
+    }
 
-		if (!otp.matches("\\d{6}")) {
-			AlertUtil.showError("Ma OTP phai gom dung 6 chu so");
-			return;
-		}
+    private String validateStrongPassword(String password) {
+        if (password == null || password.isBlank()) {
+            return "Please enter a new password.";
+        }
+        if (password.length() < 8) {
+            return "The password must contain at least 8 characters.";
+        }
+        if (password.contains(" ")) {
+            return "The password must not contain spaces.";
+        }
+        if (!password.matches(".*[a-z].*")) {
+            return "The password must contain at least one lowercase letter.";
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            return "The password must contain at least one uppercase letter.";
+        }
+        if (!password.matches(".*\\d.*")) {
+            return "The password must contain at least one digit.";
+        }
+        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};:'\",.<>/?\\\\|`~].*")) {
+            return "The password must contain at least one special character.";
+        }
+        return null;
+    }
 
-		String passwordError = validateStrongPassword(newPass);
-		if (passwordError != null) {
-			AlertUtil.showError(passwordError);
-			return;
-		}
+    private void handleResend() {
+        generateOtpAsync();
+    }
 
-		if (confirmPass == null || confirmPass.isBlank()) {
-			AlertUtil.showError("Vui long nhap lai mat khau xac nhan");
-			return;
-		}
-
-		if (!newPass.equals(confirmPass)) {
-			AlertUtil.showError("Mat khau xac nhan khong khop");
-			return;
-		}
-
-		String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
-		confirmBtn.setDisable(true);
-
-		Task<OtpVerificationResult> task = new Task<>() {
-			@Override
-			protected OtpVerificationResult call() {
-				return otpService.verifyOtp(accountId, purpose, otp, hashedPassword);
-			}
-		};
-
-		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			confirmBtn.setDisable(false);
-			OtpVerificationResult result = task.getValue();
-			int resultCode = result.getResultCode();
-
-			switch (resultCode) {
-			case 0:
-				if (resendTimeline != null)
-					resendTimeline.stop();
-				if (expiryTimeline != null)
-					expiryTimeline.stop();
-				AlertUtil.showSuccess("Doi mat khau thanh cong. Vui long dang nhap lai.");
-				navigateToLogin();
-				break;
-			case 1:
-				AlertUtil.showError("Ma OTP khong dung, con " + result.getRemainingAttempts() + " lan thu.");
-				break;
-			case 2:
-				AlertUtil.showError("Da nhap sai qua 5 lan. Vui long yeu cau ma moi.");
-				break;
-			case 3:
-				AlertUtil.showError("Ma OTP da het han. Vui long yeu cau ma moi.");
-				break;
-			case 4:
-				AlertUtil.showError("Khong tim thay yeu cau OTP.");
-				break;
-			default:
-				AlertUtil.showError("Loi khong xac dinh (code: " + resultCode + ")");
-			}
-		}));
-
-		task.setOnFailed(e -> Platform.runLater(() -> {
-			confirmBtn.setDisable(false);
-			Throwable ex = task.getException();
-			AlertUtil.showError(ex != null ? ex.getMessage() : "Loi he thong");
-		}));
-
-		new Thread(task).start();
-	}
-
-	private String validateStrongPassword(String password) {
-		if (password == null || password.isBlank()) {
-			return "Vui long nhap mat khau moi";
-		}
-
-		if (password.length() < 8) {
-			return "Mat khau phai co it nhat 8 ky tu";
-		}
-
-		if (password.contains(" ")) {
-			return "Mat khau khong duoc chua khoang trang";
-		}
-
-		if (!password.matches(".*[a-z].*")) {
-			return "Mat khau phai co it nhat 1 chu thuong";
-		}
-
-		if (!password.matches(".*[A-Z].*")) {
-			return "Mat khau phai co it nhat 1 chu hoa";
-		}
-
-		if (!password.matches(".*\\d.*")) {
-			return "Mat khau phai co it nhat 1 chu so";
-		}
-
-		if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};:'\",.<>/?\\\\|`~].*")) {
-			return "Mat khau phai co it nhat 1 ky tu dac biet";
-		}
-
-		return null;
-	}
-
-	private void handleResend() {
-		generateOtpAsync();
-	}
-
-	private void navigateToLogin() {
-		try {
-			Stage stage = (Stage) confirmBtn.getScene().getWindow();
-			SceneManager.switchScene(stage, SceneManager.LOGIN);
-		} catch (Exception ex) {
-			AlertUtil.showError("Loi chuyen man hinh: " + ex.getMessage());
-		}
-	}
+    private void navigateToLogin() {
+        try {
+            Stage stage = (Stage) confirmBtn.getScene().getWindow();
+            SceneManager.switchScene(stage, SceneManager.LOGIN);
+        } catch (Exception ex) {
+            AlertUtil.showError("Failed to switch screens: " + ex.getMessage());
+        }
+    }
 }

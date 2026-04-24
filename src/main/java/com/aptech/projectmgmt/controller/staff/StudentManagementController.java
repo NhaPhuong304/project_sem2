@@ -62,13 +62,21 @@ public class StudentManagementController {
 	private void setupTableColumns() {
 		actionColumn.setCellValueFactory(param -> new javafx.beans.property.SimpleObjectProperty<>(null));
 		actionColumn.setCellFactory(col -> new TableCell<>() {
-			private final Button editBtn = new Button("Sua");
-			private final Button transferBtn = new Button("Transfer");
-			private final Button lockBtn = new Button("Lock");
-			private final Button unlockBtn = new Button("Unlock");
+			private final Button editBtn = new Button("✎");
+			private final Button transferBtn = new Button("🔄");
+			private final Button lockBtn = new Button("🔒");
+			private final Button unlockBtn = new Button("🔓");
 			private final javafx.scene.layout.HBox actionBox = new javafx.scene.layout.HBox(8);
 
 			{
+				editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit"));
+				transferBtn.setStyle("-fx-text-fill: #8b5cf6; -fx-font-size: 14px; -fx-background-color: #f5f3ff; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				transferBtn.setTooltip(new javafx.scene.control.Tooltip("Transfer"));
+				lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock"));
+				unlockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock"));
 				editBtn.setOnAction(e -> {
 					Student student = getTableView().getItems().get(getIndex());
 					handleEditStudent(student);
@@ -127,7 +135,7 @@ public class StudentManagementController {
 					avatarView = loader.load();
 					controller = loader.getController();
 				} catch (Exception ex) {
-					throw new IllegalStateException("Khong the tai avatar cell sinh vien", ex);
+					throw new IllegalStateException("Could not load the student avatar cell", ex);
 				}
 			}
 
@@ -163,14 +171,14 @@ public class StudentManagementController {
 		task.setOnSucceeded(e -> Platform.runLater(() -> students.setAll(task.getValue())));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach sinh vien: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load the student list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
 
 	private void handleEditStudent(Student student) {
 		if (student == null) {
-			AlertUtil.showError("Khong tim thay sinh vien");
+			AlertUtil.showError("Student could not be found");
 			return;
 		}
 
@@ -182,7 +190,7 @@ public class StudentManagementController {
 			controller.setData(student);
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Sua sinh vien");
+			dialog.setTitle("Edit student");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
 
@@ -200,25 +208,25 @@ public class StudentManagementController {
 			};
 
 			task.setOnSucceeded(e -> Platform.runLater(() -> {
-				AlertUtil.showSuccess("Cap nhat sinh vien thanh cong");
+				AlertUtil.showSuccess("Student updated successfully");
 				loadStudents();
 			}));
 
 			task.setOnFailed(e -> Platform.runLater(() -> {
 				Throwable ex = task.getException();
-				AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+				AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 			}));
 
 			new Thread(task).start();
 
 		} catch (Exception e) {
-			AlertUtil.showError("Khong the mo form sua sinh vien: " + e.getMessage());
+			AlertUtil.showError("Could not open the edit student form: " + e.getMessage());
 		}
 	}
 
 	private void handleTransferStudent(Student student) {
 		if (student == null) {
-			AlertUtil.showError("Khong tim thay sinh vien");
+			AlertUtil.showError("Student could not be found");
 			return;
 		}
 
@@ -238,7 +246,7 @@ public class StudentManagementController {
 				controller.setClasses(classTask.getValue(), student.getClassId());
 
 				Dialog<ButtonType> dialog = new Dialog<>();
-				dialog.setTitle("Chuyen lop cho sinh vien");
+				dialog.setTitle("Transfer student to another class");
 				dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 				dialog.getDialogPane().setContent(content);
 
@@ -258,25 +266,25 @@ public class StudentManagementController {
 				};
 
 				transferTask.setOnSucceeded(ev -> Platform.runLater(() -> {
-					AlertUtil.showSuccess("Chuyen lop thanh cong");
+					AlertUtil.showSuccess("Class transfer completed successfully");
 					loadStudents();
 				}));
 
 				transferTask.setOnFailed(ev -> Platform.runLater(() -> {
 					Throwable ex = transferTask.getException();
-					AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+					AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 				}));
 
 				new Thread(transferTask).start();
 
 			} catch (Exception ex) {
-				AlertUtil.showError("Khong the mo form chuyen lop: " + ex.getMessage());
+				AlertUtil.showError("Could not open the class transfer form: " + ex.getMessage());
 			}
 		}));
 
 		classTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = classTask.getException();
-			AlertUtil.showError("Khong the tai danh sach lop: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Could not load the class list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(classTask).start();
@@ -292,14 +300,14 @@ public class StudentManagementController {
 		codeTask.setOnSucceeded(e -> Platform.runLater(() -> openAddStudentDialog(codeTask.getValue())));
 		codeTask.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = codeTask.getException();
-			AlertUtil.showError("Khong the tao ma sinh vien moi: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Could not generate a new student code: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(codeTask).start();
 	}
 
 	private void handleLockStudent(Student student) {
 		if (student == null) {
-			AlertUtil.showError("Khong tim thay sinh vien");
+			AlertUtil.showError("Student could not be found");
 			return;
 		}
 
@@ -312,13 +320,13 @@ public class StudentManagementController {
 		};
 
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Khoa tai khoan sinh vien thanh cong");
+			AlertUtil.showSuccess("Student account locked successfully");
 			loadStudents();
 		}));
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -326,7 +334,7 @@ public class StudentManagementController {
 
 	private void handleUnlockStudent(Student student) {
 		if (student == null) {
-			AlertUtil.showError("Khong tim thay sinh vien");
+			AlertUtil.showError("Student could not be found");
 			return;
 		}
 
@@ -339,13 +347,13 @@ public class StudentManagementController {
 		};
 
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Mo khoa tai khoan sinh vien thanh cong");
+			AlertUtil.showSuccess("Student account unlocked successfully");
 			loadStudents();
 		}));
 
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 		}));
 
 		new Thread(task).start();
@@ -359,7 +367,7 @@ public class StudentManagementController {
 			controller.setStudentCode(nextStudentCode);
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Them sinh vien");
+			dialog.setTitle("Add student");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
 
@@ -377,23 +385,23 @@ public class StudentManagementController {
 			};
 			task.setOnSucceeded(e -> Platform.runLater(() -> {
 				StudentCreationResult resultInfo = task.getValue();
-				String message = "Them sinh vien thanh cong. Tai khoan mac dinh: " + resultInfo.getUsername() + " / "
-						+ resultInfo.getTemporaryPassword() + ". Sinh vien dang o trang thai chua xep lop.";
+				String message = "Add student thanh cong. Tai khoan mac dinh: " + resultInfo.getUsername() + " / "
+						+ resultInfo.getTemporaryPassword() + ". The student is currently in the unassigned class state.";
 				if (resultInfo.isNotificationEmailSent()) {
-					message += " Da gui email thong bao.";
+					message += " Notification email sent.";
 				} else {
-					message += " Chua gui duoc email thong bao.";
+					message += " Notification email could not be sent.";
 				}
 				AlertUtil.showSuccess(message);
 				loadStudents();
 			}));
 			task.setOnFailed(e -> Platform.runLater(() -> {
 				Throwable ex = task.getException();
-				AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+				AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 			}));
 			new Thread(task).start();
 		} catch (Exception e) {
-			AlertUtil.showError("Khong the mo form them sinh vien: " + e.getMessage());
+			AlertUtil.showError("Could not open the add student form: " + e.getMessage());
 		}
 	}
 }

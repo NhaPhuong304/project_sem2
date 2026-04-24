@@ -48,7 +48,7 @@ public class StudentAssignDialogController {
     public Student getSelectedStudent() {
         Student student = studentCombo.getValue();
         if (student == null) {
-            throw new RuntimeException("Vui long chon sinh vien");
+            throw new RuntimeException("Please select a student");
         }
         return student;
     }

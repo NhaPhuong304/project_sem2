@@ -84,6 +84,10 @@ public class StudentDashboardController {
                 myProjectListController.setDashboardController(this);
             }
 
+            if (content instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) content).prefWidthProperty().bind(contentArea.widthProperty());
+                ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
+            }
             contentArea.getChildren().setAll(content);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load content: " + e.getMessage());

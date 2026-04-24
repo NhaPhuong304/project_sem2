@@ -69,7 +69,7 @@ public class StudentListController {
 			@Override
 			protected String call() {
 				var sc = classService.getClassById(classId);
-				return sc != null ? sc.getClassName() : "Lop #" + classId;
+				return sc != null ? sc.getClassName() : "Class #" + classId;
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> classNameLabel.setText("Danh sach SV - " + task.getValue())));
@@ -89,7 +89,7 @@ public class StudentListController {
 					avatarView = loader.load();
 					controller = loader.getController();
 				} catch (Exception ex) {
-					throw new IllegalStateException("Khong the tai avatar cell sinh vien", ex);
+					throw new IllegalStateException("Could not load the student avatar cell", ex);
 				}
 			}
 
@@ -127,7 +127,7 @@ public class StudentListController {
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi tai danh sach SV: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Failed to load the student list: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
@@ -138,17 +138,17 @@ public class StudentListController {
 		createAccountsBtn.setManaged(!readOnlyMode && hasStudentWithoutAccount);
 		createAccountsBtn.setDisable(readOnlyMode || !hasStudentWithoutAccount);
 		createAccountsBtn.setTooltip(!readOnlyMode && hasStudentWithoutAccount
-				? new Tooltip("Tao tai khoan cho cac du lieu cu chua co account")
+				? new Tooltip("Create accounts for legacy records that do not have accounts yet")
 				: null);
 		refreshActionButtons();
 	}
 
 	private void handleCreateAccounts() {
 		if (readOnlyMode) {
-			AlertUtil.showError("Tai khoan giao vien chi duoc xem danh sach sinh vien");
+			AlertUtil.showError("Teacher accounts can only view the student list");
 			return;
 		}
-		if (!AlertUtil.showConfirm("Tao tai khoan cho toan bo sinh vien chua co tai khoan?"))
+		if (!AlertUtil.showConfirm("Create accounts for all students who do not have an account yet?"))
 			return;
 		createAccountsBtn.setDisable(true);
 		Task<Integer> task = new Task<>() {
@@ -166,14 +166,14 @@ public class StudentListController {
 		task.setOnFailed(e -> Platform.runLater(() -> {
 			createAccountsBtn.setDisable(false);
 			Throwable ex = task.getException();
-			AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(task).start();
 	}
 
 	private void handleAddStudent() {
 		if (readOnlyMode) {
-			AlertUtil.showError("Tai khoan giao vien chi duoc xem danh sach sinh vien");
+			AlertUtil.showError("Teacher accounts can only view the student list");
 			return;
 		}
 		addStudentBtn.setDisable(true);
@@ -191,14 +191,14 @@ public class StudentListController {
 			addStudentBtn.setDisable(false);
 			Throwable ex = studentsTask.getException();
 			AlertUtil.showError(
-					"Khong tai duoc danh sach sinh vien chua co lop: " + (ex != null ? ex.getMessage() : ""));
+					"Could not load students without a class: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(studentsTask).start();
 	}
 
 	private void openAssignStudentDialog(List<Student> unassignedStudents) {
 		if (unassignedStudents == null || unassignedStudents.isEmpty()) {
-			AlertUtil.showError("Khong con sinh vien nao chua xep lop");
+			AlertUtil.showError("There are no students left without a class assignment");
 			return;
 		}
 		try {
@@ -208,7 +208,7 @@ public class StudentListController {
 			controller.setStudents(unassignedStudents);
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Them sinh vien vao lop");
+			dialog.setTitle("Add Student to Class");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
 
@@ -226,16 +226,16 @@ public class StudentListController {
 				}
 			};
 			task.setOnSucceeded(e -> Platform.runLater(() -> {
-				AlertUtil.showSuccess("Da them sinh vien vao lop thanh cong");
+				AlertUtil.showSuccess("Student added to the class successfully");
 				loadStudents();
 			}));
 			task.setOnFailed(e -> Platform.runLater(() -> {
 				Throwable ex = task.getException();
-				AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+				AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
 			}));
 			new Thread(task).start();
 		} catch (Exception e) {
-			AlertUtil.showError("Khong the mo form them sinh vien: " + e.getMessage());
+			AlertUtil.showError("Could not open the add student form: " + e.getMessage());
 		}
 	}
 
@@ -258,7 +258,7 @@ public class StudentListController {
 			createAccountsBtn.setManaged(canCreateAccounts);
 			createAccountsBtn.setDisable(!canCreateAccounts);
 			createAccountsBtn.setTooltip(
-					canCreateAccounts ? new Tooltip("Tao tai khoan cho cac du lieu cu chua co account") : null);
+					canCreateAccounts ? new Tooltip("Create accounts for legacy records that do not have accounts yet") : null);
 		}
 	}
 }

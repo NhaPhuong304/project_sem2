@@ -19,12 +19,12 @@ public class AccountService {
     public void updateCurrentAvatar(String photoUrl) {
         String normalizedPhotoUrl = photoUrl != null ? photoUrl.trim() : "";
         if (normalizedPhotoUrl.isEmpty()) {
-            throw new RuntimeException("Duong dan avatar khong hop le");
+            throw new RuntimeException("Invalid avatar path");
         }
 
         Path photoPath = Paths.get(normalizedPhotoUrl);
         if (!Files.exists(photoPath)) {
-            throw new RuntimeException("Khong tim thay file avatar da chon");
+            throw new RuntimeException("The selected avatar file could not be found");
         }
         if (Files.isDirectory(photoPath)) {
             throw new RuntimeException("Avatar phai la mot file anh hop le");
@@ -33,7 +33,7 @@ public class AccountService {
         SessionManager sessionManager = SessionManager.getInstance();
         Account account = sessionManager.getCurrentAccount();
         if (account == null) {
-            throw new RuntimeException("Khong xac dinh duoc tai khoan dang dang nhap");
+            throw new RuntimeException("Could not determine the logged-in account");
         }
 
         Path avatarDirectory = AvatarUtil.getProjectAvatarDirectory();
@@ -68,7 +68,7 @@ public class AccountService {
             Files.copy(sourcePhotoPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             return targetPath;
         } catch (IOException ex) {
-            throw new RuntimeException("Khong the luu avatar vao project: " + ex.getMessage(), ex);
+            throw new RuntimeException("Could not save the avatar to the project: " + ex.getMessage(), ex);
         }
     }
 

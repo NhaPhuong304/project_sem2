@@ -136,7 +136,7 @@ public class GroupDetailController {
 
         roleColumn.setCellValueFactory(c -> {
             MemberRole r = c.getValue().getRole();
-            return new SimpleStringProperty(r == MemberRole.LEADER ? "Truong nhom" : "Thanh vien");
+            return new SimpleStringProperty(r == MemberRole.LEADER ? "Leader" : "Member");
         });
 
         statusColumn.setCellValueFactory(c -> {
@@ -179,7 +179,7 @@ public class GroupDetailController {
                 secondaryBtn.setOnAction(null);
 
                 if (member.getStatus() == MemberStatus.EXCLUDED) {
-                    primaryBtn.setText("Reactivate.");
+                    primaryBtn.setText("🔄");
                     primaryBtn.setOnAction(e -> handleReactivate(member));
                     primaryBtn.setVisible(true);
                     primaryBtn.setManaged(true);
@@ -188,6 +188,10 @@ public class GroupDetailController {
                     secondaryBtn.setManaged(false);
                 } else if (member.getRole() == MemberRole.LEADER) {
                     primaryBtn.setText(projectHasStarted ? "Revoke access" : "Delete");
+                    primaryBtn.setStyle("-fx-text-fill: #3b82f6; -fx-font-size: 14px; -fx-background-color: #eff6ff; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+                    primaryBtn.setTooltip(new javafx.scene.control.Tooltip("Primary Action"));
+                    secondaryBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+                    secondaryBtn.setTooltip(new javafx.scene.control.Tooltip("Secondary Action"));
                     primaryBtn.setOnAction(e -> {
                         if (projectHasStarted) {
                             handleExclude(member);
@@ -201,7 +205,7 @@ public class GroupDetailController {
                     secondaryBtn.setVisible(false);
                     secondaryBtn.setManaged(false);
                 } else {
-                    primaryBtn.setText("Change Leader");
+                    primaryBtn.setText("👑");
                     primaryBtn.setOnAction(e -> handleChangeLeader(member));
                     primaryBtn.setVisible(true);
                     primaryBtn.setManaged(true);
@@ -241,7 +245,7 @@ public class GroupDetailController {
 
         var currentStaff = SessionManager.getInstance().getCurrentStaff();
         if (currentStaff == null) {
-            AlertUtil.showError("Khong xac dinh duoc staff");
+            AlertUtil.showError("Could not determine the staff account");
             return;
         }
 
@@ -264,7 +268,7 @@ public class GroupDetailController {
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi doi leader: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Failed to change the leader: " + (ex != null ? ex.getMessage() : ""));
         }));
 
         new Thread(task).start();
@@ -366,7 +370,7 @@ public class GroupDetailController {
 
     private void handleExclude(GroupMember member) {
         if (readOnlyMode) {
-            AlertUtil.showError("Tai khoan giao vien chi duoc xem thong tin nhom");
+            AlertUtil.showError("Teacher accounts can only view group information");
             return;
         }
 

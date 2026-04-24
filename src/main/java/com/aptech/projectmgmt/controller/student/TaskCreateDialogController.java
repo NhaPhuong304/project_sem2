@@ -57,17 +57,17 @@ public class TaskCreateDialogController {
 
     public Task buildTask(int groupId, int currentStudentId) {
         if (titleField.getText() == null || titleField.getText().trim().isEmpty()) {
-            throw new IllegalArgumentException("Tieu de task khong duoc de trong");
+            throw new IllegalArgumentException("Task title must not be empty");
         }
         if (startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
-            throw new IllegalArgumentException("Vui long chon ngay bat dau va ket thuc");
+            throw new IllegalArgumentException("Please select a start date va ket thuc");
         }
         if (assignedCombo.getValue() == null || reviewerCombo.getValue() == null) {
-            throw new IllegalArgumentException("Vui long chon nguoi thuc hien va nguoi kiem tra");
+            throw new IllegalArgumentException("Please select both the assignee and the reviewer");
         }
 
-        LocalTime startTime = parseTime(startTimeField.getText(), "Gio bat dau khong hop le. Dung dinh dang HH:mm");
-        LocalTime endTime = parseTime(endTimeField.getText(), "Gio ket thuc khong hop le. Dung dinh dang HH:mm");
+        LocalTime startTime = parseTime(startTimeField.getText(), "Invalid start time. Use the HH:mm format");
+        LocalTime endTime = parseTime(endTimeField.getText(), "Invalid end time. Use the HH:mm format");
         LocalDateTime estimatedStart = startDatePicker.getValue().atTime(startTime);
         LocalDateTime estimatedEnd = endDatePicker.getValue().atTime(endTime);
 

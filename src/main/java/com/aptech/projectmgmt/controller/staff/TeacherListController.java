@@ -57,7 +57,7 @@ public class TeacherListController {
                     avatarView = loader.load();
                     controller = loader.getController();
                 } catch (Exception ex) {
-                    throw new IllegalStateException("Khong the tai avatar cell giao vien", ex);
+                    throw new IllegalStateException("Could not load the teacher avatar cell", ex);
                 }
             }
 
@@ -90,7 +90,7 @@ public class TeacherListController {
         task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            AlertUtil.showError("Loi tai danh sach giao vien: " + (ex != null ? ex.getMessage() : ""));
+            AlertUtil.showError("Failed to load the teacher list: " + (ex != null ? ex.getMessage() : ""));
         }));
         new Thread(task).start();
     }
@@ -102,7 +102,7 @@ public class TeacherListController {
             TeacherCreateDialogController controller = loader.getController();
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Them giao vien");
+            dialog.setTitle("Add teacher");
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             dialogPane.setContent(content);
@@ -130,12 +130,12 @@ public class TeacherListController {
                     okButton.setDisable(false);
                     dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
                     TeacherCreationResult resultInfo = task.getValue();
-                    String successMessage = "Them giao vien thanh cong. Tai khoan mac dinh: " +
+                    String successMessage = "Add teacher thanh cong. Tai khoan mac dinh: " +
                             resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
                     if (resultInfo.isNotificationEmailSent()) {
-                        successMessage += ". Da gui email thong bao.";
+                        successMessage += ". Notification email sent.";
                     } else {
-                        successMessage += ". Chua gui duoc email thong bao.";
+                        successMessage += ". Notification email could not be sent.";
                     }
                     dialog.setResult(ButtonType.OK);
                     dialog.close();
@@ -149,14 +149,14 @@ public class TeacherListController {
                     okButton.setDisable(false);
                     dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
                     Throwable ex = task.getException();
-                    AlertUtil.showError("Loi: " + (ex != null ? ex.getMessage() : ""));
+                    AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
                 }));
                 new Thread(task).start();
             });
 
             dialog.showAndWait();
         } catch (Exception ex) {
-            AlertUtil.showError("Khong the mo form them giao vien: " + ex.getMessage());
+            AlertUtil.showError("Could not open the add teacher form: " + ex.getMessage());
         }
     }
 }

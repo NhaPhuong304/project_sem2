@@ -125,8 +125,8 @@ public class SubmissionRequestListController {
     }
 
     private void setupDefaults() {
-        titleField.setText("Các nội dung cần chuẩn bị để nộp đồ án sau khi báo cáo");
-        descriptionArea.setText("Vui lòng nộp đầy đủ các file theo yêu cầu trước hạn.");
+        titleField.setText("Required materials for final project submission after presentation");
+        descriptionArea.setText("Please submit all required files before the deadline.");
         deadlineDatePicker.setValue(LocalDate.now().plusDays(7));
         deadlineTimeCombo.setItems(FXCollections.observableArrayList(
                 "08:00", "12:00", "17:00", "20:00", "23:59"));
@@ -182,12 +182,12 @@ public class SubmissionRequestListController {
 
     private void loadScreenData() {
         if (staffId <= 0) {
-            statusLabel.setText("Không tìm thấy tài khoản giáo vụ đang đăng nhập.");
+            statusLabel.setText("No logged-in staff account was found.");
             sendRequestBtn.setDisable(true);
             return;
         }
 
-        setLoading(true, "Đang tải dữ liệu...");
+        setLoading(true, "Loading data...");
         Task<ScreenData> task = new Task<>() {
             @Override
             protected ScreenData call() {
@@ -212,9 +212,9 @@ public class SubmissionRequestListController {
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setLoading(false, "Lỗi tải dữ liệu.");
-            setMonitorLoading(false, "Lỗi tải dữ liệu.");
-            AlertUtil.showError("Lỗi tải yêu cầu nộp đồ án: " + (ex != null ? ex.getMessage() : ""));
+            setLoading(false, "Failed to load data.");
+            setMonitorLoading(false, "Failed to load data.");
+            AlertUtil.showError("Failed to load project submission requests: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "submission-load-screen");
     }
@@ -232,7 +232,7 @@ public class SubmissionRequestListController {
         }
 
         if (requirements.isEmpty()) {
-            requirementBox.getChildren().add(new Label("Chưa có mẫu nội dung cần nộp trong database."));
+            requirementBox.getChildren().add(new Label("No submission requirement templates were found in the database."));
         }
     }
 
@@ -249,7 +249,7 @@ public class SubmissionRequestListController {
         }
 
         if (recipients.isEmpty()) {
-            recipientBox.getChildren().add(new Label("Chưa có nhóm nào có leader trong các lớp bạn quản lý."));
+            recipientBox.getChildren().add(new Label("No groups with a leader were found in the classes you manage."));
         }
     }
 
@@ -261,11 +261,11 @@ public class SubmissionRequestListController {
         List<Integer> groupIds = getSelectedGroupIds();
 
         if (deadline == null) {
-            AlertUtil.showError("Vui lòng chọn hạn nộp hợp lệ.");
+            AlertUtil.showError("Please select a valid deadline.");
             return;
         }
 
-        setLoading(true, "Đang gửi yêu cầu...");
+        setLoading(true, "Sending request...");
         Task<Integer> task = new Task<>() {
             @Override
             protected Integer call() {
@@ -273,14 +273,14 @@ public class SubmissionRequestListController {
             }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
-            setLoading(false, "Đã gửi yêu cầu nộp đồ án.");
-            AlertUtil.showSuccess("Đã tạo yêu cầu và gửi thông báo cho leader của các nhóm đã chọn.");
+            setLoading(false, "Project submission request sent.");
+            AlertUtil.showSuccess("The request was created and notifications were sent to the selected group leaders.");
             loadScreenData();
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setLoading(false, "Gửi yêu cầu thất bại.");
-            AlertUtil.showError("Không tạo được yêu cầu: " + (ex != null ? ex.getMessage() : ""));
+            setLoading(false, "Request sending failed.");
+            AlertUtil.showError("Could not create the request: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "submission-create-request");
     }
@@ -294,7 +294,7 @@ public class SubmissionRequestListController {
             return;
         }
 
-        setMonitorLoading(true, "Đang tải danh sách nhóm...");
+        setMonitorLoading(true, "Loading groups...");
         Task<List<SubmissionTarget>> task = new Task<>() {
             @Override
             protected List<SubmissionTarget> call() {
@@ -307,12 +307,12 @@ public class SubmissionRequestListController {
             if (!targets.isEmpty()) {
                 targetTable.getSelectionModel().selectFirst();
             }
-            setMonitorLoading(false, targets.isEmpty() ? "Chưa có nhóm nhận yêu cầu này." : "");
+            setMonitorLoading(false, targets.isEmpty() ? "No groups have received this request yet." : "");
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setMonitorLoading(false, "Lỗi tải danh sách nhóm.");
-            AlertUtil.showError("Lỗi tải nhóm nhận yêu cầu: " + (ex != null ? ex.getMessage() : ""));
+            setMonitorLoading(false, "Failed to load groups.");
+            AlertUtil.showError("Failed to load recipient groups: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "submission-load-targets");
     }
@@ -323,7 +323,7 @@ public class SubmissionRequestListController {
             return;
         }
 
-        setMonitorLoading(true, "Đang tải file đã nộp...");
+        setMonitorLoading(true, "Loading submitted files...");
         Task<List<SubmissionFile>> task = new Task<>() {
             @Override
             protected List<SubmissionFile> call() {
@@ -334,31 +334,31 @@ public class SubmissionRequestListController {
             List<SubmissionFile> files = task.getValue();
             submittedFileTable.setItems(FXCollections.observableArrayList(files));
             downloadFilesBtn.setDisable(files.isEmpty());
-            setMonitorLoading(false, files.isEmpty() ? "Nhóm này chưa nộp file nào." : "");
+            setMonitorLoading(false, files.isEmpty() ? "This group has not submitted any files yet." : "");
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setMonitorLoading(false, "Lỗi tải file đã nộp.");
-            AlertUtil.showError("Lỗi tải file đã nộp: " + (ex != null ? ex.getMessage() : ""));
+            setMonitorLoading(false, "Failed to load submitted files.");
+            AlertUtil.showError("Failed to load submitted files: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "submission-load-files");
     }
 
     private void handleDownloadFiles() {
         if (selectedMonitorTarget == null) {
-            AlertUtil.showError("Vui lòng chọn nhóm cần tải file.");
+            AlertUtil.showError("Please select a group to download files for.");
             return;
         }
 
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Chọn thư mục lưu file đã nộp");
+        directoryChooser.setTitle("Choose a folder to save the submitted files");
         Stage stage = (Stage) downloadFilesBtn.getScene().getWindow();
         File destination = directoryChooser.showDialog(stage);
         if (destination == null) {
             return;
         }
 
-        setMonitorLoading(true, "Đang tải file về máy...");
+        setMonitorLoading(true, "Downloading files...");
         Task<Integer> task = new Task<>() {
             @Override
             protected Integer call() {
@@ -367,13 +367,13 @@ public class SubmissionRequestListController {
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             int copied = task.getValue();
-            setMonitorLoading(false, "Đã tải " + copied + " file.");
-            AlertUtil.showSuccess("Đã tải " + copied + " file về thư mục bạn chọn.");
+            setMonitorLoading(false, "Downloaded " + copied + " files.");
+            AlertUtil.showSuccess("Downloaded " + copied + " files to the selected folder.");
         }));
         task.setOnFailed(e -> Platform.runLater(() -> {
             Throwable ex = task.getException();
-            setMonitorLoading(false, "Tải file thất bại.");
-            AlertUtil.showError("Không tải được file: " + (ex != null ? ex.getMessage() : ""));
+            setMonitorLoading(false, "Download failed.");
+            AlertUtil.showError("Could not download the files: " + (ex != null ? ex.getMessage() : ""));
         }));
         startTask(task, "submission-download-files");
     }
@@ -427,14 +427,14 @@ public class SubmissionRequestListController {
     }
 
     private String formatRequestStatus(int status) {
-        return status == 1 ? "Đang mở" : "Đã đóng";
+        return status == 1 ? "Open" : "Closed";
     }
 
     private String formatTargetStatus(int status) {
         return switch (status) {
-            case 3 -> "Đã nộp";
-            case 2 -> "Đang nộp";
-            default -> "Chưa hoàn tất";
+            case 3 -> "Submitted";
+            case 2 -> "In Progress";
+            default -> "Incomplete";
         };
     }
 

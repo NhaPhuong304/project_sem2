@@ -1,25 +1,25 @@
-=========================================================
+﻿=========================================================
 PROJECT MANAGEMENT SYSTEM - APTECH SEMESTER 2
 JavaFX 21 + SceneBuilder + SQL Server 2019 + Maven
 =========================================================
 
 1. GIOI THIEU
-Project nay la desktop app quan ly du an sinh vien Aptech.
-He thong hien tai ho tro 4 nhom nguoi dung:
+This project is a desktop app for managing Aptech student projects.
+The system currently supports 4 user groups:
 - Admin (Quan tri vien)
-- Staff (Giao vu)
-- Teacher (Giao vien)
-- Student (Sinh vien)
+- Staff
+- Teacher
+- Student
 
 Chuc nang chinh:
-- Dang nhap / OTP / doi mat khau lan dau
-- Quan ly lop
-- Quan ly sinh vien
-- Quan ly giao vien
-- Quan ly project
-- Quan ly nhom
-- Quan ly task
-- Hop thu den cho sinh vien
+- Login / OTP / first-time password change
+- Class management
+- Student management
+- Teacher management
+- Project management
+- Group management
+- Task management
+- Student inbox
 - Upload / doi avatar
 - Splash screen truoc khi vao login
 
@@ -56,7 +56,7 @@ Danh sach:
 
 
 =========================================================
-3. YEU CAU MOI TRUONG
+3. ENVIRONMENT REQUIREMENTS
 =========================================================
 
 Ban can cai:
@@ -76,7 +76,7 @@ Khuyen nghi:
 4. CAU TRUC PROJECT
 =========================================================
 
-Thu muc quan trong:
+Important folders:
 - src/main/java/com/aptech/projectmgmt
 - src/main/resources/fxml
 - src/main/resources/css/style.css
@@ -121,8 +121,8 @@ Can co cac key:
   smtp.from=your_email@gmail.com
 
 Luu y:
-- Khong nen de mail/password that khi chia se project
-- Neu khong cau hinh SMTP dung, cac chuc nang OTP va gui mail thong bao se loi
+- Do not keep real email/password credentials when sharing the project
+- If SMTP is not configured correctly, OTP and email notification features will fail
 
 
 =========================================================
@@ -135,7 +135,7 @@ File SQL chinh:
 File nay se:
 - Tao database `ProjectManagementDB`
 - Tao tat ca bang, index, trigger, stored procedure, view
-- Tao san account test de dang nhap ngay
+- Create test accounts for immediate sign-in
 
 6.1. Cach chay
 1. Mo DBeaver hoac SQL Server Management Studio
@@ -149,7 +149,7 @@ File nay se:
 - Neu may ban da co database trung ten roi thi can xoa DB cu hoac doi ten DB truoc khi chay lai
 
 6.3. Sau khi chay xong
-Kiem tra da co:
+Check that the following already exist:
 - Database `ProjectManagementDB`
 - Bang `Account`, `Staff`, `Student`, `Project`, `Task`, ...
 - Stored procedure `sp_GenerateOtp`, `sp_VerifyOtp`, `sp_ResetOverdueTasks`
@@ -159,14 +159,14 @@ Kiem tra da co:
 7. TAI KHOAN TEST CO SAN SAU KHI CHAY FILE SQL
 =========================================================
 
-Mat khau cho tat ca tai khoan test:
+Password for all test accounts:
 - `123`
 
 7.1. Admin
 - username: `admin`
 - password: `123`
 
-7.2. Staff (Giao vu)
+7.2. Staff
 - username: `staff001`
 - password: `123`
 - username: `staff002`
@@ -184,7 +184,7 @@ Mat khau cho tat ca tai khoan test:
 
 Luu y:
 - Cac tai khoan seed trong DDL dang de `IsFirstLogin = 0`
-- Nghia la login test truc tiep duoc, khong bi ep OTP lan dau
+- This means test login works directly without forcing first-login OTP
 
 
 =========================================================
@@ -195,13 +195,13 @@ Luu y:
 1. Mo Eclipse
 2. Chon:
    File > Import > Maven > Existing Maven Projects
-3. Chon thu muc project:
+3. Choose the project folder:
    (duong dan toi project-sem2 tren may cua ban)
 4. Finish
-5. Chuot phai project > Maven > Update Project
+5. Right-click the project > Maven > Update Project
 
 8.2. Chon dung JDK
-1. Chuot phai project > Properties
+1. Right-click the project > Properties
 2. Vao Java Build Path
 3. Dam bao project dang dung JDK 21
 4. Vao Java Compiler
@@ -218,22 +218,22 @@ Vi du macOS:
   /Applications/SceneBuilder.app/Contents/MacOS/SceneBuilder
 
 8.4. Mo file FXML bang SceneBuilder
-- Chuot phai file `.fxml`
+- Right-click the `.fxml` file
 - Open With > SceneBuilder
-Bạn cần cài trước:
-	Mở trình duyệt
-	Vào trang tải Scene Builder của Gluon:
+You need to install first:
+	Open the browser
+	Go to the Gluon Scene Builder download page:
 	https://gluonhq.com/products/scene-builder/
-	Tải bản Windows
-	Cài xong, thường sẽ có file:
+	Download the Windows version
+	After installation, the file is usually located at:
 	C:\Program Files\SceneBuilder\SceneBuilder.exe
-	Sau đó quay lại Eclipse:
+	Then return to Eclipse:
 	
-	Chuột phải file .fxml
+	Right-click the .fxml file
 	Open With > Other...
-	Chọn External programs
+	Choose External programs
 	Browse...
-	Trỏ tới:
+	Point to:
 	C:\Program Files\SceneBuilder\SceneBuilder.exe
 	Tick Use it for all '*.fxml' files
 	OK
@@ -251,7 +251,7 @@ Hoac:
   mvn javafx:run
 
 9.2. Chay trong Eclipse bang Maven Build
-1. Chuot phai project
+1. Right-click the project
 2. Run As > Maven build...
 3. Goals:
    clean javafx:run
@@ -260,13 +260,13 @@ Hoac:
 9.3. Chay trong Eclipse bang Java Application
 Neu muon bam Run truc tiep trong Eclipse:
 - Hay chay src/main/java/com/aptech/projectmgmt/AppLauncher.java
-- Khong nen chay truc tiep `Main.java` neu launch config cua Eclipse chua dung
+- Do not run `Main.java` directly if the Eclipse launch configuration is incorrect
 
 Main class nen chon:
   com.aptech.projectmgmt.AppLauncher
 
 Ly do:
-- Tranh loi `JavaFX runtime components are missing`
+- Avoid the `JavaFX runtime components are missing` error
 
 
 =========================================================
@@ -289,27 +289,27 @@ File lien quan:
 =========================================================
 
 11.1. Admin
-- Dang nhap vao dashboard admin
+- Sign in to the admin dashboard
 - Quan tri he thong
 
-11.2. Staff (Giao vu)
-- Dang nhap vao dashboard Staff
-- Quan ly lop (co ManagerID de xac dinh lop do tung staff phu trach)
-- Quan ly sinh vien
-- Quan ly giao vien
-- Quan ly project, nhom
-- Xem va quan ly task cua cac nhom
+11.2. Staff
+- Sign in to the staff dashboard
+- Class management (ManagerID identifies which staff member is responsible for each class)
+- Student management
+- Teacher management
+- Project and group management
+- View and manage tasks across groups
 
 11.3. Teacher
-- Dang nhap vao dashboard teacher rieng
-- Chi xem duoc lop va project ma minh huong dan
-- Khong tao lop, khong them sinh vien, khong tao project nhu admin/staff
+- Sign in to the teacher dashboard
+- Can only view classes and projects assigned for supervision
+- Cannot create classes, add students, or create projects like admin/staff
 
 11.4. Student
-- Dang nhap vao dashboard sinh vien
+- Sign in to the student dashboard
 - Xem project cua minh
 - Xem task
-- Tao task neu la truong nhom va du dieu kien
+- Create tasks if you are the group leader and the conditions are met
 - Xem hop thu den
 
 
@@ -325,14 +325,14 @@ File lien quan:
 - Chon anh tu may
 - App se copy anh vao:
   uploads/avatars
-- Ten file duoc tao ngau nhien, khong trung
-- Neu user da co avatar cu do project quan ly thi app se xoa file cu
+- File names are generated randomly and kept unique
+- If the user already has an old avatar managed by the project, the app removes the old file
 - DB chi luu path tuong doi, vi du:
   `uploads/avatars/avatar_acc_3_xxxxxxxxxxxxx.jpg`
 
 12.3. Khi copy project sang may khac
 Neu muon giu avatar da upload:
-- Phai copy ca thu muc:
+- You must copy the full folder:
   `uploads/avatars`
 
 
@@ -341,16 +341,16 @@ Neu muon giu avatar da upload:
 =========================================================
 
 Tinh nang can mail:
-- Quen mat khau
-- OTP doi mat khau lan dau
-- Gui thong bao khi tao sinh vien moi
-- Gui thong bao khi tao giao vien moi
-- Gui nhac nho task / mail lien quan task
+- Forgot password
+- OTP for first-time password change
+- Send a notification when creating a new student
+- Send a notification when creating a new teacher
+- Send task reminders / task-related emails
 
-Neu mail khong gui duoc:
-- Kiem tra `application.properties`
-- Kiem tra Gmail App Password
-- Kiem tra ket noi Internet
+If email cannot be sent:
+- Check `application.properties`
+- Check the Gmail App Password
+- Check the Internet connection
 
 
 =========================================================
@@ -360,26 +360,26 @@ Neu mail khong gui duoc:
 Admin:
 - Login
 - OTP
-- Cài đặt hệ thống
+- System setup
 
 Staff:
 - Staff Dashboard
-- Quan ly lop
-- Quan ly sinh vien
-- Quan ly giao vien
-- Quan ly project
+- Class management
+- Student management
+- Teacher management
+- Project management
 - Chi tiet project
-- Chi tiet nhom
+- Group details
 - Danh sach task
 
 Teacher:
 - Teacher Dashboard
-- Lop cua toi
+- My classes
 - Project huong dan
 
 Student:
 - Student Dashboard
-- Du an cua toi
+- My projects
 - Cong viec cua toi
 - Hop thu den
 
@@ -431,7 +431,7 @@ Clean va run:
 =========================================================
 
 17.1. Copy source code
-Copy toan bo thu muc project, bao gom:
+Copy the entire project folder, including:
 - source code
 - resources
 - uploads/avatars neu muon giu avatar da upload
@@ -461,44 +461,44 @@ Sua file:
 
 
 =========================================================
-18. NHUNG LOI THUONG GAP
+18. COMMON ISSUES
 =========================================================
 
-18.1. Loi khong ket noi DB
-Kiem tra:
+18.1. Database connection error
+Check:
 - SQL Server da mo chua
 - dung port 1433 chua
 - username/password trong `database.properties` dung chua
 
-18.2. Loi JavaFX runtime components are missing
+18.2. JavaFX runtime components are missing
 Cach khac phuc:
 - Chay bang `mvn javafx:run`
 hoac
 - Chay AppLauncher.java thay vi `Main.java`
 
-18.3. Khong gui duoc mail
-Kiem tra:
+18.3. Email sending failure
+Check:
 - `application.properties`
 - Gmail App Password
 - ket noi Internet
 
-18.4. Login dung ma khong vao duoc dashboard
-Kiem tra:
+18.4. Login succeeds but the dashboard does not open
+Check:
 - file SQL da chay xong chua
 - DB da co `Account`, `Staff`, `Student`
-- role co dung khong
+- whether the role is correct
 
 
 =========================================================
 19. GHI CHU QUAN TRONG
 =========================================================
 
-- Project nay dung JavaFX + FXML + SceneBuilder, khong dung Swing
-- Khong query DB tren FX Thread
+- This project uses JavaFX + FXML + SceneBuilder, not Swing
+- Do not query the database on the FX thread
 - Repository chi chua SQL
 - Service chua business logic
 - Scene chuyen bang `SceneManager`
-- Session dang nhap luu trong `SessionManager`
+- The login session is stored in `SessionManager`
 - Password luu bang BCrypt
 - Splash hien truoc login
 - Avatar upload luu trong project
@@ -527,3 +527,4 @@ Neu ban chi muon chay nhanh tren may moi:
 =========================================================
 END OF README
 =========================================================
+

@@ -35,7 +35,7 @@ public class AIChatBotController {
     @FXML private ListView<String> chatListView;
     @FXML private TextField inputField;
 
-    private int currentUserRole = 2; // Default role is Student
+    private int currentUserRole = 2;
 
     @FXML
     public void initialize() {
@@ -46,11 +46,11 @@ public class AIChatBotController {
 
         configureChatListView();
 
-        TranslateTransition t = new TranslateTransition(Duration.millis(1200), chatbotBtn);
-        t.setByY(-15);
-        t.setAutoReverse(true);
-        t.setCycleCount(TranslateTransition.INDEFINITE);
-        t.play();
+        TranslateTransition transition = new TranslateTransition(Duration.millis(1200), chatbotBtn);
+        transition.setByY(-15);
+        transition.setAutoReverse(true);
+        transition.setCycleCount(TranslateTransition.INDEFINITE);
+        transition.play();
 
         chatListView.getItems().add("AI: " + getWelcomeMessageForRole(currentUserRole));
     }
@@ -70,7 +70,7 @@ public class AIChatBotController {
             return;
         }
 
-        chatListView.getItems().add("Ban: " + userText);
+        chatListView.getItems().add("You: " + userText);
         inputField.clear();
         chatListView.scrollTo(chatListView.getItems().size() - 1);
 
@@ -79,7 +79,7 @@ public class AIChatBotController {
     }
 
     private int addAiPlaceholder() {
-        chatListView.getItems().add("AI: Dang tra loi...");
+        chatListView.getItems().add("AI: Thinking...");
         chatListView.scrollTo(chatListView.getItems().size() - 1);
         return chatListView.getItems().size() - 1;
     }
@@ -109,11 +109,10 @@ public class AIChatBotController {
                 return parseGeminiResponse(response.body());
             } catch (Exception e) {
                 e.printStackTrace();
-                return "Da co loi khi ket noi chatbot.";
+                return "An error occurred while connecting to the chatbot.";
             }
-        }).thenAccept(botResponse -> Platform.runLater(() -> {
-            animateAiResponse(placeholderIndex, "AI: " + botResponse);
-        }));
+        }).thenAccept(botResponse -> Platform.runLater(() ->
+                animateAiResponse(placeholderIndex, "AI: " + botResponse)));
     }
 
     private void configureChatListView() {
@@ -181,61 +180,60 @@ public class AIChatBotController {
     private String getSystemPromptForRole(int role) {
         return switch (role) {
             case 1 -> """
-                    Ban la tro ly AI cho vai tro Admin trong he thong quan ly project sinh vien tai Aptech.
-                    Nhiem vu chinh cua ban la ho tro van hanh he thong, quan ly tai khoan, quan ly giao vu, giao vien, lop hoc va tinh on dinh cua quy trinh.
-                    Uu tien cac chu de: phan quyen, kich hoat/khoa tai khoan, reset mat khau, quy trinh tao lop, phan cong giao vu, tao giao vien va kiem soat du lieu.
-                    Khi tra loi:
-                    - Viet ngan gon, ro rang, chia thanh cac buoc neu huong dan thao tac.
-                    - Uu tien goc nhin quan tri va kiem soat rui ro.
-                    - Neu nguoi dung hoi van de ky thuat, bao mat, quyen truy cap hoac logic he thong thi tra loi cu the.
-                    - Khong boi ra du lieu dang co trong database. Neu thieu thong tin thi noi ro ban dang dua tren mo ta chung cua he thong.
-                    - Neu cau hoi lien quan den project sinh vien, hay quy ve anh huong quan tri: lop nao, giao vien nao, giao vu nao, trang thai nao can theo doi.
+                    You are an AI assistant for the Admin role in the Aptech student project management system.
+                    Your main responsibility is to support system operations, account management, staff and teacher coordination, class administration, and process stability.
+                    Prioritize topics such as permissions, account activation/deactivation, password resets, class creation workflows, staff assignment, teacher creation, and data control.
+                    When responding:
+                    - Be concise, clear, and use steps when giving instructions.
+                    - Prioritize an administrative and risk-control perspective.
+                    - If the user asks about technical issues, security, permissions, or system logic, answer specifically.
+                    - Do not invent data that is supposedly in the database. If information is missing, clearly say you are responding based on the general system description.
+                    - If the question is about student projects, frame it in terms of administrative impact: which class, which teacher, which staff member, and which status needs attention.
                     """;
             case 2 -> """
-                    Ban la Mentor AI than thien cho Sinh vien trong he thong Student Project.
-                    Ban ho tro sinh vien lam project theo nhom, chia task, theo doi deadline, nop bao cao, trao doi voi giao vien va xu ly cac tinh huong bi tre task.
-                    Khi tra loi:
-                    - Xung ho la Mentor va Ban.
-                    - Giai thich de hieu, than thien, co tinh huong thuc te cua do an nhom.
-                    - Uu tien cac chu de: len ke hoach project, chia task hop ly, phoi hop nhom, cach bao cao tien do, cach xin ho tro giao vien, cach tranh tre deadline.
-                    - Neu Ban dang gap van de voi task, hay de xuat hanh dong cu the theo thu tu uu tien.
-                    - Khuyen khich tinh chu dong, trung thuc ve tien do, va ton trong quy tac lam viec nhom.
-                    - Khong gia vo nhu dang doc duoc du lieu task that trong he thong neu nguoi dung chua cung cap.
+                    You are a friendly AI mentor for students in the Student Project system.
+                    You help students work on group projects, divide tasks, track deadlines, submit reports, communicate with teachers, and handle delayed tasks.
+                    When responding:
+                    - Use a supportive and easy-to-understand tone.
+                    - Prioritize topics such as project planning, sensible task assignment, team coordination, progress reporting, asking teachers for help, and avoiding missed deadlines.
+                    - If the user is struggling with a task, suggest specific actions in priority order.
+                    - Encourage initiative, honesty about progress, and respect for team collaboration rules.
+                    - Do not pretend you can read real task data from the system unless the user provides it.
                     """;
             case 3 -> """
-                    Ban la tro ly AI cho Giao vien huong dan project sinh vien.
-                    Ban ho tro theo doi tien do nhom, danh gia task, dua nhan xet chuyen mon, nhac sinh vien bam sat muc tieu project va deadline.
-                    Khi tra loi:
-                    - Van phong trang trong, chuyen nghiep, ngan gon.
-                    - Uu tien cac chu de: danh gia tien do, nhan dien rui ro tre han, cach giao task, cach review bai lam, cach nhac sinh vien cap nhat trang thai.
-                    - Neu nguoi dung hoi cach xu ly mot nhom cham tien do, hay dua ra huong xu ly co thu tu: kiem tra task, xac dinh nguoi phu trach, hen moc cap nhat, gui nhac nho.
-                    - Neu lien quan chat luong hoc thuat, hay dua ra tieu chi ro rang va co the ap dung duoc.
-                    - Khong tu nhan biet diem so, lich su task hay du lieu thuc te neu chua duoc cung cap.
+                    You are an AI assistant for teachers supervising student projects.
+                    You help monitor team progress, evaluate tasks, provide professional feedback, and remind students to stay aligned with project goals and deadlines.
+                    When responding:
+                    - Be professional, respectful, and concise.
+                    - Prioritize topics such as progress evaluation, deadline risk detection, task assignment, work review, and student status updates.
+                    - If the user asks how to handle a delayed group, provide a structured action plan: review tasks, identify the responsible member, set an update checkpoint, and send reminders.
+                    - If academic quality is involved, provide clear and actionable criteria.
+                    - Do not claim to know real grades, task history, or actual system data unless it has been provided.
                     """;
             case 4 -> """
-                    Ban la tro ly AI cho Giao vu trong he thong quan ly project sinh vien.
-                    Ban ho tro to chuc lop, sap xep nhom, quan ly danh sach sinh vien, phoi hop voi giao vien, va theo doi van de hanh chinh lien quan den project.
-                    Khi tra loi:
-                    - Van phong ro rang, thao tac duoc ngay, nghieng ve quy trinh.
-                    - Uu tien cac chu de: tao lop, chuyen lop, them sinh vien, chia nhom, phan cong giao vien huong dan, nhac nho quy dinh va deadline.
-                    - Neu co xung dot hoac thay doi nhom/lop, hay dua ra cach xu ly theo huong cong bang va de theo doi.
-                    - Neu cau hoi lien quan task, hay tap trung vao goc nhin dieu phoi va nhac viec, khong di sau vao danh gia hoc thuat nhu giao vien.
-                    - Khong bo sung thong tin he thong neu nguoi dung chua cung cap.
+                    You are an AI assistant for staff members in the student project management system.
+                    You help organize classes, arrange groups, manage student lists, coordinate with teachers, and track administrative issues related to projects.
+                    When responding:
+                    - Be clear, actionable, and process-oriented.
+                    - Prioritize topics such as class creation, class transfers, student enrollment, group assignment, teacher assignment, and deadline reminders.
+                    - If there is a conflict or a class/group change, suggest a fair and traceable handling approach.
+                    - If the question is about tasks, focus on coordination and reminders rather than academic evaluation.
+                    - Do not add system facts that the user has not provided.
                     """;
             default -> """
-                    Ban la tro ly AI than thien cho he thong quan ly project sinh vien.
-                    Hay tra loi ro rang, dung trong tam, khong boi ra du lieu khong co.
+                    You are a friendly AI assistant for the student project management system.
+                    Reply clearly, stay on topic, and do not invent missing data.
                     """;
         };
     }
 
     private String getWelcomeMessageForRole(int role) {
         return switch (role) {
-            case 1 -> "Xin chao Admin. Toi co the ho tro quan ly tai khoan, lop hoc, phan quyen va quy trinh van hanh project.";
-            case 2 -> "Xin chao Ban. Mentor co the giup Ban chia task, len ke hoach project, xu ly tre deadline va chuan bi bao cao.";
-            case 3 -> "Xin chao Giang vien. Toi co the ho tro theo doi tien do nhom, danh gia task va goi y cach nhac sinh vien.";
-            case 4 -> "Xin chao Giao vu. Toi co the ho tro ve lop hoc, chia nhom, phan cong va cac quy trinh dieu phoi project.";
-            default -> "Xin chao! Toi co the giup gi cho ban hom nay?";
+            case 1 -> "Hello Admin. I can help with accounts, classes, permissions, and project operations.";
+            case 2 -> "Hello. I can help you split tasks, plan the project, manage delays, and prepare reports.";
+            case 3 -> "Hello Teacher. I can help track team progress, review tasks, and suggest follow-up actions for students.";
+            case 4 -> "Hello Staff. I can help with classes, group assignment, coordination, and project administration workflows.";
+            default -> "Hello. How can I help you today?";
         };
     }
 
@@ -249,13 +247,13 @@ public class AIChatBotController {
     private String parseGeminiResponse(String responseBody) {
         try {
             if (responseBody == null || responseBody.isBlank()) {
-                return "AI chua tra ve noi dung.";
+                return "The AI did not return any content.";
             }
 
             String trimmed = responseBody.trim();
             String lowerCaseBody = trimmed.toLowerCase();
             if (lowerCaseBody.startsWith("<!doctype html") || lowerCaseBody.startsWith("<html")) {
-                return "Chatbot proxy dang tra ve HTML thay vi JSON. Hay kiem tra lai Apps Script deployment va quyen truy cap /exec.";
+                return "The chatbot proxy returned HTML instead of JSON. Please check the Apps Script deployment and /exec access permissions.";
             }
 
             if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
@@ -288,7 +286,7 @@ public class AIChatBotController {
 
             return trimmed;
         } catch (Exception e) {
-            return "Khong the doc phan hoi tu AI.";
+            return "Could not parse the AI response.";
         }
     }
 

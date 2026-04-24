@@ -40,12 +40,12 @@ public class TaskService {
         if (!assignedReminders.isEmpty()) {
             for (TaskReminderInfo info : assignedReminders) {
                 mailService.sendEmailQuietly(info.getStudentEmail(), "[Aptech] Nhac nho nhan task", 
-                    "Xin chao " + info.getStudentName() + ",\nBan co task '" + info.getTitle() + "' can duoc xac nhan thuc hien. Vui long kiem tra tren he thong.");
+                    "Hello " + info.getStudentName() + ",\nYou have a task '" + info.getTitle() + "' that needs execution confirmation. Please check the system.");
                 Message m = new Message();
                 m.setSenderId(info.getAdvisorId());
                 m.setReceiverId(info.getStudentId());
                 m.setTaskId(info.getTaskId());
-                m.setContent(NotificationUtil.buildReminderContent("[ASSIGNED] Ban co task chua xac nhan."));
+                m.setContent(NotificationUtil.buildReminderContent("[ASSIGNED] You have a task chua xac nhan."));
                 messageRepository.insert(m, now);
             }
         }
@@ -54,7 +54,7 @@ public class TaskService {
         if (!dueReminders.isEmpty()) {
             for (TaskReminderInfo info : dueReminders) {
                 mailService.sendEmailQuietly(info.getStudentEmail(), "[Aptech] Nhac nho han chot task", 
-                    "Xin chao " + info.getStudentName() + ",\nTask '" + info.getTitle() + "' cua ban chi con 30 phut nua thoi. Vui long nhanh chong hoan thanh.");
+                    "Hello " + info.getStudentName() + ",\nTask '" + info.getTitle() + "' cua ban chi con 30 phut nua thoi. Vui long nhanh chong hoan thanh.");
                 Message m = new Message();
                 m.setSenderId(info.getAdvisorId());
                 m.setReceiverId(info.getStudentId());
@@ -68,7 +68,7 @@ public class TaskService {
         if (!dailyReminders.isEmpty()) {
             for (TaskReminderInfo info : dailyReminders) {
                 mailService.sendEmailQuietly(info.getStudentEmail(), "[Aptech] Task sap het han (duoi 3 ngay)", 
-                    "Xin chao " + info.getStudentName() + ",\nTask '" + info.getTitle() + "' cua ban chi con duoi 3 ngay nua la het han. Vui long hoan thanh dung tien do.");
+                    "Hello " + info.getStudentName() + ",\nTask '" + info.getTitle() + "' cua ban chi con duoi 3 ngay nua la het han. Vui long hoan thanh dung tien do.");
                 Message m = new Message();
                 m.setSenderId(info.getAdvisorId());
                 m.setReceiverId(info.getStudentId());
@@ -91,13 +91,13 @@ public class TaskService {
 	public void startTask(int taskId, int studentId) {
 		Task task = taskRepository.findById(taskId);
 		if (task == null)
-			throw new RuntimeException("Khong tim thay task");
+			throw new RuntimeException("Task could not be found");
 		requireActiveMember(studentId, task.getGroupId());
 		if (task.getStatus() != TaskStatus.PENDING) {
-			throw new IllegalStateException("Task khong o trang thai PENDING");
+			throw new IllegalStateException("The task is not in PENDING status");
 		}
 		if (task.getAssignedTo() == null || task.getAssignedTo() != studentId) {
-			throw new RuntimeException("Ban khong duoc phan cong task nay");
+			throw new RuntimeException("You are not assigned to this task");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime start = task.getEstimatedStartDate();
@@ -116,13 +116,13 @@ public class TaskService {
 	public void submitForReview(int taskId, int studentId) {
 		Task task = taskRepository.findById(taskId);
 		if (task == null)
-			throw new RuntimeException("Khong tim thay task");
+			throw new RuntimeException("Task could not be found");
 		requireActiveMember(studentId, task.getGroupId());
 		if (task.getStatus() != TaskStatus.IN_PROGRESS) {
-			throw new IllegalStateException("Task khong o trang thai IN_PROGRESS");
+			throw new IllegalStateException("The task is not in IN_PROGRESS status");
 		}
 		if (task.getAssignedTo() == null || task.getAssignedTo() != studentId) {
-			throw new RuntimeException("Ban khong duoc phan cong task nay");
+			throw new RuntimeException("You are not assigned to this task");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		taskRepository.updateStatus(taskId, TaskStatus.REVIEWING.getValue());
@@ -133,16 +133,16 @@ public class TaskService {
 	public void requestRevision(int taskId, int studentId, String note) {
 		Task task = taskRepository.findById(taskId);
 		if (task == null)
-			throw new RuntimeException("Khong tim thay task");
+			throw new RuntimeException("Task could not be found");
 		requireActiveMember(studentId, task.getGroupId());
 		if (task.getStatus() != TaskStatus.REVIEWING) {
-			throw new IllegalStateException("Task khong o trang thai REVIEWING");
+			throw new IllegalStateException("The task is not in REVIEWING status");
 		}
 		if (task.getReviewedBy() == null || task.getReviewedBy() != studentId) {
-			throw new RuntimeException("Ban khong phai nguoi kiem tra task nay");
+			throw new RuntimeException("You are not the reviewer for this task");
 		}
 		if (note == null || note.trim().isEmpty()) {
-			throw new RuntimeException("Noi dung yeu cau chinh sua khong duoc de trong");
+			throw new RuntimeException("Revision request content must not be empty");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		taskRepository.updateStatus(taskId, TaskStatus.REVISING.getValue());
@@ -155,13 +155,13 @@ public class TaskService {
 	public void confirmCompleted(int taskId, int studentId) {
 		Task task = taskRepository.findById(taskId);
 		if (task == null)
-			throw new RuntimeException("Khong tim thay task");
+			throw new RuntimeException("Task could not be found");
 		requireActiveMember(studentId, task.getGroupId());
 		if (task.getStatus() != TaskStatus.REVIEWING) {
-			throw new IllegalStateException("Task khong o trang thai REVIEWING");
+			throw new IllegalStateException("The task is not in REVIEWING status");
 		}
 		if (task.getReviewedBy() == null || task.getReviewedBy() != studentId) {
-			throw new RuntimeException("Ban khong phai nguoi kiem tra task nay");
+			throw new RuntimeException("You are not the reviewer for this task");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		taskRepository.updateStatus(taskId, TaskStatus.COMPLETED.getValue());
@@ -173,13 +173,13 @@ public class TaskService {
 	public void submitRevised(int taskId, int studentId) {
 		Task task = taskRepository.findById(taskId);
 		if (task == null)
-			throw new RuntimeException("Khong tim thay task");
+			throw new RuntimeException("Task could not be found");
 		requireActiveMember(studentId, task.getGroupId());
 		if (task.getStatus() != TaskStatus.REVISING) {
-			throw new IllegalStateException("Task khong o trang thai REVISING");
+			throw new IllegalStateException("The task is not in REVISING status");
 		}
 		if (task.getAssignedTo() == null || task.getAssignedTo() != studentId) {
-			throw new RuntimeException("Ban khong duoc phan cong task nay");
+			throw new RuntimeException("You are not assigned to this task");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		taskRepository.updateStatus(taskId, TaskStatus.REVIEWING.getValue());
@@ -190,14 +190,14 @@ public class TaskService {
 	public void createTask(Task task) {
 		requireActiveLeader(task.getCreatedBy(), task.getGroupId());
 		if (groupRepository.countActiveMembers(task.getGroupId()) < 2) {
-			throw new RuntimeException("Nhom phai co toi thieu 2 sinh vien dang hoat dong moi duoc giao task");
+			throw new RuntimeException("A group must have at least 2 active students before tasks can be assigned");
 		}
 		if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
-			throw new RuntimeException("Tieu de task khong duoc de trong");
+			throw new RuntimeException("Task title must not be empty");
 		}
 		if (task.getEstimatedStartDate() != null && task.getEstimatedEndDate() != null
 				&& task.getEstimatedEndDate().isBefore(task.getEstimatedStartDate())) {
-			throw new RuntimeException("Ngay ket thuc phai sau ngay bat dau");
+			throw new RuntimeException("The end date must be after the start date");
 		}
 		if (task.getEstimatedStartDate() != null
 				&& task.getEstimatedStartDate().isBefore(LocalDateTime.now().minusHours(1))) {
@@ -205,7 +205,7 @@ public class TaskService {
 		}
 		if (task.getAssignedTo() != null && task.getReviewedBy() != null
 				&& task.getAssignedTo().equals(task.getReviewedBy())) {
-			throw new RuntimeException("Nguoi thuc hien va nguoi kiem tra phai khac nhau");
+			throw new RuntimeException("The assignee and reviewer must be different people");
 		}
 		task.setStatus(TaskStatus.PENDING);
 		int taskId = taskRepository.create(task);
@@ -215,7 +215,7 @@ public class TaskService {
 
 	public void sendReminderMessage(int staffId, int studentId, int taskId, String content) {
 		if (content == null || content.trim().isEmpty()) {
-			throw new RuntimeException("Noi dung tin nhan khong duoc de trong");
+			throw new RuntimeException("Message content must not be empty");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		Message msg = new Message();
@@ -231,9 +231,9 @@ public class TaskService {
 		if (task != null && staff != null && student != null && student.getEmail() != null
 				&& !student.getEmail().isBlank()) {
 			String subject = "[Aptech] Nhac nho thuc hien task";
-			String body = "Xin chao " + student.getFullName() + ",\n\n" + staff.getFullName()
-					+ " vua gui nhac nho cho task: " + task.getTitle() + ".\n" + "Noi dung: " + content.trim() + "\n\n"
-					+ "Vui long vao he thong de kiem tra va xu ly task.";
+			String body = "Hello " + student.getFullName() + ",\n\n" + staff.getFullName()
+					+ " has sent a reminder for task: " + task.getTitle() + ".\n" + "Content: " + content.trim() + "\n\n"
+					+ "Please open the system to review and handle the task.";
 			mailService.sendEmailQuietly(student.getEmail(), subject, body);
 		}
 	}
@@ -253,7 +253,7 @@ public class TaskService {
 	private int getCurrentAccountId() {
 		var account = SessionManager.getInstance().getCurrentAccount();
 		if (account == null) {
-			throw new RuntimeException("Khong xac dinh duoc tai khoan dang dang nhap");
+			throw new RuntimeException("Could not determine the logged-in account");
 		}
 		return account.getAccountId();
 	}
@@ -261,17 +261,17 @@ public class TaskService {
 	private void requireActiveMember(int studentId, int groupId) {
 		GroupMember member = groupRepository.findMemberByStudentAndGroup(studentId, groupId);
 		if (member == null || member.getStatus() != MemberStatus.ACTIVE) {
-			throw new RuntimeException("Ban khong con tham gia nhom nay");
+			throw new RuntimeException("You are no longer part of this group");
 		}
 	}
 
 	private void requireActiveLeader(int studentId, int groupId) {
 		GroupMember member = groupRepository.findMemberByStudentAndGroup(studentId, groupId);
 		if (member == null || member.getStatus() != MemberStatus.ACTIVE) {
-			throw new RuntimeException("Ban khong con tham gia nhom nay");
+			throw new RuntimeException("You are no longer part of this group");
 		}
 		if (member.getRole() != MemberRole.LEADER) {
-			throw new RuntimeException("Chi truong nhom moi duoc tao task");
+			throw new RuntimeException("Only the group leader can create tasks");
 		}
 	}
 
@@ -284,10 +284,10 @@ public class TaskService {
 		if (assignee == null || reviewer == null || assignee.getEmail() == null || assignee.getEmail().isBlank()) {
 			return;
 		}
-		String subject = "[Aptech] Yeu cau chinh sua task";
-		String body = "Xin chao " + assignee.getFullName() + ",\n\n" + reviewer.getFullName()
-				+ " vua gui yeu cau chinh sua cho task: " + task.getTitle() + ".\n" + "Noi dung yeu cau: " + note
-				+ "\n\n" + "Vui long vao he thong de xem chi tiet va gui lai task sau khi chinh sua.";
+		String subject = "[Aptech] Task revision request";
+		String body = "Hello " + assignee.getFullName() + ",\n\n" + reviewer.getFullName()
+				+ " has submitted a revision request for task: " + task.getTitle() + ".\n" + "Request content: " + note
+				+ "\n\n" + "Please open the system to review the details and resubmit the task after revising it.";
 		mailService.sendEmailQuietly(assignee.getEmail(), subject, body);
 	}
 }
