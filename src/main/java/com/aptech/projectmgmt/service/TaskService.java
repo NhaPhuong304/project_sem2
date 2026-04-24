@@ -45,7 +45,7 @@ public class TaskService {
                 m.setSenderId(info.getAdvisorId());
                 m.setReceiverId(info.getStudentId());
                 m.setTaskId(info.getTaskId());
-                m.setContent(NotificationUtil.buildReminderContent("[ASSIGNED] You have a task chua xac nhan."));
+                m.setContent(NotificationUtil.buildReminderContent("ASSIGNED_REMINDER You have an unconfirmed task."));
                 messageRepository.insert(m, now);
             }
         }
@@ -59,7 +59,7 @@ public class TaskService {
                 m.setSenderId(info.getAdvisorId());
                 m.setReceiverId(info.getStudentId());
                 m.setTaskId(info.getTaskId());
-                m.setContent(NotificationUtil.buildReminderContent("[DUE] Task cua ban sap het han trong 30 phut."));
+                m.setContent(NotificationUtil.buildReminderContent("DUE_REMINDER Your task is due in 30 minutes."));
                 messageRepository.insert(m, now);
             }
         }
@@ -73,7 +73,7 @@ public class TaskService {
                 m.setSenderId(info.getAdvisorId());
                 m.setReceiverId(info.getStudentId());
                 m.setTaskId(info.getTaskId());
-                m.setContent(NotificationUtil.buildReminderContent("[DAILY] Task cua ban con duoi 3 ngay nua la het han."));
+                m.setContent(NotificationUtil.buildReminderContent("DAILY_REMINDER Your task is due in less than 3 days."));
                 messageRepository.insert(m, now);
             }
         }

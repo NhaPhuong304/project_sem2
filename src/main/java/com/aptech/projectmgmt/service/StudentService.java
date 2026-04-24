@@ -35,8 +35,8 @@ public class StudentService {
 		return studentRepository.findByClassId(unassignedClassId);
 	}
 
-	public void updateStudent(int studentId, String fullName) {
-		studentRepository.updateStudent(studentId, fullName);
+	public void updateStudent(int studentId, String fullName, String email) {
+		studentRepository.updateStudent(studentId, fullName, email);
 	}
 	public Student findById(int studentId) {
 	    return studentRepository.findById(studentId);

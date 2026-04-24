@@ -391,3 +391,27 @@
 .student-table .thumb:hover {
     -fx-background-color: #94a3b8;
 }
+
+/* Custom Chart Colors for Different Dashboards */
+
+/* Staff Dashboard */
+#studentsByClassChart .chart-bar { -fx-bar-fill: #8b5cf6; }
+#studentsByClassChart .chart-bar:hover { -fx-bar-fill: #7c3aed; }
+#completedTasksChart .chart-series-line { -fx-stroke: #14b8a6; }
+#completedTasksChart .chart-line-symbol { -fx-background-color: #14b8a6, white; }
+#overdueTasksChart .chart-series-area-line { -fx-stroke: #ef4444; }
+#overdueTasksChart .chart-series-area-fill { -fx-fill: rgba(239, 68, 68, 0.14); }
+#overdueTasksChart .chart-area-symbol { -fx-background-color: #ef4444, white; }
+
+/* Admin Dashboard */
+#classesByManagerChart .chart-bar { -fx-bar-fill: #10b981; }
+#classesByManagerChart .chart-bar:hover { -fx-bar-fill: #059669; }
+#projectsByAdvisorChart .chart-bar { -fx-bar-fill: #f59e0b; }
+#projectsByAdvisorChart .chart-bar:hover { -fx-bar-fill: #d97706; }
+#accountGrowthChart .chart-series-area-line { -fx-stroke: #3b82f6; }
+#accountGrowthChart .chart-series-area-fill { -fx-fill: rgba(59, 130, 246, 0.14); }
+#accountGrowthChart .chart-area-symbol { -fx-background-color: #3b82f6, white; }
+
+/* Teacher Dashboard */
+#projectsByClassChart .chart-bar { -fx-bar-fill: #f43f5e; }
+#projectsByClassChart .chart-bar:hover { -fx-bar-fill: #e11d48; }

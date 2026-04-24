@@ -21,9 +21,6 @@ public class AdminStaffCreateDialogController {
 
         usernameField.setEditable(false);
         usernameField.setDisable(true);
-
-        emailField.setEditable(false);
-        emailField.setDisable(true);
     }
 
     public String getUsername() {

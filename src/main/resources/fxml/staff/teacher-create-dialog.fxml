@@ -11,7 +11,7 @@
     <Label text="Username:" layoutX="20" layoutY="28" />
     <TextField fx:id="usernameField" layoutX="130" layoutY="24" prefWidth="260" />
 
-    <Label text="Fulle Name:" layoutX="20" layoutY="74" />
+    <Label text="Full Name:" layoutX="20" layoutY="74" />
     <TextField fx:id="fullNameField" layoutX="130" layoutY="70" prefWidth="260" />
 
     <Label text="Email:" layoutX="20" layoutY="120" />

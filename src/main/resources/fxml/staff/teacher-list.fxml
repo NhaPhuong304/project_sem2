@@ -19,9 +19,9 @@
         <columns>
             <TableColumn fx:id="avatarColumn" text="Avatar" prefWidth="90.0" />
             <TableColumn fx:id="usernameColumn" text="Username" prefWidth="160.0" />
-            <TableColumn fx:id="fullNameColumn" text="Fulle Name" prefWidth="220.0" />
+            <TableColumn fx:id="fullNameColumn" text="Full Name" prefWidth="220.0" />
             <TableColumn fx:id="emailColumn" text="Email" prefWidth="260.0" />
-            <TableColumn fx:id="accountStatusColumn" text="Account" prefWidth="110.0" />
+            <TableColumn fx:id="accountStatusColumn" text="Status" prefWidth="110.0" />
         </columns>
 		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
     </TableView>

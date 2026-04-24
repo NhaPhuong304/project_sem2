@@ -66,10 +66,10 @@ public class StudentRepository extends BaseRepository {
 		}
 	}
 
-	public void updateStudent(int studentId, String fullName) {
-		String sql = "UPDATE Student SET FullName = ? WHERE StudentID = ?";
+	public void updateStudent(int studentId, String fullName, String email) {
+		String sql = "UPDATE Student SET FullName = ?, Email = ? WHERE StudentID = ?";
 		try {
-			executeUpdate(sql, fullName, studentId);
+			executeUpdate(sql, fullName, email, studentId);
 		} catch (SQLException e) {
 			throw new RuntimeException("DB error in updateStudent: " + e.getMessage(), e);
 		}

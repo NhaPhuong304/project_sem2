@@ -20,9 +20,6 @@ public class AdminTeacherCreateDialogController {
         emailField.setText(teacher.getEmail());
         usernameField.setEditable(false);
         usernameField.setDisable(true);
-
-        emailField.setEditable(false);
-        emailField.setDisable(true);
     }
 
     public String getUsername() {

@@ -243,9 +243,11 @@ public class AdminTeacherListController {
                 Task<Void> task = new Task<>() {
                     @Override
                     protected Void call() {
-                    	staffService.updateTeacherFullName(
+                    	staffService.updateStaff(
                     		    teacher.getStaffId(),
-                    		    controller.getFullName()
+                    		    teacher.getUsername(),
+                    		    controller.getFullName(),
+                    		    controller.getEmail()
                     		);
                         return null;
                     }

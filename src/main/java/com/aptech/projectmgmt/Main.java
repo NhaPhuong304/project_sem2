@@ -40,20 +40,30 @@ public class Main extends Application {
 
     private void startScheduler() {
         TaskService taskService = new TaskService();
-        scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r, "task-reset-scheduler");
+        scheduler = Executors.newScheduledThreadPool(1, r -> {
+            Thread t = new Thread(r, "task-background-scheduler");
             t.setDaemon(true);
             return t;
         });
+
+        // Tự động thu hồi task quá hạn: quét mỗi 5 phút
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 taskService.resetOverdueTasks();
-                taskService.processEmailReminders();
-                System.out.println("[Scheduler] Scheduler jobs done.");
             } catch (Exception e) {
-                System.err.println("[Scheduler] Error: " + e.getMessage());
+                System.err.println("[Scheduler] Reset Error: " + e.getMessage());
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, 5, TimeUnit.MINUTES);
+
+        // Gửi email nhắc nhở: quét 1 giờ 1 lần
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                taskService.processEmailReminders();
+                System.out.println("[Scheduler] Sent hourly email reminders.");
+            } catch (Exception e) {
+                System.err.println("[Scheduler] Email Error: " + e.getMessage());
+            }
+        }, 0, 1, TimeUnit.HOURS);
     }
 
     @Override

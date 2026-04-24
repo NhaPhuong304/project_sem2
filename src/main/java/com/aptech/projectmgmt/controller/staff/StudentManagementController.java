@@ -202,7 +202,7 @@ public class StudentManagementController {
 			Task<Void> task = new Task<>() {
 				@Override
 				protected Void call() {
-					studentService.updateStudent(student.getStudentId(), controller.getFullName());
+					studentService.updateStudent(student.getStudentId(), controller.getFullName(), controller.getEmail());
 					return null;
 				}
 			};

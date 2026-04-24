@@ -60,11 +60,13 @@ public class SceneManager {
     public static void switchScene(Stage stage, String fxmlPath) throws IOException {
         FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
         Parent root = loader.load();
+        
         Scene scene = new Scene(root);
         addStylesheet(scene);
         stage.setScene(scene);
+        stage.sizeToScene();
+        stage.centerOnScreen();
         stage.show();
-
     }
 
     public static void openModal(String fxmlPath, String title) throws IOException {

@@ -37,7 +37,7 @@
 				text="Email" />
 
 			<TableColumn fx:id="accountStatusColumn"
-				prefWidth="198.0" text="Account Status" />
+				prefWidth="198.0" text="Status" />
 		</columns>
 		<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
 	</TableView>

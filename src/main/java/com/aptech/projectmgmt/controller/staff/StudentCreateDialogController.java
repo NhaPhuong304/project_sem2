@@ -25,9 +25,6 @@ public class StudentCreateDialogController {
 
         studentCodeField.setEditable(false);
         studentCodeField.setDisable(true);
-
-        emailField.setEditable(false);
-        emailField.setDisable(true);
     }
 
     public String getStudentCode() {

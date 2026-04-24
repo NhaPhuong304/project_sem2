@@ -30,12 +30,12 @@
             <VBox prefWidth="330.0" spacing="10.0">
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Assigned requirements" />
-                    <Button fx:id="refreshButton" text="Refesh" />
+                    <Button fx:id="refreshButton" text="Refresh" />
                 </HBox>
                 <TableView fx:id="targetTable" prefHeight="505.0" styleClass="student-table" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="requestTitleColumn" prefWidth="145.0" text="Requied" />
-                        <TableColumn fx:id="deadlineColumn" prefWidth="105.0" text="Dealine" />
+                        <TableColumn fx:id="requestTitleColumn" prefWidth="145.0" text="Requirement" />
+                        <TableColumn fx:id="deadlineColumn" prefWidth="105.0" text="Deadline" />
                         <TableColumn fx:id="targetStatusColumn" prefWidth="95.0" text="Status" />
                     </columns>
                 </TableView>
@@ -61,7 +61,7 @@
                 </ScrollPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
-                    <Button fx:id="completeButton" disable="true" styleClass="add-btn" text="Hoàn tất nộp" />
+                    <Button fx:id="completeButton" disable="true" styleClass="add-btn" text="Complete Submission" />
                     <Label fx:id="statusLabel" style="-fx-text-fill: #475569;" />
                 </HBox>
             </VBox>

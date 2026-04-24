@@ -424,7 +424,7 @@ public class TaskRepository extends BaseRepository {
                      "                WHERE TaskID = t.TaskID " +
                      "                  AND ReceiverID = t.AssignedTo " +
                      "                  AND SentAt >= DATEADD(hour, -1, ?) " +
-                     "                  AND Content LIKE 'SYSTEM_REMINDER|[ASSIGNED]%')";
+                     "                  AND Content LIKE 'SYSTEM_REMINDER|ASSIGNED_REMINDER%')";
         try {
             return executeQuery(sql, rs -> {
                 List<TaskReminderInfo> list = new ArrayList<>();
@@ -450,7 +450,7 @@ public class TaskRepository extends BaseRepository {
                      "                WHERE TaskID = t.TaskID " +
                      "                  AND ReceiverID = t.AssignedTo " +
                      "                  AND SentAt >= DATEADD(hour, -1, ?) " +
-                     "                  AND Content LIKE 'SYSTEM_REMINDER|[DUE]%')";
+                     "                  AND Content LIKE 'SYSTEM_REMINDER|DUE_REMINDER%')";
         try {
             return executeQuery(sql, rs -> {
                 List<TaskReminderInfo> list = new ArrayList<>();
@@ -476,7 +476,7 @@ public class TaskRepository extends BaseRepository {
                      "                WHERE TaskID = t.TaskID " +
                      "                  AND ReceiverID = t.AssignedTo " +
                      "                  AND SentAt >= DATEADD(hour, -1, ?) " +
-                     "                  AND Content LIKE 'SYSTEM_REMINDER|[DAILY]%')";
+                     "                  AND Content LIKE 'SYSTEM_REMINDER|DAILY_REMINDER%')";
         try {
             return executeQuery(sql, rs -> {
                 List<TaskReminderInfo> list = new ArrayList<>();
