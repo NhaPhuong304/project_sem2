@@ -23,6 +23,32 @@ public class StudentRepository extends BaseRepository {
 			throw new RuntimeException("DB error in findByAccountId: " + e.getMessage(), e);
 		}
 	}
+	public boolean existsEmailInStaff(String email) {
+	    String sql = "SELECT COUNT(*) AS Total FROM Staff WHERE Email = ?";
+	    try {
+	        return executeQuery(sql, rs -> {
+	            if (rs.next()) {
+	                return rs.getInt("Total") > 0;
+	            }
+	            return false;
+	        }, email);
+	    } catch (SQLException e) {
+	        throw new RuntimeException("DB error in existsEmailInStaff: " + e.getMessage(), e);
+	    }
+	}
+	public boolean existsEmailInStudent(String email) {
+	    String sql = "SELECT COUNT(*) AS Total FROM Student WHERE Email = ?";
+	    try {
+	        return executeQuery(sql, rs -> {
+	            if (rs.next()) {
+	                return rs.getInt("Total") > 0;
+	            }
+	            return false;
+	        }, email);
+	    } catch (SQLException e) {
+	        throw new RuntimeException("DB error in existsEmailInStudent: " + e.getMessage(), e);
+	    }
+	}
 
 	public Student findById(int studentId) {
 		String sql = "SELECT s.StudentID, s.StudentCode, s.FullName, s.Email, s.ClassID, s.AccountID, a.PhotoUrl, a.IsActive, c.ClassName, s.CreatedByStaffId, st.FullName as CreatedByStaffName "

@@ -48,6 +48,9 @@ public class StaffService {
         if (normalizedEmail.isEmpty()) {
             throw new RuntimeException("Email must not be empty");
         }
+        if (staffRepository.existsEmailInStaff(email) || staffRepository.existsEmailInStudent(email)) {
+            throw new RuntimeException("Email đã tồn tại trong hệ thống.");
+        }
         if (!normalizedEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             throw new RuntimeException("Invalid email address");
         }

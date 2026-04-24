@@ -384,7 +384,7 @@ public class ProjectListController {
 	private void refreshSemesterOptions() {
 		String currentSelection = semesterCombo.getValue();
 		SchoolClass selectedClass = classCombo.getValue();
-		ObservableList<String> semesters = FXCollections.observableArrayList("Tat ca");
+		ObservableList<String> semesters = FXCollections.observableArrayList("All");
 		allProjects.stream()
 				.filter(project -> selectedClass == null || selectedClass.getClassId() == ALL_CLASSES_ID
 						|| project.getClassId() == selectedClass.getClassId())

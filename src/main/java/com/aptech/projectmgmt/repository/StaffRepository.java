@@ -24,6 +24,32 @@ public class StaffRepository extends BaseRepository {
 			throw new RuntimeException("DB error in findByAccountId: " + e.getMessage(), e);
 		}
 	}
+	public boolean existsEmailInStudent(String email) {
+	    String sql = "SELECT COUNT(*) AS Total FROM Student WHERE Email = ?";
+	    try {
+	        return executeQuery(sql, rs -> {
+	            if (rs.next()) {
+	                return rs.getInt("Total") > 0;
+	            }
+	            return false;
+	        }, email);
+	    } catch (SQLException e) {
+	        throw new RuntimeException("DB error in existsEmailInStudent: " + e.getMessage(), e);
+	    }
+	}
+	public boolean existsEmailInStaff(String email) {
+	    String sql = "SELECT COUNT(*) AS Total FROM Staff WHERE Email = ?";
+	    try {
+	        return executeQuery(sql, rs -> {
+	            if (rs.next()) {
+	                return rs.getInt("Total") > 0;
+	            }
+	            return false;
+	        }, email);
+	    } catch (SQLException e) {
+	        throw new RuntimeException("DB error in existsEmailInStaff: " + e.getMessage(), e);
+	    }
+	}
 
 	public Staff findById(int staffId) {
 		String sql = "SELECT s.StaffID, s.FullName, s.Email, s.AccountID, "

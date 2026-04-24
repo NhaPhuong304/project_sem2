@@ -1684,6 +1684,12 @@ BEGIN
     VALUES (N'eProjects Status report', N'.xlsx', 2)
 END
 GO
+UPDATE dbo.SubmissionRequirementTemplate
+SET RequiredExtension = N'.xls'
+WHERE RequirementName IN (
+    N'eProjects Status report',
+    N'eProjects Feedback Form'
+);
 
 IF NOT EXISTS (SELECT 1 FROM dbo.SubmissionRequirementTemplate WHERE RequirementName = N'eProjects Feedback Form')
 BEGIN

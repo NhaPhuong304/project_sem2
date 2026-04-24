@@ -106,7 +106,6 @@ public class StudentSubmissionController {
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> {
             List<SubmissionTarget> targets = task.getValue();
-            targetTable.setItems(FXCollections.observableArrayList(targets));
             if (targets.isEmpty()) {
                 clearDetail("You do not have any project submission requests yet. Only group leaders can see requests here.");
                 setLoading(false, "");

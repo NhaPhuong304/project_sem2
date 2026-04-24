@@ -102,7 +102,7 @@ public class AdminStaffListController {
 			return new SimpleStringProperty("");
 		});
 		accountStatusColumn
-				.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isActive() ? "Hoat dong" : "Da khoa"));
+				.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isActive() ? "Active" : "Inactive"));
 		actionColumn.setCellFactory(col -> new TableCell<>() {
 			private final Button editBtn = new Button("✎");
 			private final Button lockBtn = new Button("🔒");

@@ -736,7 +736,7 @@ public class MyTaskListController {
 						revision.getCreatedAt() != null ? revision.getCreatedAt().format(dateTimeFormatter) : "?")
 						.append(" | ").append(revision.getNote()).append("\n");
 			}
-			detailBuilder.append("\n=== LICH SU BO TASK ===\n");
+			detailBuilder.append("\n=== Task Abandonment History ===\n");
 			for (TaskAbandonLog abandonLog : taskDetailData.abandonLogs()) {
 				detailBuilder
 						.append(abandonLog.getAbandonedAt() != null

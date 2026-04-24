@@ -20,6 +20,7 @@ public class StudentService {
 	public List<Student> getStudentsByClass(int classId) {
 		return studentRepository.findByClassId(classId);
 	}
+	
 
 	public String getNextStudentCode() {
 		return studentRepository.getNextStudentCode();
@@ -55,6 +56,7 @@ public class StudentService {
 		}
 		return count;
 	}
+	
 
 	public StudentCreationResult addStudent(String studentCode, String fullName, String email) {
 		String normalizedStudentCode = studentCode != null ? studentCode.trim() : "";
@@ -69,6 +71,9 @@ public class StudentService {
 		}
 		if (normalizedEmail.isEmpty()) {
 			throw new RuntimeException("Email must not be empty");
+		}
+		if (studentRepository.existsEmailInStudent(email) || studentRepository.existsEmailInStaff(email)) {
+		    throw new RuntimeException("Email already exists.");
 		}
 		if (!normalizedEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
 			throw new RuntimeException("Invalid email address");

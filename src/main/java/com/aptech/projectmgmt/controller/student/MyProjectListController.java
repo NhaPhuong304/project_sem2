@@ -62,7 +62,7 @@ public class MyProjectListController {
 						+ (c.getValue().getEndDate() != null ? c.getValue().getEndDate().format(dateTimeFormatter)
 								: "?")));
 		statusColumn.setCellValueFactory(c -> new SimpleStringProperty(
-				c.getValue().getStatus() == ProjectStatus.ACTIVE ? "Dang hoat dong" : "Hoan thanh"));
+				c.getValue().getStatus() == ProjectStatus.ACTIVE ? "Active" : "Completed"));
 		roleColumn.setCellValueFactory(c -> new SimpleStringProperty(
 				c.getValue().getMyRole() == MemberRole.LEADER ? "Leader" : "Member"));
 
