@@ -75,8 +75,8 @@ public class StudentManagementController {
 				transferBtn.setTooltip(new javafx.scene.control.Tooltip("Transfer"));
 				lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock"));
-				unlockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
-				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock"));
+				unlockBtn.setStyle("-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				unlockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock"));
 				editBtn.setOnAction(e -> {
 					Student student = getTableView().getItems().get(getIndex());
 					handleEditStudent(student);
@@ -102,11 +102,12 @@ public class StudentManagementController {
 			protected void updateItem(Void item, boolean empty) {
 				super.updateItem(item, empty);
 
-				if (empty || getIndex() >= getTableView().getItems().size()) {
+				if (empty || getTableRow() == null || getTableRow().getItem() == null) {
 					setGraphic(null);
+					if (getTableRow() != null) getTableRow().setStyle("");
 					return;
 				}
-				Student student = getTableView().getItems().get(getIndex());
+				Student student = getTableRow().getItem();
 				actionBox.getChildren().clear();
 
 				actionBox.getChildren().add(editBtn);
@@ -115,9 +116,13 @@ public class StudentManagementController {
 				if (student.getAccountId() != null) {
 					if (student.isActive()) {
 						actionBox.getChildren().add(lockBtn);
+						getTableRow().setStyle("");
 					} else {
 						actionBox.getChildren().add(unlockBtn);
+						getTableRow().setStyle("-fx-opacity: 0.6; -fx-background-color: #f3f4f6;");
 					}
+				} else {
+					getTableRow().setStyle("");
 				}
 
 				setGraphic(actionBox);

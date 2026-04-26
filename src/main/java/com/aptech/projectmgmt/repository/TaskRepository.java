@@ -423,7 +423,7 @@ public class TaskRepository extends BaseRepository {
                      "AND NOT EXISTS (SELECT 1 FROM Message " +
                      "                WHERE TaskID = t.TaskID " +
                      "                  AND ReceiverID = t.AssignedTo " +
-                     "                  AND SentAt >= DATEADD(hour, -1, ?) " +
+                     "                  AND SentAt >= DATEADD(hour, -24, ?) " +
                      "                  AND Content LIKE 'SYSTEM_REMINDER|ASSIGNED_REMINDER%')";
         try {
             return executeQuery(sql, rs -> {
@@ -449,7 +449,7 @@ public class TaskRepository extends BaseRepository {
                      "AND NOT EXISTS (SELECT 1 FROM Message " +
                      "                WHERE TaskID = t.TaskID " +
                      "                  AND ReceiverID = t.AssignedTo " +
-                     "                  AND SentAt >= DATEADD(hour, -1, ?) " +
+                     "                  AND SentAt >= DATEADD(hour, -24, ?) " +
                      "                  AND Content LIKE 'SYSTEM_REMINDER|DUE_REMINDER%')";
         try {
             return executeQuery(sql, rs -> {
@@ -475,7 +475,7 @@ public class TaskRepository extends BaseRepository {
                      "AND NOT EXISTS (SELECT 1 FROM Message " +
                      "                WHERE TaskID = t.TaskID " +
                      "                  AND ReceiverID = t.AssignedTo " +
-                     "                  AND SentAt >= DATEADD(hour, -1, ?) " +
+                     "                  AND SentAt >= DATEADD(hour, -24, ?) " +
                      "                  AND Content LIKE 'SYSTEM_REMINDER|DAILY_REMINDER%')";
         try {
             return executeQuery(sql, rs -> {

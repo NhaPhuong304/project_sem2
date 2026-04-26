@@ -124,8 +124,23 @@ public class AdminTeacherListController {
                 super.updateItem(item, empty);
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
+                    if (getTableRow() != null) getTableRow().setStyle("");
                     return;
                 }
+                
+                Staff teacher = getTableRow().getItem();
+                if (teacher.isActive()) {
+                    lockBtn.setText("🔒");
+                    lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+                    lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock Teacher"));
+                    getTableRow().setStyle("");
+                } else {
+                    lockBtn.setText("🔓");
+                    lockBtn.setStyle("-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+                    lockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock Teacher"));
+                    getTableRow().setStyle("-fx-opacity: 0.6; -fx-background-color: #f3f4f6;");
+                }
+
                 javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, editBtn, lockBtn);
                 setGraphic(box);
             }
