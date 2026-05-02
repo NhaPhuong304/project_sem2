@@ -72,7 +72,7 @@ public class StudentListController {
 				return sc != null ? sc.getClassName() : "Class #" + classId;
 			}
 		};
-		task.setOnSucceeded(e -> Platform.runLater(() -> classNameLabel.setText("Danh sach SV - " + task.getValue())));
+		task.setOnSucceeded(e -> Platform.runLater(() -> classNameLabel.setText("List Student - " + task.getValue())));
 		new Thread(task).start();
 		loadStudents();
 	}
@@ -109,7 +109,7 @@ public class StudentListController {
 		emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 		accountStatusColumn.setCellValueFactory(c -> {
 			Integer accId = c.getValue().getAccountId();
-			String status = accId != null ? "Co tai khoan" : "Chua co tai khoan";
+			String status = accId != null ? "Has Account" : "No Account";
 			return new SimpleStringProperty(status);
 		});
 	}
@@ -160,7 +160,7 @@ public class StudentListController {
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
 			createAccountsBtn.setDisable(false);
 			int count = task.getValue();
-			AlertUtil.showSuccess("Da tao " + count + " tai khoan thanh cong");
+			AlertUtil.showSuccess("Successfully created " + count + " accounts");
 			loadStudents();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> {

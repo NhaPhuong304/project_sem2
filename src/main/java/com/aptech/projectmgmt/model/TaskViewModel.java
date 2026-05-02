@@ -32,28 +32,37 @@ public class TaskViewModel {
         if (displayColor != null) {
             return displayColor;
         }
-        if (status == TaskStatus.COMPLETED && !isLate) return DisplayColor.GREEN;
+
+        if (status == TaskStatus.COMPLETED && !isLate) {
+            return DisplayColor.GREEN;
+        }
+
         if (isLate || (status != TaskStatus.COMPLETED
-                && estimatedEndDate != null && estimatedEndDate.isBefore(LocalDateTime.now()))) {
+                && estimatedEndDate != null
+                && estimatedEndDate.isBefore(LocalDateTime.now()))) {
             return DisplayColor.RED;
         }
+
         if (status == TaskStatus.PENDING
-                && estimatedStartDate != null && estimatedStartDate.isBefore(LocalDateTime.now())) {
+                && estimatedStartDate != null
+                && estimatedStartDate.isBefore(LocalDateTime.now())) {
             return DisplayColor.YELLOW;
         }
+
         return DisplayColor.NORMAL;
     }
 
+    // FIX STATUS ENGLISH
     public String getStatusDisplay() {
         if (status == null) return "";
-        switch (status) {
-            case PENDING: return "Cho xu ly";
-            case IN_PROGRESS: return "Dang thuc hien";
-            case REVIEWING: return "Under review";
-            case REVISING: return "Dang chinh sua";
-            case COMPLETED: return "Hoan thanh";
-            default: return status.name();
-        }
+
+        return switch (status) {
+            case PENDING -> "Pending";
+            case IN_PROGRESS -> "In Progress";
+            case REVIEWING -> "Reviewing";
+            case REVISING -> "Revising";
+            case COMPLETED -> "Completed";
+        };
     }
 
     public int getTaskId() { return taskId; }
@@ -93,8 +102,9 @@ public class TaskViewModel {
         if (assignedToName == null || assignedToName.isBlank()) {
             return "";
         }
+
         return assignedMemberStatus == MemberStatus.EXCLUDED
-                ? assignedToName + " (Da bi loai)"
+                ? assignedToName + " (Excluded)"
                 : assignedToName;
     }
 
@@ -114,8 +124,9 @@ public class TaskViewModel {
         if (reviewedByName == null || reviewedByName.isBlank()) {
             return "";
         }
+
         return reviewedMemberStatus == MemberStatus.EXCLUDED
-                ? reviewedByName + " (Da bi loai)"
+                ? reviewedByName + " (Excluded)"
                 : reviewedByName;
     }
 

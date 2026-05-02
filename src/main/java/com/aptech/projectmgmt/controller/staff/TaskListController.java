@@ -58,8 +58,8 @@ public class TaskListController {
 	private int groupId;
 	private ObservableList<TaskViewModel> taskList = FXCollections.observableArrayList();
 	private List<TaskViewModel> loadedTasks = List.of();
-	private String statusFilter = "Tat ca";
-	private String memberFilter = "Tat ca";
+	private String statusFilter = "All";
+	private String memberFilter = "All";
 	private Timeline autoRefresh;
 	private boolean readOnlyMode;
 
@@ -87,7 +87,7 @@ public class TaskListController {
 	}
 
 	public void setMemberFilter(String memberName) {
-		this.memberFilter = memberName;
+		this.memberFilter = memberName != null ? memberName.trim() : "All";
 		applyFilters();
 	}
 
@@ -195,13 +195,10 @@ public class TaskListController {
 				String assignedName = taskViewModel.getAssignedToDisplayName();
 				String assignedPhoto = taskViewModel.getAssignedToPhoto();
 
-				System.out.println("AssignedToName = " + assignedName);
-				System.out.println("AssignedToPhoto = " + assignedPhoto);
-
 				if (assignedName == null || assignedName.isBlank()) {
-					setText("Chua phan cong");
+					setText("Not assigned yet");
 					setGraphic(null);
-					return;
+					return; // FIX
 				}
 
 				setText(null);
@@ -313,7 +310,7 @@ public class TaskListController {
 	}
 
 	public void setStatusFilter(String statusFilter) {
-		this.statusFilter = statusFilter != null ? statusFilter : "Tat ca";
+		this.statusFilter = statusFilter != null ? statusFilter.trim() : "All";
 		applyFilters();
 	}
 
@@ -323,26 +320,35 @@ public class TaskListController {
 			return;
 		}
 
-		taskList.setAll(loadedTasks.stream().filter(taskViewModel -> {
-			if (statusFilter == null || statusFilter.equals("Tat ca")) {
-				return true;
-			}
-			return statusFilter.equals(taskViewModel.getStatusDisplay());
-		}).filter(taskViewModel -> {
-			if (memberFilter == null || memberFilter.equals("Tat ca")) {
-				return true;
-			}
-			String assignedName = taskViewModel.getAssignedToDisplayName();
-			return assignedName != null && assignedName.equals(memberFilter);
-		}).toList());
+		taskList.setAll(loadedTasks.stream()
+
+				.filter(task -> {
+					if (statusFilter == null || statusFilter.equalsIgnoreCase("All")) {
+						return true;
+					}
+
+					String taskStatus = task.getStatusDisplay();
+					return taskStatus != null && taskStatus.trim().equalsIgnoreCase(statusFilter);
+				})
+
+				.filter(task -> {
+					if (memberFilter == null || memberFilter.equalsIgnoreCase("All")) {
+						return true;
+					}
+
+					String assignedName = task.getAssignedToDisplayName();
+					return assignedName != null && assignedName.trim().equalsIgnoreCase(memberFilter);
+				})
+
+				.toList());
 	}
 
 	private void handleSendMessage(TaskViewModel task) {
 		if (task.getAssignedToId() == null) {
-			AlertUtil.showError("Task chua co nguoi duoc phan cong");
+			AlertUtil.showError("The task has not been assigned to anyone yet.");
 			return;
 		}
-		Optional<String> result = showTextPromptDialog("Nhan tin nhac nho",
+		Optional<String> result = showTextPromptDialog("Send a reminder message",
 				"Send a reminder message to " + task.getAssignedToName(), "Content");
 		result.ifPresent(content -> {
 			if (content.trim().isEmpty()) {
@@ -366,8 +372,8 @@ public class TaskListController {
 				AlertUtil.showSuccess("Reminder sent successfully");
 				loadTasks();
 			}));
-			sendTask.setOnFailed(
-					e -> Platform.runLater(() -> AlertUtil.showError("Error: " + sendTask.getException().getMessage())));
+			sendTask.setOnFailed(e -> Platform
+					.runLater(() -> AlertUtil.showError("Error: " + sendTask.getException().getMessage())));
 			new Thread(sendTask).start();
 		});
 	}
@@ -397,7 +403,7 @@ public class TaskListController {
 						revision.getCreatedAt() != null ? revision.getCreatedAt().format(dateTimeFormatter) : "?")
 						.append(" | ").append(revision.getNote()).append("\n");
 			}
-			detailBuilder.append("\n=== LICH SU BO TASK ===\n");
+			detailBuilder.append("\n=== Abandonment History ===\n");
 			for (TaskAbandonLog abandonLog : taskDetailData.abandonLogs()) {
 				detailBuilder
 						.append(abandonLog.getAbandonedAt() != null
@@ -408,8 +414,8 @@ public class TaskListController {
 			}
 			showTaskDetailModal(taskVm.getTitle(), detailBuilder.toString());
 		}));
-		loadTask.setOnFailed(e -> Platform
-				.runLater(() -> AlertUtil.showError("Failed to load details: " + loadTask.getException().getMessage())));
+		loadTask.setOnFailed(e -> Platform.runLater(
+				() -> AlertUtil.showError("Failed to load details: " + loadTask.getException().getMessage())));
 		new Thread(loadTask).start();
 	}
 
@@ -448,7 +454,7 @@ public class TaskListController {
 
 			Stage modal = new Stage();
 			modal.initModality(Modality.APPLICATION_MODAL);
-			modal.setTitle("Chi tiet Task: " + taskTitle);
+			modal.setTitle("Detail Task: " + taskTitle);
 			Scene scene = new Scene(root);
 			String css = getClass().getResource("/css/style.css") != null
 					? getClass().getResource("/css/style.css").toExternalForm()

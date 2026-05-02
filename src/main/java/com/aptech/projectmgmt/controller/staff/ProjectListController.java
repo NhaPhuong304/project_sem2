@@ -448,7 +448,7 @@ public class ProjectListController {
 			controller.setSupervisors(staffList);
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Tao Project moi");
+			dialog.setTitle("Create new project");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
 			dialog.getDialogPane().setPrefWidth(560);
@@ -460,11 +460,10 @@ public class ProjectListController {
 
 			Project project = controller.buildProject(classId);
 
-			// Validate: end date must be exactly 1 month after start date
 			java.time.LocalDate startDate = project.getStartDate();
 			java.time.LocalDate endDate = project.getEndDate();
 			if (startDate == null || endDate == null) {
-				AlertUtil.showError("Please select a start date va ngay ket thuc cho project.");
+				AlertUtil.showError("Please select a start date and end date for project.");
 				return;
 			}
 			if (!endDate.equals(startDate.plusMonths(1))) {
@@ -480,7 +479,7 @@ public class ProjectListController {
 				}
 			};
 			task.setOnSucceeded(e -> Platform.runLater(() -> {
-				AlertUtil.showSuccess("Tao project thanh cong");
+				AlertUtil.showSuccess("Create project successfully");
 				requestedClassId = classId;
 				loadProjects();
 			}));
@@ -500,22 +499,22 @@ public class ProjectListController {
 		}
 		LocalDate today = LocalDate.now();
 		if (project.getStatus() == ProjectStatus.COMPLETED) {
-			return "Hoan thanh";
+			return "Completed.";
 		}
 		if (project.getStartDate() != null && today.isBefore(project.getStartDate())) {
-			return "Chua bat dau";
+			return "Not started";
 		}
 		if (project.getEndDate() == null) {
-			return "Dang hoat dong";
+			return "Active.";
 		}
 		if (today.isAfter(project.getEndDate())) {
-			return "Da qua han";
+			return "Overdue.";
 		}
 		long remainingDays = ChronoUnit.DAYS.between(today, project.getEndDate());
 		if (remainingDays <= NEAR_END_THRESHOLD_DAYS) {
-			return "Sap het han";
+			return "Expiring soon";
 		}
-		return "Dang hoat dong";
+		return "Active";
 	}
 
 	private String getProjectStatusStyle(Project project) {

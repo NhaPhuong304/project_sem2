@@ -25,6 +25,9 @@ public class GroupService {
 	public List<ProjectGroup> getGroupsByProject(int projectId) {
 		return groupRepository.findByProjectId(projectId);
 	}
+	public void deleteLeaderAndTransfer(int oldLeaderId, int newLeaderId){
+		groupRepository.deleteLeaderAndTransfer(oldLeaderId, newLeaderId);
+	}
 
 	public List<GroupMember> getMembersByGroup(int groupId) {
 		return groupRepository.findMembersByGroupId(groupId);

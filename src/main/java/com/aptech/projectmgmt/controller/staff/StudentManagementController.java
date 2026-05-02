@@ -69,13 +69,17 @@ public class StudentManagementController {
 			private final javafx.scene.layout.HBox actionBox = new javafx.scene.layout.HBox(8);
 
 			{
-				editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				editBtn.setStyle(
+						"-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit"));
-				transferBtn.setStyle("-fx-text-fill: #8b5cf6; -fx-font-size: 14px; -fx-background-color: #f5f3ff; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				transferBtn.setStyle(
+						"-fx-text-fill: #8b5cf6; -fx-font-size: 14px; -fx-background-color: #f5f3ff; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				transferBtn.setTooltip(new javafx.scene.control.Tooltip("Transfer"));
-				lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				lockBtn.setStyle(
+						"-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock"));
-				unlockBtn.setStyle("-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				unlockBtn.setStyle(
+						"-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				unlockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock"));
 				editBtn.setOnAction(e -> {
 					Student student = getTableView().getItems().get(getIndex());
@@ -104,7 +108,8 @@ public class StudentManagementController {
 
 				if (empty || getTableRow() == null || getTableRow().getItem() == null) {
 					setGraphic(null);
-					if (getTableRow() != null) getTableRow().setStyle("");
+					if (getTableRow() != null)
+						getTableRow().setStyle("");
 					return;
 				}
 				Student student = getTableRow().getItem();
@@ -207,7 +212,8 @@ public class StudentManagementController {
 			Task<Void> task = new Task<>() {
 				@Override
 				protected Void call() {
-					studentService.updateStudent(student.getStudentId(), controller.getFullName(), controller.getEmail());
+					studentService.updateStudent(student.getStudentId(), controller.getFullName(),
+							controller.getEmail());
 					return null;
 				}
 			};
@@ -238,7 +244,10 @@ public class StudentManagementController {
 		Task<java.util.List<SchoolClass>> classTask = new Task<>() {
 			@Override
 			protected java.util.List<SchoolClass> call() {
-				return classService.getAllClasses();
+
+				var account = com.aptech.projectmgmt.util.SessionManager.getInstance().getCurrentAccount();
+
+				return classService.getClassesByManager(account.getAccountId());
 			}
 		};
 
@@ -391,7 +400,8 @@ public class StudentManagementController {
 			task.setOnSucceeded(e -> Platform.runLater(() -> {
 				StudentCreationResult resultInfo = task.getValue();
 				String message = "Add student thanh cong. Tai khoan mac dinh: " + resultInfo.getUsername() + " / "
-						+ resultInfo.getTemporaryPassword() + ". The student is currently in the unassigned class state.";
+						+ resultInfo.getTemporaryPassword()
+						+ ". The student is currently in the unassigned class state.";
 				if (resultInfo.isNotificationEmailSent()) {
 					message += " Notification email sent.";
 				} else {

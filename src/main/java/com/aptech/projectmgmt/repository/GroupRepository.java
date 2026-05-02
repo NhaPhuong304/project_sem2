@@ -37,6 +37,52 @@ public class GroupRepository extends BaseRepository {
 		}
 	}
 
+	public void deleteLeaderAndTransfer(int oldLeaderMemberId, int newLeaderMemberId) {
+
+		String demoteOldLeaderSql = "UPDATE GroupMember SET Role = ? WHERE MemberID = ?";
+
+		String promoteNewLeaderSql = "UPDATE GroupMember SET Role = ? WHERE MemberID = ?";
+
+		String deleteOldLeaderSql = "DELETE FROM GroupMember WHERE MemberID = ?";
+
+		try (java.sql.Connection conn = com.aptech.projectmgmt.config.DatabaseConfig.getConnection()) {
+
+			conn.setAutoCommit(false);
+
+			try (java.sql.PreparedStatement ps1 = conn.prepareStatement(demoteOldLeaderSql);
+
+					java.sql.PreparedStatement ps2 = conn.prepareStatement(promoteNewLeaderSql);
+
+					java.sql.PreparedStatement ps3 = conn.prepareStatement(deleteOldLeaderSql)) {
+
+				// hạ leader cũ xuống member
+				ps1.setInt(1, MemberRole.MEMBER.getValue());
+				ps1.setInt(2, oldLeaderMemberId);
+				ps1.executeUpdate();
+
+				// set leader mới
+				ps2.setInt(1, MemberRole.LEADER.getValue());
+				ps2.setInt(2, newLeaderMemberId);
+				ps2.executeUpdate();
+
+				// xóa leader cũ
+				ps3.setInt(1, oldLeaderMemberId);
+				ps3.executeUpdate();
+
+				conn.commit();
+
+			} catch (Exception ex) {
+				conn.rollback();
+				throw ex;
+			} finally {
+				conn.setAutoCommit(true);
+			}
+
+		} catch (Exception e) {
+			throw new RuntimeException("DB error in deleteLeaderAndTransfer: " + e.getMessage(), e);
+		}
+	}
+
 	public void reactivateMember(int memberId) {
 		String sql = "UPDATE GroupMember SET Status = ?, ExcludedBy = NULL, ExcludedAt = NULL, ExcludedReason = NULL WHERE MemberID = ?";
 		try {
@@ -101,7 +147,6 @@ public class GroupRepository extends BaseRepository {
 			throw new RuntimeException("DB error in transferLeader: " + e.getMessage(), e);
 		}
 	}
-
 
 	public void transferLeaderAndExclude(int oldLeaderMemberId, int newLeaderMemberId, int staffId, String reason) {
 		String demoteOldLeaderSql = "UPDATE GroupMember SET Role = ? WHERE MemberID = ?";

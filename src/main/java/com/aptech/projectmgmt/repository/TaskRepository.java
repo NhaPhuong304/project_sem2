@@ -26,7 +26,7 @@ public class TaskRepository extends BaseRepository {
 				+ "gmAssigned.Status AS AssignedMemberStatus, gmReviewed.Status AS ReviewedMemberStatus, "
 				+ "CASE WHEN reminder.TaskID IS NULL THEN 0 ELSE 1 END AS HasReminderSent " + "FROM Task t "
 				+ "INNER JOIN ProjectGroup pg ON pg.GroupID = t.GroupID "
-				+ "INNER JOIN Project p ON p.GroupID = pg.GroupID " + "INNER JOIN Class c ON c.ClassID = pg.ClassID "
+				+ "LEFT JOIN Project p ON p.GroupID = pg.GroupID " + "INNER JOIN Class c ON c.ClassID = pg.ClassID "
 				+ "LEFT JOIN Student assigned ON assigned.StudentID = t.AssignedTo "
 				+ "LEFT JOIN Account assignedAccount ON assignedAccount.AccountID = assigned.AccountID "
 				+ "LEFT JOIN Student reviewed ON reviewed.StudentID = t.ReviewedBy "
