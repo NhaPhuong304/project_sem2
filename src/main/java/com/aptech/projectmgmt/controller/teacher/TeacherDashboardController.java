@@ -6,6 +6,7 @@ import com.aptech.projectmgmt.model.Staff;
 import com.aptech.projectmgmt.service.AccountService;
 import com.aptech.projectmgmt.util.AlertUtil;
 import com.aptech.projectmgmt.util.AvatarUtil;
+import com.aptech.projectmgmt.util.ChatbotUiContextUtil;
 import com.aptech.projectmgmt.util.SceneManager;
 import com.aptech.projectmgmt.util.SessionManager;
 import javafx.application.Platform;
@@ -63,6 +64,7 @@ public class TeacherDashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent view = loader.load();
             contentArea.getChildren().setAll(view);
+            ChatbotUiContextUtil.updateCurrentScreen(fxmlPath, loader.getController());
         } catch (Exception e) {
             e.printStackTrace();
             AlertUtil.showError("Unable to load screen: " + e.getMessage());
@@ -99,6 +101,7 @@ public class TeacherDashboardController {
                 ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
             }
             contentArea.getChildren().setAll(content);
+            ChatbotUiContextUtil.updateCurrentScreen(SceneManager.CLASS_LIST, controller);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load classes: " + e.getMessage());
         }
@@ -116,6 +119,7 @@ public class TeacherDashboardController {
                 ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
             }
             contentArea.getChildren().setAll(content);
+            ChatbotUiContextUtil.updateCurrentScreen(SceneManager.PROJECT_LIST, controller);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load supervised projects: " + e.getMessage());
         }

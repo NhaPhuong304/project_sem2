@@ -1,6 +1,7 @@
 package com.aptech.projectmgmt.controller;
 
 import com.aptech.projectmgmt.model.Account;
+import com.aptech.projectmgmt.util.ChatbotUiContextUtil;
 import com.aptech.projectmgmt.util.SessionManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -86,12 +87,14 @@ public class AIChatBotController {
 
     private void callGeminiApiAsync(String userMessage, int placeholderIndex) {
         String rolePrompt = getSystemPromptForRole(currentUserRole);
+        String uiContext = ChatbotUiContextUtil.buildContextSummary(chatListView.getScene());
         String requestBody = String.format("""
             {
               "prompt": "%s",
-              "rolePrompt": "%s"
+              "rolePrompt": "%s",
+              "uiContext": "%s"
             }
-            """, escapeJson(userMessage), escapeJson(rolePrompt));
+            """, escapeJson(userMessage), escapeJson(rolePrompt), escapeJson(uiContext));
 
         HttpClient client = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
@@ -189,6 +192,9 @@ public class AIChatBotController {
                     - If the user asks about technical issues, security, permissions, or system logic, answer specifically.
                     - Do not invent data that is supposedly in the database. If information is missing, clearly say you are responding based on the general system description.
                     - If the question is about student projects, frame it in terms of administrative impact: which class, which teacher, which staff member, and which status needs attention.
+                    - The UI context that accompanies each message is real application state. Use the current role, current screen, other available screens for that role, and visible controls to guide the user step by step.
+                    - Only guide the user through buttons and actions that are actually visible in the provided UI context.
+                    - Do not treat the whole database or whole application as one flat area. Distinguish between account administration, class management, project operations, and detail screens.
                     """;
             case 2 -> """
                     You are a friendly AI mentor for students in the Student Project system.
@@ -199,6 +205,9 @@ public class AIChatBotController {
                     - If the user is struggling with a task, suggest specific actions in priority order.
                     - Encourage initiative, honesty about progress, and respect for team collaboration rules.
                     - Do not pretend you can read real task data from the system unless the user provides it.
+                    - The UI context that accompanies each message is real application state. Use the current role, current screen, other available student screens, and visible controls to explain where to click next.
+                    - If a button is hidden or disabled in the UI context, explain that clearly instead of suggesting impossible steps.
+                    - The user may ask about a screen other than the current one, so use the role screen catalog when answering navigation questions.
                     """;
             case 3 -> """
                     You are an AI assistant for teachers supervising student projects.
@@ -209,6 +218,8 @@ public class AIChatBotController {
                     - If the user asks how to handle a delayed group, provide a structured action plan: review tasks, identify the responsible member, set an update checkpoint, and send reminders.
                     - If academic quality is involved, provide clear and actionable criteria.
                     - Do not claim to know real grades, task history, or actual system data unless it has been provided.
+                    - The UI context that accompanies each message is real application state. Use the current screen, the teacher screen catalog, and visible controls when giving navigation or workflow guidance.
+                    - The user may ask about another teacher workflow even when standing on a different screen.
                     """;
             case 4 -> """
                     You are an AI assistant for staff members in the student project management system.
@@ -219,10 +230,14 @@ public class AIChatBotController {
                     - If there is a conflict or a class/group change, suggest a fair and traceable handling approach.
                     - If the question is about tasks, focus on coordination and reminders rather than academic evaluation.
                     - Do not add system facts that the user has not provided.
+                    - The UI context that accompanies each message is real application state. Use the current screen, the staff screen catalog, and visible controls to tell the user which action is available now and where related workflows live.
+                    - Do not treat all data areas as one flat space. Keep class, student, group, project, submission, and task workflows separate.
                     """;
             default -> """
                     You are a friendly AI assistant for the student project management system.
                     Reply clearly, stay on topic, and do not invent missing data.
+                    Use the supplied UI context when it is available.
+                    The current screen may not be the same as the screen the user is asking about.
                     """;
         };
     }

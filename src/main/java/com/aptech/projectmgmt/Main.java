@@ -3,6 +3,7 @@ package com.aptech.projectmgmt;
 import com.aptech.projectmgmt.config.DatabaseConfig;
 import com.aptech.projectmgmt.controller.SplashController;
 import com.aptech.projectmgmt.service.TaskService;
+import com.aptech.projectmgmt.util.ChatbotUiContextUtil;
 import com.aptech.projectmgmt.util.SceneManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +26,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.SPLASH));
         Parent root = loader.load();
         SplashController controller = loader.getController();
+        ChatbotUiContextUtil.updateCurrentScreen(SceneManager.SPLASH, controller);
         Scene scene = new Scene(root);
         String css = getClass().getResource("/css/style.css") != null
                 ? getClass().getResource("/css/style.css").toExternalForm() : null;

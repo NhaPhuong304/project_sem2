@@ -6,6 +6,7 @@ import com.aptech.projectmgmt.service.AccountService;
 import com.aptech.projectmgmt.service.MessageService;
 import com.aptech.projectmgmt.util.AlertUtil;
 import com.aptech.projectmgmt.util.AvatarUtil;
+import com.aptech.projectmgmt.util.ChatbotUiContextUtil;
 import com.aptech.projectmgmt.util.SceneManager;
 import com.aptech.projectmgmt.util.SessionManager;
 import javafx.animation.Animation;
@@ -89,6 +90,7 @@ public class StudentDashboardController {
                 ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
             }
             contentArea.getChildren().setAll(content);
+            ChatbotUiContextUtil.updateCurrentScreen(fxmlPath, controller);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load content: " + e.getMessage());
         }
@@ -237,6 +239,7 @@ public class StudentDashboardController {
                     advisor, description);
 
             contentArea.getChildren().setAll(view);
+            ChatbotUiContextUtil.updateCurrentScreen("/fxml/student/student-project-detail.fxml", controller);
 
         } catch (IOException e) {
             AlertUtil.showError("Unable to load project details: " + e.getMessage());

@@ -5,6 +5,7 @@ import com.aptech.projectmgmt.model.Staff;
 import com.aptech.projectmgmt.service.AccountService;
 import com.aptech.projectmgmt.util.AlertUtil;
 import com.aptech.projectmgmt.util.AvatarUtil;
+import com.aptech.projectmgmt.util.ChatbotUiContextUtil;
 import com.aptech.projectmgmt.util.SceneManager;
 import com.aptech.projectmgmt.util.SessionManager;
 import javafx.application.Platform;
@@ -60,6 +61,7 @@ public class AdminDashboardController {
                 ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
             }
             contentArea.getChildren().setAll(content);
+            ChatbotUiContextUtil.updateCurrentScreen(fxmlPath, loader.getController());
         } catch (Exception e) {
             AlertUtil.showError("Unable to load content: " + e.getMessage());
         }
@@ -77,6 +79,7 @@ public class AdminDashboardController {
                 ((javafx.scene.layout.Region) content).prefHeightProperty().bind(contentArea.heightProperty());
             }
             contentArea.getChildren().setAll(content);
+            ChatbotUiContextUtil.updateCurrentScreen(SceneManager.STUDENT_LIST, controller);
         } catch (Exception e) {
             AlertUtil.showError("Unable to load students: " + e.getMessage());
         }

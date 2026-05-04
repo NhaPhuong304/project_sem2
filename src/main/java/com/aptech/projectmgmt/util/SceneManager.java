@@ -60,6 +60,7 @@ public class SceneManager {
     public static void switchScene(Stage stage, String fxmlPath) throws IOException {
         FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
         Parent root = loader.load();
+        ChatbotUiContextUtil.updateCurrentScreen(fxmlPath, loader.getController());
         
         Scene scene = new Scene(root);
         addStylesheet(scene);
