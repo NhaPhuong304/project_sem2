@@ -5,185 +5,199 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane prefHeight="750.0" prefWidth="1350.0"
-            xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.aptech.projectmgmt.controller.staff.SubmissionRequestListController">
+	xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.aptech.projectmgmt.controller.staff.SubmissionRequestListController">
 
-    <!-- TOP -->
-    <top>
-        <VBox spacing="4.0">
-            <padding>
-                <Insets bottom="8.0" left="20.0" right="20.0" top="18.0" />
-            </padding>
+	<!-- TOP -->
+	<top>
+		<VBox spacing="4.0">
+			<padding>
+				<Insets bottom="8.0" left="20.0" right="20.0" top="18.0" />
+			</padding>
 
-            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"
-                   text="Project Submission Request" />
+			<Label
+				style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"
+				text="Project Submission Request" />
 
-            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;"
-                   text="Create requests, track group submissions, and download submitted files." />
-        </VBox>
-    </top>
+			<Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;"
+				text="Create requests, track group submissions, and download submitted files." />
+		</VBox>
+	</top>
 
-    <!-- CENTER -->
-    <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE" maxWidth="Infinity" maxHeight="Infinity">
+	<!-- CENTER -->
+	<center>
+		<TabPane tabClosingPolicy="UNAVAILABLE" maxWidth="Infinity"
+			maxHeight="Infinity">
 
-            <tabs>
+			<tabs>
 
-                <!-- TAB 1 -->
-                <Tab text="Create Request">
-                    <content>
+				<!-- TAB 1 -->
+				<Tab text="Create Request">
+					<content>
 
-                        <HBox spacing="18.0" prefWidth="Infinity">
+						<HBox spacing="18.0" prefWidth="Infinity">
 
-                            <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="12.0" />
-                            </padding>
+							<padding>
+								<Insets bottom="20.0" left="20.0" right="20.0" top="12.0" />
+							</padding>
 
-                            <!-- LEFT -->
-                            <VBox prefWidth="420.0" spacing="10.0">
+							<!-- LEFT -->
+							<VBox prefWidth="420.0" spacing="10.0">
 
-                                <Label style="-fx-font-weight: bold;" text="Request Information" />
+								<Label style="-fx-font-weight: bold;"
+									text="Request Information" />
 
-                                <TextField fx:id="titleField" promptText="Request title" />
+								<TextField fx:id="titleField"
+									promptText="Request title" />
 
-                                <TextArea fx:id="descriptionArea"
-                                          prefHeight="100.0"
-                                          promptText="Message sent to group leaders"
-                                          wrapText="true" />
+								<TextArea fx:id="descriptionArea" prefHeight="100.0"
+									promptText="Message sent to group leaders" wrapText="true" />
 
-                                <HBox spacing="8.0">
-                                    <DatePicker fx:id="deadlineDatePicker" prefWidth="250.0"/>
-                                    <ComboBox fx:id="deadlineTimeCombo" prefWidth="150.0"/>
-                                </HBox>
+								<HBox spacing="8.0">
+									<DatePicker fx:id="deadlineDatePicker"
+										prefWidth="250.0" />
+									<ComboBox fx:id="deadlineTimeCombo" prefWidth="150.0" />
+								</HBox>
 
-                                <Label style="-fx-font-weight: bold;" text="Requirements" />
+								<Label style="-fx-font-weight: bold;" text="Requirements" />
 
-                                <ScrollPane fitToWidth="true" prefHeight="170.0">
-                                    <content>
-                                        <VBox fx:id="requirementBox" spacing="7.0"/>
-                                    </content>
-                                </ScrollPane>
+								<ScrollPane fitToWidth="true" prefHeight="170.0">
+									<content>
+										<VBox fx:id="requirementBox" spacing="7.0" />
+									</content>
+								</ScrollPane>
 
-                                <Label style="-fx-font-weight: bold;" text="Recipients" />
+								<Label style="-fx-font-weight: bold;" text="Recipients" />
 
-                                <ScrollPane fitToWidth="true" prefHeight="200.0">
-                                    <content>
-                                        <VBox fx:id="recipientBox" spacing="7.0"/>
-                                    </content>
-                                </ScrollPane>
+								<ScrollPane fitToWidth="true" prefHeight="200.0">
+									<content>
+										<VBox fx:id="recipientBox" spacing="7.0" />
+									</content>
+								</ScrollPane>
 
-                                <Button fx:id="sendRequestBtn" text="Send Request"/>
-                                <Label fx:id="statusLabel"/>
+								<Button fx:id="sendRequestBtn" text="Send Request" />
+								<Label fx:id="statusLabel" />
 
-                            </VBox>
+							</VBox>
 
-                            <!-- RIGHT TABLE -->
-                            <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+							<!-- RIGHT TABLE -->
+							<VBox spacing="10.0" HBox.hgrow="ALWAYS">
 
-                                <Label style="-fx-font-weight: bold;" text="Created Requests" />
+								<Label style="-fx-font-weight: bold;"
+									text="Created Requests" />
 
-                                <TableView fx:id="requestTable"
-                                           VBox.vgrow="ALWAYS"
-                                           maxWidth="Infinity">
+								<TableView fx:id="requestTable" VBox.vgrow="ALWAYS"
+									maxWidth="Infinity">
 
-                                    <columns>
-                                        <TableColumn fx:id="titleColumn" text="Title" minWidth="250"/>
-                                        <TableColumn fx:id="deadlineColumn" text="Deadline" minWidth="120"/>
-                                        <TableColumn fx:id="statusColumn" text="Status" minWidth="100"/>
-                                        <TableColumn fx:id="createdAtColumn" text="Created At" minWidth="140"/>
-                                    </columns>
+									<columns>
+										<TableColumn fx:id="titleColumn" text="Title"
+											minWidth="250" />
+										<TableColumn fx:id="deadlineColumn"
+											text="Deadline" minWidth="120" />
+										<TableColumn fx:id="statusColumn" text="Status"
+											minWidth="100" />
+										<TableColumn fx:id="createdAtColumn"
+											text="Created At" minWidth="140" />
+									</columns>
 
-                                </TableView>
+								</TableView>
 
-                            </VBox>
+							</VBox>
 
-                        </HBox>
+						</HBox>
 
-                    </content>
-                </Tab>
+					</content>
+				</Tab>
 
-                <!-- TAB 2 -->
-                <Tab text="Submission Tracking">
-                    <content>
+				<!-- TAB 2 -->
+				<Tab text="Submission Tracking">
+					<content>
 
-                        <HBox spacing="16.0" prefWidth="Infinity">
+						<HBox spacing="16.0" prefWidth="Infinity">
 
-                            <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="12.0" />
-                            </padding>
+							<padding>
+								<Insets bottom="20.0" left="20.0" right="20.0" top="12.0" />
+							</padding>
 
-                            <!-- REQUESTS -->
-                            <VBox HBox.hgrow="ALWAYS" spacing="10.0">
+							<!-- REQUESTS -->
+							<VBox HBox.hgrow="ALWAYS" spacing="10.0">
 
-                                <Label text="Requests"/>
+								<Label text="Requests" />
 
-                                <TableView fx:id="monitorRequestTable"
-                                           VBox.vgrow="ALWAYS"
-                                           maxWidth="Infinity">
+								<TableView fx:id="monitorRequestTable"
+									VBox.vgrow="ALWAYS" maxWidth="Infinity">
 
-                                    <columns>
-                                        <TableColumn fx:id="monitorTitleColumn" text="Title"/>
-                                        <TableColumn fx:id="monitorDeadlineColumn" text="Deadline"/>
-                                        <TableColumn fx:id="monitorStatusColumn" text="Status"/>
-                                    </columns>
+									<columns>
+										<TableColumn fx:id="monitorTitleColumn"
+											text="Title" />
+										<TableColumn fx:id="monitorDeadlineColumn"
+											text="Deadline" />
+										<TableColumn fx:id="monitorStatusColumn"
+											text="Status" />
+									</columns>
 
-                                </TableView>
+								</TableView>
 
-                            </VBox>
+							</VBox>
 
-                            <!-- GROUPS -->
-                            <VBox HBox.hgrow="ALWAYS" spacing="10.0">
+							<!-- GROUPS -->
+							<VBox HBox.hgrow="ALWAYS" spacing="10.0">
 
-                                <Label text="Recipient Groups"/>
+								<Label text="Recipient Groups" />
 
-                                <TableView fx:id="targetTable"
-                                           VBox.vgrow="ALWAYS"
-                                           maxWidth="Infinity">
+								<TableView fx:id="targetTable" VBox.vgrow="ALWAYS"
+									maxWidth="Infinity">
 
-                                    <columns>
-                                        <TableColumn fx:id="groupColumn" text="Group"/>
-                                        <TableColumn fx:id="leaderColumn" text="Leader"/>
-                                        <TableColumn fx:id="targetStatusColumn" text="Status"/>
-                                        <TableColumn fx:id="submittedAtColumn" text="Submitted"/>
-                                    </columns>
+									<columns>
+										<TableColumn fx:id="groupColumn" text="Group" />
+										<TableColumn fx:id="leaderColumn" text="Leader" />
+										<TableColumn fx:id="targetStatusColumn"
+											text="Status" />
+										<TableColumn fx:id="submittedAtColumn"
+											text="Submitted" />
+									</columns>
 
-                                </TableView>
+								</TableView>
 
-                            </VBox>
+							</VBox>
 
-                            <!-- FILES -->
-                            <VBox HBox.hgrow="ALWAYS" spacing="10.0">
+							<!-- FILES -->
+							<VBox HBox.hgrow="ALWAYS" spacing="10.0">
 
-                                <Label text="Submitted Files"/>
+								<Label text="Submitted Files" />
 
-                                <TableView fx:id="submittedFileTable"
-                                           VBox.vgrow="ALWAYS"
-                                           maxWidth="Infinity">
+								<TableView fx:id="submittedFileTable"
+									VBox.vgrow="ALWAYS" maxWidth="Infinity">
 
-                                    <columns>
-                                        <TableColumn fx:id="requirementColumn" text="Requirement"/>
-                                        <TableColumn fx:id="submittedFileNameColumn" text="File Name"/>
-                                        <TableColumn fx:id="submittedFileSizeColumn" text="Size"/>
-                                        <TableColumn fx:id="uploadedAtColumn" text="Submitted At"/>
-                                    </columns>
+									<columns>
+										<TableColumn fx:id="requirementColumn"
+											text="Requirement" />
+										<TableColumn fx:id="submittedFileNameColumn"
+											text="File Name" />
+										<TableColumn fx:id="submittedFileSizeColumn"
+											text="Size" />
+										<TableColumn fx:id="uploadedAtColumn"
+											text="Submitted At" />
+									</columns>
 
-                                </TableView>
+								</TableView>
 
-                                <HBox spacing="10.0">
-                                    <Button fx:id="downloadFilesBtn" text="Download Group Files"/>
-                                    <Label fx:id="monitorStatusLabel"/>
-                                </HBox>
+								<HBox spacing="10.0">
+									<Button fx:id="refreshMonitorBtn" text="Refresh" />
+									<Button fx:id="downloadFilesBtn"
+										text="Download Group Files" />
+									<Label fx:id="monitorStatusLabel" />
+								</HBox>
 
-                            </VBox>
+							</VBox>
 
-                        </HBox>
+						</HBox>
 
-                    </content>
-                </Tab>
+					</content>
+				</Tab>
 
-            </tabs>
-        </TabPane>
-    </center>
+			</tabs>
+		</TabPane>
+	</center>
 
 </BorderPane>

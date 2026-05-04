@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -51,9 +52,11 @@ public class AdminStaffListController {
 	private TextField fullNameField;
 	@FXML
 	private TextField emailField;
+	@FXML private TextField searchField;
 
 	private final StaffService staffService = new StaffService();
 	private final ObservableList<Staff> teacherList = FXCollections.observableArrayList();
+	private FilteredList<Staff> filteredTeachers;
 
 	@FXML
 	public void initialize() {
@@ -61,6 +64,21 @@ public class AdminStaffListController {
 		teacherTable.setItems(teacherList);
 		addTeacherBtn.setOnAction(e -> handleAddTeacher());
 		loadTeachers();
+		setupSearch();
+	}
+	private void setupSearch() {
+	    filteredTeachers = new FilteredList<>(teacherList, p -> true);
+	    teacherTable.setItems(filteredTeachers);
+
+	    searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+	        filteredTeachers.setPredicate(staff -> {
+	            if (newVal == null || newVal.isEmpty()) return true;
+	            String lower = newVal.toLowerCase();
+	            return staff.getUsername().toLowerCase().contains(lower)
+	                    || staff.getFullName().toLowerCase().contains(lower)
+	                    || staff.getEmail().toLowerCase().contains(lower);
+	        });
+	    });
 	}
 
 	private void setupTableColumns() {

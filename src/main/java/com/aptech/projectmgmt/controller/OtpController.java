@@ -71,14 +71,14 @@ public class OtpController {
             visibleField.setManaged(true);
             hiddenField.setVisible(false);
             hiddenField.setManaged(false);
-            toggleBtn.setText("ðŸ™ˆ");
+            toggleBtn.setText("🙈");
         } else {
             hiddenField.setText(visibleField.getText());
             hiddenField.setVisible(true);
             hiddenField.setManaged(true);
             visibleField.setVisible(false);
             visibleField.setManaged(false);
-            toggleBtn.setText("ðŸ‘");
+            toggleBtn.setText("👁");
         }
     }
 

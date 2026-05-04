@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
 
 <AnchorPane prefHeight="620.0" prefWidth="880.0"
 	xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
@@ -20,6 +21,10 @@
 	<!-- Buttons -->
 	<HBox spacing="10.0" AnchorPane.topAnchor="55.0"
 		AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+
+		<!-- Ô search -->
+		<TextField fx:id="searchField"
+			promptText="Search student..." prefWidth="250.0" prefHeight="34.0" />
 
 		<Button fx:id="createAccountsBtn"
 			text="Create Accounts for Class" prefHeight="34.0" />

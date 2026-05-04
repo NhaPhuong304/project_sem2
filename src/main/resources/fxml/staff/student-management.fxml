@@ -5,6 +5,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
 
 <AnchorPane prefHeight="620" prefWidth="880"
 	styleClass="page-root" stylesheets="@../../css/staff.css"
@@ -13,6 +14,9 @@
 	fx:controller="com.aptech.projectmgmt.controller.staff.StudentManagementController">
 
 	<HBox layoutX="24" layoutY="20" spacing="10">
+	<TextField fx:id="searchField"
+			promptText="Search student..." prefWidth="250.0" prefHeight="34.0" />
+	
 		<Button fx:id="addStudentBtn" styleClass="add-student-btn"
 			text="+ Add Student" />
 	</HBox>

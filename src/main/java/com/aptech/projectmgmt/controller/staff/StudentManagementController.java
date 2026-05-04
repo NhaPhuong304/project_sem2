@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,12 +23,14 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.Optional;
 
 public class StudentManagementController {
-
+	@FXML
+	private TextField searchField;
 	@FXML
 	private TableView<Student> studentTable;
 	@FXML
@@ -50,13 +53,33 @@ public class StudentManagementController {
 	private final ClassService classService = new ClassService();
 	private final StudentService studentService = new StudentService();
 	private final ObservableList<Student> students = FXCollections.observableArrayList();
+	private FilteredList<Student> filteredStudents;
 
 	@FXML
 	public void initialize() {
 		setupTableColumns();
-		studentTable.setItems(students);
+		setupSearch();
 		addStudentBtn.setOnAction(e -> handleAddStudent());
 		loadStudents();
+	}
+
+	private void setupSearch() {
+		filteredStudents = new FilteredList<>(students, p -> true);
+		studentTable.setItems(filteredStudents);
+
+		searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+			filteredStudents.setPredicate(student -> {
+				if (newVal == null || newVal.isEmpty())
+					return true;
+				String lower = newVal.trim().toLowerCase();
+
+				return (student.getStudentCode() != null && student.getStudentCode().toLowerCase().contains(lower))
+						|| (student.getFullName() != null && student.getFullName().toLowerCase().contains(lower))
+						|| (student.getEmail() != null && student.getEmail().toLowerCase().contains(lower))
+						|| ((student.getAccountId() != null ? "has account" : "no account").toLowerCase()
+								.contains(lower));
+			});
+		});
 	}
 
 	private void setupTableColumns() {

@@ -341,10 +341,10 @@ public class MyTaskListController {
 				}
 
 				Dialog<ButtonType> dialog = new Dialog<>();
-				dialog.setTitle("Phan cong task");
-				dialog.setHeaderText("Chon nguoi thuc hien va thoi gian du kien");
+				dialog.setTitle("Assign tasks");
+				dialog.setHeaderText("Select the assignee and estimated time.");
 
-				ButtonType saveButtonType = new ButtonType("Luu", ButtonBar.ButtonData.OK_DONE);
+				ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
 				dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
 				ComboBox<GroupMember> memberCombo = new ComboBox<>();
@@ -378,18 +378,17 @@ public class MyTaskListController {
 						taskVm.getEstimatedEndDate() != null ? taskVm.getEstimatedEndDate().getHour() : 17);
 				Spinner<Integer> endMinute = new Spinner<>(0, 59,
 						taskVm.getEstimatedEndDate() != null ? taskVm.getEstimatedEndDate().getMinute() : 0);
-
 				GridPane grid = new GridPane();
 				grid.setHgap(10);
 				grid.setVgap(10);
 
-				grid.add(new Label("Nguoi thuc hien:"), 0, 0);
+				grid.add(new Label("Assignee:"), 0, 0);
 				grid.add(memberCombo, 1, 0);
 
-				grid.add(new Label("Bat dau du kien:"), 0, 1);
+				grid.add(new Label("Estimated start date:"), 0, 1);
 				grid.add(new HBox(8, startDatePicker, startHour, startMinute), 1, 1);
 
-				grid.add(new Label("Ket thuc du kien:"), 0, 2);
+				grid.add(new Label("Estimated end date:"), 0, 2);
 				grid.add(new HBox(8, endDatePicker, endHour, endMinute), 1, 2);
 
 				dialog.getDialogPane().setContent(grid);
@@ -400,7 +399,7 @@ public class MyTaskListController {
 				saveButton.addEventFilter(ActionEvent.ACTION, event -> {
 					GroupMember selected = memberCombo.getValue();
 					if (selected == null) {
-						AlertUtil.showError("Phai chon nguoi thuc hien");
+						AlertUtil.showError("You must select an assignee.");
 						event.consume();
 						return;
 					}
@@ -412,7 +411,7 @@ public class MyTaskListController {
 					}
 
 					if (startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
-						AlertUtil.showError("Phai chon du ngay bat dau va ket thuc");
+						AlertUtil.showError("You must select both the start date and end date.");
 						event.consume();
 						return;
 					}
@@ -424,7 +423,7 @@ public class MyTaskListController {
 							java.time.LocalTime.of(endHour.getValue(), endMinute.getValue()));
 
 					if (!end.isAfter(start)) {
-						AlertUtil.showError("Thoi gian ket thuc phai sau thoi gian bat dau");
+						AlertUtil.showError("The end date must be later than the start date.");
 						event.consume();
 						return;
 					}
@@ -449,7 +448,7 @@ public class MyTaskListController {
 				};
 
 				assignTask.setOnSucceeded(ev -> Platform.runLater(() -> {
-					AlertUtil.showSuccess("Phan cong task thanh cong");
+					AlertUtil.showSuccess("Task assigned successfully.");
 					loadTasks();
 				}));
 

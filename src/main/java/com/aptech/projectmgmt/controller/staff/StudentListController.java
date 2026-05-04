@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -40,22 +41,45 @@ public class StudentListController {
 	private TableColumn<Student, String> emailColumn;
 	@FXML
 	private TableColumn<Student, String> accountStatusColumn;
+	@FXML
+	private TextField searchField;
 
 	private final StudentService studentService = new StudentService();
 	private final ClassService classService = new ClassService();
 	private int classId;
 	private ObservableList<Student> studentList = FXCollections.observableArrayList();
 	private boolean readOnlyMode;
+	private FilteredList<Student> filteredStudents;
 
 	@FXML
 	public void initialize() {
 		setupTableColumns();
+		setupSearch();
 		studentTable.setItems(studentList);
 		createAccountsBtn.setVisible(false);
 		createAccountsBtn.setManaged(false);
 		createAccountsBtn.setOnAction(e -> handleCreateAccounts());
 		addStudentBtn.setOnAction(e -> handleAddStudent());
 		refreshActionButtons();
+	}
+
+	private void setupSearch() {
+		filteredStudents = new FilteredList<>(studentList, p -> true);
+		studentTable.setItems(filteredStudents);
+
+		searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+			filteredStudents.setPredicate(student -> {
+				if (newVal == null || newVal.isEmpty())
+					return true;
+				String lower = newVal.toLowerCase();
+
+				return student.getStudentCode().toLowerCase().contains(lower)
+						|| student.getFullName().toLowerCase().contains(lower)
+						|| student.getEmail().toLowerCase().contains(lower)
+						|| (student.getAccountId() != null ? "Has Account" : "No Account").toLowerCase()
+								.contains(lower);
+			});
+		});
 	}
 
 	public void setReadOnlyMode(boolean readOnlyMode) {
@@ -190,8 +214,7 @@ public class StudentListController {
 		studentsTask.setOnFailed(e -> Platform.runLater(() -> {
 			addStudentBtn.setDisable(false);
 			Throwable ex = studentsTask.getException();
-			AlertUtil.showError(
-					"Could not load students without a class: " + (ex != null ? ex.getMessage() : ""));
+			AlertUtil.showError("Could not load students without a class: " + (ex != null ? ex.getMessage() : ""));
 		}));
 		new Thread(studentsTask).start();
 	}
@@ -242,6 +265,7 @@ public class StudentListController {
 	private void refreshActionButtons() {
 		var account = com.aptech.projectmgmt.util.SessionManager.getInstance().getCurrentAccount();
 		boolean isStaff = account != null && account.getRole() == com.aptech.projectmgmt.model.UserRole.STAFF;
+		boolean isAdmin = account != null && account.getRole() == com.aptech.projectmgmt.model.UserRole.ADMIN;
 
 		if (addStudentBtn != null) {
 			boolean canAddStudent = isStaff && !readOnlyMode;
@@ -252,13 +276,21 @@ public class StudentListController {
 
 		if (createAccountsBtn != null) {
 			boolean hasStudentWithoutAccount = studentList.stream().anyMatch(student -> student.getAccountId() == null);
-
 			boolean canCreateAccounts = isStaff && !readOnlyMode && hasStudentWithoutAccount;
 			createAccountsBtn.setVisible(canCreateAccounts);
 			createAccountsBtn.setManaged(canCreateAccounts);
 			createAccountsBtn.setDisable(!canCreateAccounts);
 			createAccountsBtn.setTooltip(
-					canCreateAccounts ? new Tooltip("Create accounts for legacy records that do not have accounts yet") : null);
+					canCreateAccounts ? new Tooltip("Create accounts for legacy records that do not have accounts yet")
+							: null);
+		}
+
+		if (searchField != null) {
+			// Cho cả Admin và Staff đều thấy search
+			boolean canSearch = isAdmin || isStaff;
+			searchField.setVisible(canSearch);
+			searchField.setManaged(canSearch);
 		}
 	}
+
 }

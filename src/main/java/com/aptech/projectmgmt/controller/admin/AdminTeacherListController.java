@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +22,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.List;
 public class AdminTeacherListController {
 
     @FXML private TableView<Staff> teacherTable;
+    @FXML private TextField searchField;
     @FXML private Button addTeacherBtn;
     @FXML private TableColumn<Staff, String> avatarColumn;
     @FXML private TableColumn<Staff, String> usernameColumn;
@@ -39,6 +42,7 @@ public class AdminTeacherListController {
 
     private final StaffService staffService = new StaffService();
     private final ObservableList<Staff> teacherList = FXCollections.observableArrayList();
+    private FilteredList<Staff> filteredTeachers;
 
     @FXML
     public void initialize() {
@@ -46,6 +50,7 @@ public class AdminTeacherListController {
         teacherTable.setItems(teacherList);
         addTeacherBtn.setOnAction(e -> handleAddTeacher());
         loadTeachers();
+        setupSearch();
     }
 
     private void setupTableColumns() {
@@ -235,6 +240,21 @@ public class AdminTeacherListController {
         } catch (Exception ex) {
             AlertUtil.showError("Unable to open Add Teacher form.: " + ex.getMessage());
         }
+    }
+    private void setupSearch() {
+        filteredTeachers = new FilteredList<>(teacherList, p -> true);
+        teacherTable.setItems(filteredTeachers);
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            filteredTeachers.setPredicate(teacher -> {
+                if (newVal == null || newVal.isEmpty()) return true;
+                String lower = newVal.toLowerCase();
+
+                return teacher.getUsername().toLowerCase().contains(lower)
+                        || teacher.getFullName().toLowerCase().contains(lower)
+                        || teacher.getEmail().toLowerCase().contains(lower);
+            });
+        });
     }
 
     private void handleEditTeacher(Staff teacher) {

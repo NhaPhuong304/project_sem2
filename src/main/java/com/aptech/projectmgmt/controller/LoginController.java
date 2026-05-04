@@ -53,13 +53,13 @@ public class LoginController {
             visiblePasswordField.setManaged(true);
             passwordField.setVisible(false);
             passwordField.setManaged(false);
-            togglePasswordBtn.setText("ðŸ™ˆ");
+            togglePasswordBtn.setText("🙈");
         } else {
             visiblePasswordField.setVisible(false);
             visiblePasswordField.setManaged(false);
             passwordField.setVisible(true);
             passwordField.setManaged(true);
-            togglePasswordBtn.setText("ðŸ‘");
+            togglePasswordBtn.setText("👁");
         }
     }
 
