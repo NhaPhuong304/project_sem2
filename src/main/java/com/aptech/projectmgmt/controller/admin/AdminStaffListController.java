@@ -52,7 +52,8 @@ public class AdminStaffListController {
 	private TextField fullNameField;
 	@FXML
 	private TextField emailField;
-	@FXML private TextField searchField;
+	@FXML
+	private TextField searchField;
 
 	private final StaffService staffService = new StaffService();
 	private final ObservableList<Staff> teacherList = FXCollections.observableArrayList();
@@ -66,19 +67,21 @@ public class AdminStaffListController {
 		loadTeachers();
 		setupSearch();
 	}
-	private void setupSearch() {
-	    filteredTeachers = new FilteredList<>(teacherList, p -> true);
-	    teacherTable.setItems(filteredTeachers);
 
-	    searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-	        filteredTeachers.setPredicate(staff -> {
-	            if (newVal == null || newVal.isEmpty()) return true;
-	            String lower = newVal.toLowerCase();
-	            return staff.getUsername().toLowerCase().contains(lower)
-	                    || staff.getFullName().toLowerCase().contains(lower)
-	                    || staff.getEmail().toLowerCase().contains(lower);
-	        });
-	    });
+	private void setupSearch() {
+		filteredTeachers = new FilteredList<>(teacherList, p -> true);
+		teacherTable.setItems(filteredTeachers);
+
+		searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+			filteredTeachers.setPredicate(staff -> {
+				if (newVal == null || newVal.isEmpty())
+					return true;
+				String lower = newVal.toLowerCase();
+				return staff.getUsername().toLowerCase().contains(lower)
+						|| staff.getFullName().toLowerCase().contains(lower)
+						|| staff.getEmail().toLowerCase().contains(lower);
+			});
+		});
 	}
 
 	private void setupTableColumns() {
@@ -126,9 +129,11 @@ public class AdminStaffListController {
 			private final Button lockBtn = new Button("🔒");
 
 			{
-				editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				editBtn.setStyle(
+						"-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit Staff"));
-				lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				lockBtn.setStyle(
+						"-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock/Unlock Staff"));
 				editBtn.setOnAction(e -> {
 					Staff staff = getTableRow().getItem();
@@ -150,19 +155,22 @@ public class AdminStaffListController {
 				super.updateItem(item, empty);
 				if (empty || getTableRow() == null || getTableRow().getItem() == null) {
 					setGraphic(null);
-					if (getTableRow() != null) getTableRow().setStyle("");
+					if (getTableRow() != null)
+						getTableRow().setStyle("");
 					return;
 				}
-				
+
 				Staff staff = getTableRow().getItem();
 				if (staff.isActive()) {
 					lockBtn.setText("🔒");
-					lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+					lockBtn.setStyle(
+							"-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 					lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock Staff"));
 					getTableRow().setStyle("");
 				} else {
 					lockBtn.setText("🔓");
-					lockBtn.setStyle("-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+					lockBtn.setStyle(
+							"-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
 					lockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock Staff"));
 					getTableRow().setStyle("-fx-opacity: 0.6; -fx-background-color: #f3f4f6;");
 				}
@@ -203,6 +211,11 @@ public class AdminStaffListController {
 			Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
 			okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
 				event.consume();
+				String error = controller.validate();
+				if (error != null) {
+					AlertUtil.showError(error);
+					return;
+				}
 
 				Task<TeacherCreationResult> task = new Task<>() {
 					@Override
@@ -216,28 +229,28 @@ public class AdminStaffListController {
 				dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
 
 				task.setOnSucceeded(e -> Platform.runLater(() -> {
-				    okButton.setDisable(false);
-				    dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
+					okButton.setDisable(false);
+					dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
 
-				    TeacherCreationResult resultInfo = task.getValue();
-				    String successMessage = "Staff added successfully. Default account created.: "
-				            + resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
+					TeacherCreationResult resultInfo = task.getValue();
+					String successMessage = "Staff added successfully. Default account created.: "
+							+ resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
 
-				    if (resultInfo.isNotificationEmailSent()) {
-				        successMessage += ". Notification email sent.";
-				    } else {
-				        successMessage += ". Failed to send notification email.";
-				    }
+					if (resultInfo.isNotificationEmailSent()) {
+						successMessage += ". Notification email sent.";
+					} else {
+						successMessage += ". Failed to send notification email.";
+					}
 
-				    String finalSuccessMessage = successMessage;
+					String finalSuccessMessage = successMessage;
 
-				    dialog.setResult(ButtonType.OK);
-				    dialog.close();
+					dialog.setResult(ButtonType.OK);
+					dialog.close();
 
-				    Platform.runLater(() -> {
-				        AlertUtil.showSuccess(finalSuccessMessage);
-				        loadTeachers();
-				    });
+					Platform.runLater(() -> {
+						AlertUtil.showSuccess(finalSuccessMessage);
+						loadTeachers();
+					});
 				}));
 				task.setOnFailed(e -> Platform.runLater(() -> {
 					okButton.setDisable(false);
@@ -272,15 +285,17 @@ public class AdminStaffListController {
 			okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
 				event.consume();
 
+				String error = controller.validate();
+				if (error != null) {
+					AlertUtil.showError(error);
+					return;
+				}
+
 				Task<Void> task = new Task<>() {
 					@Override
 					protected Void call() {
-						staffService.updateStaff(
-						    staff.getStaffId(), 
-						    staff.getUsername(), 
-						    controller.getFullName(), 
-						    controller.getEmail()
-						);
+						staffService.updateStaff(staff.getStaffId(), staff.getUsername(), controller.getFullName(),
+								controller.getEmail());
 						return null;
 					}
 				};
@@ -289,13 +304,13 @@ public class AdminStaffListController {
 				dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
 
 				task.setOnSucceeded(e -> Platform.runLater(() -> {
-				    dialog.setResult(ButtonType.OK);
-				    dialog.close();
+					dialog.setResult(ButtonType.OK);
+					dialog.close();
 
-				    Platform.runLater(() -> {
-				        AlertUtil.showSuccess("Staff member updated successfully");
-				        loadTeachers();
-				    });
+					Platform.runLater(() -> {
+						AlertUtil.showSuccess("Staff member updated successfully");
+						loadTeachers();
+					});
 				}));
 
 				task.setOnFailed(e -> Platform.runLater(() -> {

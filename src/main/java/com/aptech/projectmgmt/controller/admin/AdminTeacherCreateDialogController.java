@@ -29,6 +29,25 @@ public class AdminTeacherCreateDialogController {
     public String getFullName() {
         return fullNameField.getText() != null ? fullNameField.getText().trim() : "";
     }
+    public String validate() {
+
+        if (getUsername().isEmpty()) {
+            return "Username is required";
+        }
+
+        if (getFullName().isEmpty()) {
+            return "Full name is required";
+        }
+
+        if (getEmail().isEmpty()) {
+            return "Email is required";
+        }
+        if (!getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            return "Invalid email format";
+        }
+
+        return null;
+    }
 
     public String getEmail() {
         return emailField.getText() != null ? emailField.getText().trim() : "";

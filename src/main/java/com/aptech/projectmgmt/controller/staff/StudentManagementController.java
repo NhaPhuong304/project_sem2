@@ -226,7 +226,15 @@ public class StudentManagementController {
 			dialog.setTitle("Edit student");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
+			Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
 
+			okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+				String error = controller.validate();
+				if (error != null) {
+					AlertUtil.showError(error);
+					event.consume();
+				}
+			});
 			Optional<ButtonType> result = dialog.showAndWait();
 			if (result.isEmpty() || result.get() != ButtonType.OK) {
 				return;
@@ -407,7 +415,15 @@ public class StudentManagementController {
 			dialog.setTitle("Add student");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
+			Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
 
+			okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+				String error = controller.validate();
+				if (error != null) {
+					AlertUtil.showError(error);
+					event.consume();
+				}
+			});
 			Optional<ButtonType> result = dialog.showAndWait();
 			if (result.isEmpty() || result.get() != ButtonType.OK) {
 				return;

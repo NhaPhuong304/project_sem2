@@ -22,6 +22,21 @@ public class AdminStaffCreateDialogController {
         usernameField.setEditable(false);
         usernameField.setDisable(true);
     }
+    public String validate() {
+        if (getFullName() == null || getFullName().trim().isEmpty()) {
+            return "Full name is required";
+        }
+
+        if (getEmail() == null || getEmail().trim().isEmpty()) {
+            return "Email is required";
+        }
+
+        if (!getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            return "Invalid email format";
+        }
+
+        return null;
+    }
 
     public String getUsername() {
         return usernameField.getText() != null ? usernameField.getText().trim() : "";

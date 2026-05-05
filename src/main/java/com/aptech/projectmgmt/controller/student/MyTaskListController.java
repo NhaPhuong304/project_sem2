@@ -517,7 +517,7 @@ public class MyTaskListController {
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Da bat dau task");
+			AlertUtil.showSuccess("The task has been started");
 			loadTasks();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError(task.getException().getMessage())));
@@ -565,7 +565,7 @@ public class MyTaskListController {
 	}
 
 	private void handleConfirmCompleted(int taskId) {
-		if (!AlertUtil.showConfirm("Xac nhan task da hoan thanh?"))
+		if (!AlertUtil.showConfirm("Confirm task completion?"))
 			return;
 		Task<Void> task = new Task<>() {
 			@Override
@@ -575,7 +575,7 @@ public class MyTaskListController {
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
-			AlertUtil.showSuccess("Task da hoan thanh");
+			AlertUtil.showSuccess("Task completed");
 			loadTasks();
 		}));
 		task.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError(task.getException().getMessage())));
@@ -662,7 +662,7 @@ public class MyTaskListController {
 			controller.setMembers(members);
 
 			Dialog<ButtonType> dialog = new Dialog<>();
-			dialog.setTitle("Them cong viec moi");
+			dialog.setTitle("Add new task");
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 			dialog.getDialogPane().setContent(content);
 			dialog.getDialogPane().setPrefWidth(560);
@@ -698,7 +698,7 @@ public class MyTaskListController {
 				}
 			};
 			taskOp.setOnSucceeded(e -> Platform.runLater(() -> {
-				AlertUtil.showSuccess("Them task thanh cong");
+				AlertUtil.showSuccess("Task added successfully");
 				loadTasks();
 			}));
 			taskOp.setOnFailed(e -> Platform.runLater(() -> AlertUtil.showError(taskOp.getException().getMessage())));

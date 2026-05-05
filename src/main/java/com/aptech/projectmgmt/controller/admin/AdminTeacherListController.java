@@ -29,322 +29,339 @@ import java.util.List;
 
 public class AdminTeacherListController {
 
-    @FXML private TableView<Staff> teacherTable;
-    @FXML private TextField searchField;
-    @FXML private Button addTeacherBtn;
-    @FXML private TableColumn<Staff, String> avatarColumn;
-    @FXML private TableColumn<Staff, String> usernameColumn;
-    @FXML private TableColumn<Staff, String> fullNameColumn;
-    @FXML private TableColumn<Staff, String> emailColumn;
-    @FXML private TableColumn<Staff, String> roleColumn;
-    @FXML private TableColumn<Staff, String> accountStatusColumn;
-    @FXML private TableColumn<Staff, Void> actionColumn;
+	@FXML
+	private TableView<Staff> teacherTable;
+	@FXML
+	private TextField searchField;
+	@FXML
+	private Button addTeacherBtn;
+	@FXML
+	private TableColumn<Staff, String> avatarColumn;
+	@FXML
+	private TableColumn<Staff, String> usernameColumn;
+	@FXML
+	private TableColumn<Staff, String> fullNameColumn;
+	@FXML
+	private TableColumn<Staff, String> emailColumn;
+	@FXML
+	private TableColumn<Staff, String> roleColumn;
+	@FXML
+	private TableColumn<Staff, String> accountStatusColumn;
+	@FXML
+	private TableColumn<Staff, Void> actionColumn;
 
-    private final StaffService staffService = new StaffService();
-    private final ObservableList<Staff> teacherList = FXCollections.observableArrayList();
-    private FilteredList<Staff> filteredTeachers;
+	private final StaffService staffService = new StaffService();
+	private final ObservableList<Staff> teacherList = FXCollections.observableArrayList();
+	private FilteredList<Staff> filteredTeachers;
 
-    @FXML
-    public void initialize() {
-        setupTableColumns();
-        teacherTable.setItems(teacherList);
-        addTeacherBtn.setOnAction(e -> handleAddTeacher());
-        loadTeachers();
-        setupSearch();
-    }
+	@FXML
+	public void initialize() {
+		setupTableColumns();
+		teacherTable.setItems(teacherList);
+		addTeacherBtn.setOnAction(e -> handleAddTeacher());
+		loadTeachers();
+		setupSearch();
+	}
 
-    private void setupTableColumns() {
-        avatarColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPhotoUrl()));
-        avatarColumn.setCellFactory(col -> new TableCell<>() {
-            private final Parent avatarView;
-            private final AvatarCellController controller;
+	private void setupTableColumns() {
+		avatarColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPhotoUrl()));
+		avatarColumn.setCellFactory(col -> new TableCell<>() {
+			private final Parent avatarView;
+			private final AvatarCellController controller;
 
-            {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.AVATAR_CELL));
-                    avatarView = loader.load();
-                    controller = loader.getController();
-                } catch (Exception ex) {
-                    throw new IllegalStateException("Failed to load teacher avatar cell", ex);
-                }
-            }
+			{
+				try {
+					FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.AVATAR_CELL));
+					avatarView = loader.load();
+					controller = loader.getController();
+				} catch (Exception ex) {
+					throw new IllegalStateException("Failed to load teacher avatar cell", ex);
+				}
+			}
 
-            @Override
-            protected void updateItem(String photoUrl, boolean empty) {
-                super.updateItem(photoUrl, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
-                    setGraphic(null);
-                    return;
-                }
-                controller.setPhoto(photoUrl);
-                setGraphic(avatarView);
-            }
-        });
+			@Override
+			protected void updateItem(String photoUrl, boolean empty) {
+				super.updateItem(photoUrl, empty);
+				if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+					setGraphic(null);
+					return;
+				}
+				controller.setPhoto(photoUrl);
+				setGraphic(avatarView);
+			}
+		});
 
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+		usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+		fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+		emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        roleColumn.setCellValueFactory(c -> {
-            com.aptech.projectmgmt.model.UserRole r = c.getValue().getRole();
-            if (r == com.aptech.projectmgmt.model.UserRole.STAFF) {
-                return new SimpleStringProperty("Staff");
-            }
-            if (r == com.aptech.projectmgmt.model.UserRole.TEACHER) {
-                return new SimpleStringProperty("Teacher");
-            }
-            return new SimpleStringProperty("");
-        });
+		roleColumn.setCellValueFactory(c -> {
+			com.aptech.projectmgmt.model.UserRole r = c.getValue().getRole();
+			if (r == com.aptech.projectmgmt.model.UserRole.STAFF) {
+				return new SimpleStringProperty("Staff");
+			}
+			if (r == com.aptech.projectmgmt.model.UserRole.TEACHER) {
+				return new SimpleStringProperty("Teacher");
+			}
+			return new SimpleStringProperty("");
+		});
 
-        accountStatusColumn.setCellValueFactory(c ->
-                new SimpleStringProperty(c.getValue().isActive() ? "Active" : "Inactive")
-        );
+		accountStatusColumn
+				.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isActive() ? "Active" : "Inactive"));
 
-        actionColumn.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn = new Button("✎");
-            private final Button lockBtn = new Button("🔒");
+		actionColumn.setCellFactory(col -> new TableCell<>() {
+			private final Button editBtn = new Button("✎");
+			private final Button lockBtn = new Button("🔒");
 
-            {
-                editBtn.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
-                editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit Teacher"));
-                lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
-                lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock/Unlock Teacher"));
-                editBtn.setOnAction(e -> {
-                    Staff teacher = getTableRow().getItem();
-                    if (teacher != null) {
-                        handleEditTeacher(teacher);
-                    }
-                });
+			{
+				editBtn.setStyle(
+						"-fx-text-fill: #f59e0b; -fx-font-size: 14px; -fx-background-color: #fef3c7; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				editBtn.setTooltip(new javafx.scene.control.Tooltip("Edit Teacher"));
+				lockBtn.setStyle(
+						"-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+				lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock/Unlock Teacher"));
+				editBtn.setOnAction(e -> {
+					Staff teacher = getTableRow().getItem();
+					if (teacher != null) {
+						handleEditTeacher(teacher);
+					}
+				});
 
-                lockBtn.setOnAction(e -> {
-                    Staff teacher = getTableRow().getItem();
-                    if (teacher != null) {
-                        handleToggleStatus(teacher);
-                    }
-                });
-            }
+				lockBtn.setOnAction(e -> {
+					Staff teacher = getTableRow().getItem();
+					if (teacher != null) {
+						handleToggleStatus(teacher);
+					}
+				});
+			}
 
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
-                    setGraphic(null);
-                    if (getTableRow() != null) getTableRow().setStyle("");
-                    return;
-                }
-                
-                Staff teacher = getTableRow().getItem();
-                if (teacher.isActive()) {
-                    lockBtn.setText("🔒");
-                    lockBtn.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
-                    lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock Teacher"));
-                    getTableRow().setStyle("");
-                } else {
-                    lockBtn.setText("🔓");
-                    lockBtn.setStyle("-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
-                    lockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock Teacher"));
-                    getTableRow().setStyle("-fx-opacity: 0.6; -fx-background-color: #f3f4f6;");
-                }
+			@Override
+			protected void updateItem(Void item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+					setGraphic(null);
+					if (getTableRow() != null)
+						getTableRow().setStyle("");
+					return;
+				}
 
-                javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, editBtn, lockBtn);
-                setGraphic(box);
-            }
-        });
-    }
+				Staff teacher = getTableRow().getItem();
+				if (teacher.isActive()) {
+					lockBtn.setText("🔒");
+					lockBtn.setStyle(
+							"-fx-text-fill: #ef4444; -fx-font-size: 14px; -fx-background-color: #fef2f2; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+					lockBtn.setTooltip(new javafx.scene.control.Tooltip("Lock Teacher"));
+					getTableRow().setStyle("");
+				} else {
+					lockBtn.setText("🔓");
+					lockBtn.setStyle(
+							"-fx-text-fill: #10b981; -fx-font-size: 14px; -fx-background-color: #ecfdf5; -fx-background-radius: 6; -fx-padding: 4 8; -fx-cursor: hand;");
+					lockBtn.setTooltip(new javafx.scene.control.Tooltip("Unlock Teacher"));
+					getTableRow().setStyle("-fx-opacity: 0.6; -fx-background-color: #f3f4f6;");
+				}
 
-    private void loadTeachers() {
-        Task<List<Staff>> task = new Task<>() {
-            @Override
-            protected List<Staff> call() {
-                return staffService.getTeachers();
-            }
-        };
+				javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, editBtn, lockBtn);
+				setGraphic(box);
+			}
+		});
+	}
 
-        task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
+	private void loadTeachers() {
+		Task<List<Staff>> task = new Task<>() {
+			@Override
+			protected List<Staff> call() {
+				return staffService.getTeachers();
+			}
+		};
 
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            Throwable ex = task.getException();
-            AlertUtil.showError("Failed to load the teacher list: " + (ex != null ? ex.getMessage() : ""));
-        }));
+		task.setOnSucceeded(e -> Platform.runLater(() -> teacherList.setAll(task.getValue())));
 
-        new Thread(task).start();
-    }
+		task.setOnFailed(e -> Platform.runLater(() -> {
+			Throwable ex = task.getException();
+			AlertUtil.showError("Failed to load the teacher list: " + (ex != null ? ex.getMessage() : ""));
+		}));
 
-    private void handleAddTeacher() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_TEACHER_CREATE_DIALOG));
-            Parent content = loader.load();
-            AdminTeacherCreateDialogController controller = loader.getController();
+		new Thread(task).start();
+	}
 
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Create Teacher");
-            DialogPane dialogPane = dialog.getDialogPane();
-            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-            dialogPane.setContent(content);
+	private void handleAddTeacher() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_TEACHER_CREATE_DIALOG));
+			Parent content = loader.load();
+			AdminTeacherCreateDialogController controller = loader.getController();
 
-            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-                event.consume();
+			Dialog<ButtonType> dialog = new Dialog<>();
+			dialog.setTitle("Create Teacher");
+			DialogPane dialogPane = dialog.getDialogPane();
+			dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+			dialogPane.setContent(content);
 
-                Task<TeacherCreationResult> task = new Task<>() {
-                    @Override
-                    protected TeacherCreationResult call() {
-                        return staffService.createStaffMember(
-                                controller.getUsername(),
-                                controller.getFullName(),
-                                controller.getEmail(),
-                                com.aptech.projectmgmt.model.UserRole.TEACHER
-                        );
-                    }
-                };
+			Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+			okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+				event.consume();
+				String error = controller.validate();
+				if (error != null) {
+					AlertUtil.showError(error);
+					return;
+				}
 
-                okButton.setDisable(true);
-                dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
+				Task<TeacherCreationResult> task = new Task<>() {
+					@Override
+					protected TeacherCreationResult call() {
+						return staffService.createStaffMember(controller.getUsername(), controller.getFullName(),
+								controller.getEmail(), com.aptech.projectmgmt.model.UserRole.TEACHER);
+					}
+				};
 
-                task.setOnSucceeded(e -> Platform.runLater(() -> {
-                    okButton.setDisable(false);
-                    dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
+				okButton.setDisable(true);
+				dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
 
-                    TeacherCreationResult resultInfo = task.getValue();
-                    String successMessage = "Teacher added successfully. Default account created: "
-                            + resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
+				task.setOnSucceeded(e -> Platform.runLater(() -> {
+					okButton.setDisable(false);
+					dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
 
-                    if (resultInfo.isNotificationEmailSent()) {
-                        successMessage += ". Notification email sent.";
-                    } else {
-                        successMessage += ". Failed to send notification email.";
-                    }
+					TeacherCreationResult resultInfo = task.getValue();
+					String successMessage = "Teacher added successfully. Default account created: "
+							+ resultInfo.getUsername() + " / " + resultInfo.getTemporaryPassword();
 
-                    String finalSuccessMessage = successMessage;
+					if (resultInfo.isNotificationEmailSent()) {
+						successMessage += ". Notification email sent.";
+					} else {
+						successMessage += ". Failed to send notification email.";
+					}
 
-                    dialog.setResult(ButtonType.OK);
-                    dialog.close();
+					String finalSuccessMessage = successMessage;
 
-                    Platform.runLater(() -> {
-                        AlertUtil.showSuccess(finalSuccessMessage);
-                        loadTeachers();
-                    });
-                }));
+					dialog.setResult(ButtonType.OK);
+					dialog.close();
 
-                task.setOnFailed(e -> Platform.runLater(() -> {
-                    okButton.setDisable(false);
-                    dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
-                    Throwable ex = task.getException();
-                    AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
-                }));
+					Platform.runLater(() -> {
+						AlertUtil.showSuccess(finalSuccessMessage);
+						loadTeachers();
+					});
+				}));
 
-                new Thread(task).start();
-            });
+				task.setOnFailed(e -> Platform.runLater(() -> {
+					okButton.setDisable(false);
+					dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
+					Throwable ex = task.getException();
+					AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
+				}));
 
-            dialog.showAndWait();
-        } catch (Exception ex) {
-            AlertUtil.showError("Unable to open Add Teacher form.: " + ex.getMessage());
-        }
-    }
-    private void setupSearch() {
-        filteredTeachers = new FilteredList<>(teacherList, p -> true);
-        teacherTable.setItems(filteredTeachers);
+				new Thread(task).start();
+			});
 
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            filteredTeachers.setPredicate(teacher -> {
-                if (newVal == null || newVal.isEmpty()) return true;
-                String lower = newVal.toLowerCase();
+			dialog.showAndWait();
+		} catch (Exception ex) {
+			AlertUtil.showError("Unable to open Add Teacher form.: " + ex.getMessage());
+		}
+	}
 
-                return teacher.getUsername().toLowerCase().contains(lower)
-                        || teacher.getFullName().toLowerCase().contains(lower)
-                        || teacher.getEmail().toLowerCase().contains(lower);
-            });
-        });
-    }
+	private void setupSearch() {
+		filteredTeachers = new FilteredList<>(teacherList, p -> true);
+		teacherTable.setItems(filteredTeachers);
 
-    private void handleEditTeacher(Staff teacher) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_TEACHER_CREATE_DIALOG));
-            Parent content = loader.load();
-            AdminTeacherCreateDialogController controller = loader.getController();
+		searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+			filteredTeachers.setPredicate(teacher -> {
+				if (newVal == null || newVal.isEmpty())
+					return true;
+				String lower = newVal.toLowerCase();
 
-            controller.setData(teacher);
+				return teacher.getUsername().toLowerCase().contains(lower)
+						|| teacher.getFullName().toLowerCase().contains(lower)
+						|| teacher.getEmail().toLowerCase().contains(lower);
+			});
+		});
+	}
 
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Edit Teacher");
-            DialogPane dialogPane = dialog.getDialogPane();
-            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-            dialogPane.setContent(content);
+	private void handleEditTeacher(Staff teacher) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.ADMIN_TEACHER_CREATE_DIALOG));
+			Parent content = loader.load();
+			AdminTeacherCreateDialogController controller = loader.getController();
 
-            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-                event.consume();
+			controller.setData(teacher);
 
-                Task<Void> task = new Task<>() {
-                    @Override
-                    protected Void call() {
-                    	staffService.updateStaff(
-                    		    teacher.getStaffId(),
-                    		    teacher.getUsername(),
-                    		    controller.getFullName(),
-                    		    controller.getEmail()
-                    		);
-                        return null;
-                    }
-                };
+			Dialog<ButtonType> dialog = new Dialog<>();
+			dialog.setTitle("Edit Teacher");
+			DialogPane dialogPane = dialog.getDialogPane();
+			dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+			dialogPane.setContent(content);
 
-                okButton.setDisable(true);
-                dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
+			Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+			okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+				event.consume();
+				String error = controller.validate();
+				if (error != null) {
+					AlertUtil.showError(error);
+					return;
+				}
 
-                task.setOnSucceeded(e -> Platform.runLater(() -> {
-                    dialog.setResult(ButtonType.OK);
-                    dialog.close();
+				Task<Void> task = new Task<>() {
+					@Override
+					protected Void call() {
+						staffService.updateStaff(teacher.getStaffId(), teacher.getUsername(), controller.getFullName(),
+								controller.getEmail());
+						return null;
+					}
+				};
 
-                    Platform.runLater(() -> {
-                        AlertUtil.showSuccess("Teacher updated successfully.");
-                        loadTeachers();
-                    });
-                }));
+				okButton.setDisable(true);
+				dialogPane.lookupButton(ButtonType.CANCEL).setDisable(true);
 
-                task.setOnFailed(e -> Platform.runLater(() -> {
-                    okButton.setDisable(false);
-                    dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
-                    Throwable ex = task.getException();
-                    AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
-                }));
+				task.setOnSucceeded(e -> Platform.runLater(() -> {
+					dialog.setResult(ButtonType.OK);
+					dialog.close();
 
-                new Thread(task).start();
-            });
+					Platform.runLater(() -> {
+						AlertUtil.showSuccess("Teacher updated successfully.");
+						loadTeachers();
+					});
+				}));
 
-            dialog.showAndWait();
-        } catch (Exception ex) {
-            AlertUtil.showError("Unable to open Edit Teacher form.: " + ex.getMessage());
-        }
-    }
+				task.setOnFailed(e -> Platform.runLater(() -> {
+					okButton.setDisable(false);
+					dialogPane.lookupButton(ButtonType.CANCEL).setDisable(false);
+					Throwable ex = task.getException();
+					AlertUtil.showError("Error: " + (ex != null ? ex.getMessage() : ""));
+				}));
 
-    private void handleToggleStatus(Staff teacher) {
-        String message = teacher.isActive()
-                ? "Are you sure you want to lock this teacher account?"
-                : "Are you sure you want to unlock this teacher account?";
+				new Thread(task).start();
+			});
 
-        boolean confirmed = AlertUtil.showConfirm(message);
-        if (!confirmed) {
-            return;
-        }
+			dialog.showAndWait();
+		} catch (Exception ex) {
+			AlertUtil.showError("Unable to open Edit Teacher form.: " + ex.getMessage());
+		}
+	}
 
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                staffService.toggleStaffStatus(teacher.getStaffId());
-                return null;
-            }
-        };
+	private void handleToggleStatus(Staff teacher) {
+		String message = teacher.isActive() ? "Are you sure you want to lock this teacher account?"
+				: "Are you sure you want to unlock this teacher account?";
 
-        task.setOnSucceeded(e -> Platform.runLater(() -> {
-            AlertUtil.showSuccess("Teacher status updated successfully");
-            loadTeachers();
-        }));
+		boolean confirmed = AlertUtil.showConfirm(message);
+		if (!confirmed) {
+			return;
+		}
 
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            Throwable ex = task.getException();
-            AlertUtil.showError("Failed to update status. " + (ex != null ? ex.getMessage() : ""));
-        }));
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				staffService.toggleStaffStatus(teacher.getStaffId());
+				return null;
+			}
+		};
 
-        new Thread(task).start();
-    }
+		task.setOnSucceeded(e -> Platform.runLater(() -> {
+			AlertUtil.showSuccess("Teacher status updated successfully");
+			loadTeachers();
+		}));
+
+		task.setOnFailed(e -> Platform.runLater(() -> {
+			Throwable ex = task.getException();
+			AlertUtil.showError("Failed to update status. " + (ex != null ? ex.getMessage() : ""));
+		}));
+
+		new Thread(task).start();
+	}
 }

@@ -100,7 +100,7 @@ public class StudentSubmissionController {
 		Task<List<SubmissionTarget>> task = new Task<>() {
 			@Override
 			protected List<SubmissionTarget> call() {
-				return submissionService.getTargetsForLeader(studentId);
+				return submissionService.getTargetsForStudent(studentId);
 			}
 		};
 		task.setOnSucceeded(e -> Platform.runLater(() -> {
